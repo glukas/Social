@@ -1,0 +1,24 @@
+This document is based on 12. Novembers discussion.
+
+Project Summary:
+
+The application allows users to share thoughts and impressions. This is done in a peer-to-peer way. A server is used to relay messages. Messages by the users are encrypted and authenticated in a way that they are infeasibly hard to read by the server or any unintended recipients. The application tries to alleviate availability issues inherent in the distributed approach.
+
+General Minimum Requirements:
+
+Each user has a set of friends.
+Users can add other users as friends if they are in phisical proximity or if they have a friend in common.
+Each user has an ordered stream of posts.
+Text and images are the minimally supported types of posts.
+Users can view the streams of their friends.
+(?!) It remains to be discussed if -and if so in which way- users can post to their friends streams.
+     ->Maybe users can post to their own, but also to their friends streams
+     -> ....
+
+Main Technical Aspects:
+
+-Server & Networking (Mathias)
+-Persistence & Databases (Alessio)
+-UI (Samuel)
+-Protocol specification & implementation (Vincent & Young)
+-Security (Lukas)

@@ -1,0 +1,3 @@
+The application allows users to share thoughts and impressions. This is done in a peer-to-peer way. A server is used to relay messages. Messages by the users are encrypted and authenticated in a way that they are infeasibly hard to read by the server or any unintended recipients. The application tries to alleviate availability issues inherent in the distributed approach.
+
+Final Project for the 2014 Distributed Systems lecture at ETH.
