@@ -11,20 +11,23 @@
 * This form of key agreement must be robust against an active adversary.
 * In particular the newly established key must be fresh.
 * It is highly desirable that a single compromised friend is not enough for the exchange to become insecure.
+* If time is tight, we can drop (II) - it is a very useful feature but not completely essential.
 *
 * (III) Peers can exchange messages in a way that provides chosen cyphertext level security and authenticated communication. It is possible to broadcast a message to all friends by encrypting it only once.
 * This is especially urgent to allow for efficient caching of messages.
-* It is highly desirable that even if a device is compromised at a later point, previous communication remains secured.
+* It is highly desirable that even if a device is compromised at a later point, previous communication remains secured. This is an ambitious goal and may be out of scope.
 
 * Security Protocols:
 * 
 * (I) Key exchange in physical proximity:
 * 	  DH-Key agreement protocol.
 * 	  To provide a way to compare keys, a one way function of them is exposed to the user.
+* 	  After a shared secret key has been established, the participants use the broadcast key request protocol (See III below).
 * 
 * (II) A peer maintains a set of trusted friends.(TODO: decide strategy on how to choose them:)
 * 	   - The first few friends a person makes are the trusted friends (->simple and makes some sense)
 *      - All friends established using (I) are trusted friends (->as we have met in person, in practice similar to first strategy)
+*      
 *      
 * 	   Any peer A can get a list of friends-of-a-friend from any of the trusted peers.
 * 	   Say A trusts T, then A can request a fresh list of friends of T:
@@ -41,8 +44,6 @@
 * 	   The Exchange protocol is based on the Needham-Shroeder protocol with a fix to avoid replay attacks (attack by Lowe).
 * 	   Note that the situation is more tricky, as all peers can act as T.
 * 	   The identity of the trusted common friend T is included in the messages to avoid possible exploits of this new symmetry.
-* 
-* 	   (TODO: we may want to include the broadcast keys in the last two messages for efficiency/simplicity) 
 * 
 *      Version 1:
 * 
@@ -61,25 +62,36 @@
 *	   [A and B share a fresh secret key KAB]
 *
 *	   
-*
-*		Version 2: (TODO draft, designed to be more practical for our setting, but still have to consider it rigorously, also not sure if that much more practical)
+*	   Version 2: (TODO : draft, designed to be more practical for our setting, but still have to consider it rigorously)
+*	   Incorporates the exchange of the broadcast keys (See III below for details).
 *
 * 	   [A shares a secret key KAT with T,
-* 		B shares a secret key KBT with T]
+* 		B shares a secret key KBT with T,
+* 		A has broadcast key KA,
+* 		B has broadcast key KB]
 *  
-* 	   Friend request)  A -> B : T, {"1", B, T, N_A}_KAT [fresh N_A]
-*	   Key request )  	B -> T : {"1", B, T, N_A}_KAT, {"2", A, T, KAB}_KBT  (if B wants to friend A) [fresh KAB]
-*	   Key response )   T -> B : {"3a", A, T, KAB {"3b", B, T, N_A, KAB}_KAT}_KBT
-* 	   Friend accept )  B -> A : {"3b", B, T, N_A, KAB}_KAT
-*	   Friend ack )     A -> B : {"4", KAB}_KAB
+* 	   Friend 1)  A -> B : T, {"1", B, T, N_A, K_A}_KAT [fresh N_A]
+*	   Friend 2)  B -> T : {"1", B, T, N_A, K_A}_KAT, {"2", A, T, K_AB}_KBT  (if B wants to friend A) [fresh K_AB]
+*	   Friend 3)  T -> B : {"3a", A, T, K_AB, K_A}_KBT {"3b", B, T, K_AB, N_A, K_B}_KAT (B can start looking at A's posts even if A is unavailable)
+* 	   Friend 4)  B -> A : {"3b", B, T, K_AB, N_A, K_B}_KAT (A can start looking at B's post)
+*	   Friend 5)  A -> B : {"4", B}_KAB (if B doesn't receive this message during some interval,
+*										B decides that the protocol failed and stops looking at A's posts)
 *
-*	   [A and B share a fresh secret key KAB]
+*	   [A and B share a fresh secret key KAB,
+*	   A has B's broadcast key KB,
+* 	   B has A's broadcast key KA]
+*
+*	   Note that if an adversary blocks message 4, then A cannot distinguish whether B has ignored the friend request or the protocol failed.
+*	   This is probably not a dangerous attack though.
+*	   Also note that if it is not security relevant that A and B have a consistent view on the state of their friendship, the last message can be dropped entirely.
 *
 *
 * (III) (a) Broadcast keys: 
 *       Peers distribute broadcast keys that are used for broadcasts. Posts that are broadcast are secured under these keys.
 *		
 *		Broadcast key request protocol:
+*
+*		This protocol is needed when exchanging keys using (I).
 *
 *		Say A wants to get B's current ephemeral key:
 *		[A and B share secret key KAB,
@@ -94,7 +106,7 @@
 *      	Advanced (nice to have extension of broadcast key mechanism):
 *      			When a peer A removes a friend B, A generates a fresh broadcast key.
 *      			This ensures that B can only see the old posts that where made before removal.		
-*
+		
 *      	(b) Posts:
 *       
 *       As already mentioned, posts are encrypted using the broadcast keys. This allows a peer to encrypt its posts only once for all friends.
