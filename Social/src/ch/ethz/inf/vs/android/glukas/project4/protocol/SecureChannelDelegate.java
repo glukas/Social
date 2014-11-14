@@ -7,8 +7,8 @@ import ch.ethz.inf.vs.android.glukas.project4.exceptions.FailureReason;
 
 /**
  * This class makes the link between the network calls back and above.
- * It provides method to the network layer to notify the application of
- * news received from network.
+ * The protocol layer implements this interface in order to discover and receive
+ * updates from the other peers.
  */
 public interface SecureChannelDelegate {
 	
@@ -16,40 +16,24 @@ public interface SecureChannelDelegate {
 	 * A protocol message was received.
 	 * @param message
 	 */
-	public void onMessageReceived(String message);
+	public void onMessageReceived(String message, User sender);
 	
 	/**
 	 * The previous search for peers is successful
 	 * @param peers
 	 */
-	public void onPeersDiscovered(List<String> peers);
+	public void onPeersDiscovered(List<User> peers);
 	
 	/**
 	 * The previous search has failed
 	 * @param reason
 	 */
-	public void onPeerDiscoveryFailure(FailureReason reason);
+	public void onPeerDiscoveryFailed(FailureReason reason);
 	
 	/**
-	 * Connection of the user to the server succeeded
+	 * The user accepted the friendship.
+	 * @param user
 	 */
-	public void onConnectionSuccess();
-	
-	/**
-	 * Connection of the user to the server failed
-	 * @param reason
-	 */
-	public void onConnectionFailure(FailureReason reason);
-	
-	/**
-	 * Disconnection of the user from the server succeeded
-	 */
-	public void onDisconnectionSuccess();
-	
-	/**
-	 * Disconnection of the user from the server failed
-	 * @param reason
-	 */
-	public void onDisconnectionFailure(FailureReason reason);
+	public void onFriendshipAccepted(User user);
 
 }
