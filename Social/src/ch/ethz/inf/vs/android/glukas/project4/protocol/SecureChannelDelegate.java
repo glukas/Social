@@ -8,7 +8,7 @@ import ch.ethz.inf.vs.android.glukas.project4.exceptions.FailureReason;
  * It provides method to the network layer to notify the application of
  * news received from network.
  */
-public interface SecurityInterface {
+public interface SecureChannelDelegate {
 	
 	/**
 	 * A wall has been received from the network
