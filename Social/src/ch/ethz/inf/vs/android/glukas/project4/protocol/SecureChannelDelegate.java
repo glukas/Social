@@ -1,5 +1,7 @@
 package ch.ethz.inf.vs.android.glukas.project4.protocol;
 
+import java.util.List;
+
 import ch.ethz.inf.vs.android.glukas.project4.Wall;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.FailureReason;
 
@@ -11,60 +13,22 @@ import ch.ethz.inf.vs.android.glukas.project4.exceptions.FailureReason;
 public interface SecureChannelDelegate {
 	
 	/**
-	 * A wall has been received from the network
-	 * @param wall
+	 * A protocol message was received.
+	 * @param message
 	 */
-	public void onWallReceived(Wall wall);
+	public void onMessageReceived(String message);
 	
 	/**
-	 * A wall asked by the user is not accessible
-	 * @param username, the name of the user of the wall asked
-	 * @param reason, the reason why the wall is not accessible
+	 * The previous search for peers is successful
+	 * @param peers
 	 */
-	public void onWallFailedToAccess(String username, FailureReason reason);
-	
-	
-	/**
-	 * Someone asked the user to be friends
-	 * @param username 
-	 * @param comment String linked with the demand 
-	 */
-	public void onFriendshipAsked(String username, String comment);
-	
-	/**
-	 * Someone declined invitation of the user to be friend
-	 * @param username 
-	 * @param comment String that explains the reject
-	 */
-	public void onFriendshipDeclined(String username, String comment);
-	
-	/**
-	 * Someone accepted invitation of the user to be friend
-	 * @param username 
-	 * @param comment
-	 */
-	public void onFriendshipAccepted(String username, String comment);
-	
-	/**
-	 * Something went wrong during the process of demand
-	 * @param username 
-	 * @param reason the reason of the failure
-	 */
-	public void onFriendshipFailure(String username, FailureReason reason);
-	
-	
-	/**
-	 * The previous search for user is successful
-	 * @param usernames
-	 */
-	public void onUsersFound(String[] usernames);
+	public void onPeersDiscovered(List<String> peers);
 	
 	/**
 	 * The previous search has failed
 	 * @param reason
 	 */
-	public void onUsersSearchFailure(FailureReason reason);
-	
+	public void onPeerDiscoveryFailure(FailureReason reason);
 	
 	/**
 	 * Connection of the user to the server succeeded
@@ -87,11 +51,5 @@ public interface SecureChannelDelegate {
 	 * @param reason
 	 */
 	public void onDisconnectionFailure(FailureReason reason);
-	
-	/**
-	 * The user is asked to store some data
-	 * @param data
-	 */
-	public void onDataToStoreReceived(byte[] data);
 
 }
