@@ -9,7 +9,7 @@ import ch.ethz.inf.vs.android.glukas.project4.exceptions.NetworkException;
  * It provides method to post new data on the user's wall, to ask for another user's wall
  * to connect and disconnect from the connected list on server.
  */
-public interface UserInterface {
+public interface UserDelegate {
 	
 	/**
 	 * Connect the user to the network.
@@ -44,7 +44,6 @@ public interface UserInterface {
 	 * @param DistUsername
 	 * @throws NetworkException, if network is not accessible
 	 */
-	//TODO : discuss behavior of this (with security layer mainly)
 	public void askFriendship(String DistUsername) throws NetworkException;
 
 	/**

@@ -1,7 +1,5 @@
 package ch.ethz.inf.vs.android.glukas.project4.protocol;
 
-import java.util.Arrays;
-
 //Represents the identity of a user
 public class User {
 
