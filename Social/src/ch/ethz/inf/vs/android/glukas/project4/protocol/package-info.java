@@ -20,11 +20,13 @@
  *  >95%, but not that there's a trivial solution where it's not possible : everyone is never connected. The whole
  *  principle is based on the fact that people are more and more connected at every time.)
  *  
- *  (II) User should be able to make new friends. (TODO : discuss more how.)
+ *  (II) User should be able to make new friends. This can be done by physical proximity or by trusting
+ *  a common friend.
  *  
  *  Non-functional Requirements :
  *  
- *  (I) TODO : discuss internally
+ *  (I) Each user updates a clock which gives an identity at all his / her messages and create a partial
+ *  order to sort messages.
  */
 
 package ch.ethz.inf.vs.android.glukas.project4.protocol;
