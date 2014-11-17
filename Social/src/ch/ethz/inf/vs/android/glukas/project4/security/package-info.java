@@ -32,154 +32,98 @@
  * 
  * The sender is a unique id of the sender.
  * The recipient is the unique id of the recipient, or 0 the message is is a broadcast.
- * The pair (sender, message id) is unique.
+ * The pair (sender, message, id) is unique.
  * 
  * Security Protocols:
  * 
  * (Overview)
- *       On first application start, every peer generates a secret broadcast key.
- * 		 This key consists of a public/private key pair to allow signing, and two symmetric keys for encryption and MACs respectively.
- * 		 The public broadcast key is the private broadcast key without the private key used for signing.
- * 		 To establish a friendship, peers exchange their public broadcast keys, and establish a new shared secret between them. The shared
- * 		 secret is a symmetric key pair (K1, K2) where K1 is used for encryption, and K2 for message authentication.
- * 		 Broadcast keys are used to encrypt the posts.
- * 		 The shared secret is used to secure other protocol messages.
+ *       On first application start, every peer generates a private broadcast key.
+ *       A private broadcast key KA is of the form (KSim, (SKsign, SKverify), (SKdec, PKenc))
+ *       A public broadcast key KA is of the form (KSim, PKverify, PKenc))
+ *
+ *  	 KSim is a symmetric key pair (K1, K2) where K1 is used for encryption and K2 for MACs.
+ * 		 The keys (SKsign, SKverify) allow signatures, and (SKdec, PKenc) allows public key cryptography.
+ * 		 To establish a friendship, peers exchange their public broadcast keys.
+ * 		 Broadcast keys are used to encrypt the posts. They are also used to secure other protocol messages.
  * 
  * (I)   Key exchange in physical proximity:
  *  
- *   (a) DH-Key agreement protocol.
- * 	     To provide a way to compare keys, a one way function of them is exposed to the user.
- * 	     After a shared secret key has been established by DH, the participants use the broadcast key request protocol
+ *   	 **DH-Key agreement protocol**
+ *   	 
+ *       The well-known Diffie-Hellman key exchange is done to derive a shared secret KAB between peers A and B.
+ * 	     After a shared secret key KAB has been established by DH, the participants use the broadcast key request protocol
  * 	     
- * 	 (b) Broadcast key request protocol:
- 
+ * 	     **Broadcast key request protocol**
+ *
  *	  	 Say A wants to get B's current broadcast key:
  *	  	 [A and B share secret key KAB,
  *	 	 B has current broadcast key KB]
  *	
- *	  	 A -> B : {"key request", A, N_A}_KAB [fresh N_A]
- *	     B -> A : {"key response", N_A, KB}_KAB
+ *	  	 Request 1)  A -> B : {"key request", A, N_A}_KAB [fresh N_A]
+ *	     Request 2)  B -> A : {"key response", N_A, KB}_KAB
  *
  *	     [A has B's current broadcast key KB]
  *
- *	     Note that the broadcast key protocol does not provide forward secrecy, as someone that has KAB can get KB.
- *    	 Advanced (nice to have extension of broadcast key mechanism):
- *      			When a peer A removes a friend B, A generates a fresh broadcast key, and distributes it.
- *      			This ensures that B can only see the old posts that where made before removal.		
-
- * 
- * (II) A peer maintains a set of trusted friends.
- * 	   //- The first few friends a person makes are the trusted friends (->simple and makes some sense)
- *      //- All friends established using (I) are trusted friends (->as we have met in person, in practice similar to first strategy)
- *      - All friends are trusted (easiest strategy giving highest availability, we can start out using this strategy)
- *      
- * 	   Any peer A can get a list of friends-of-a-friend from any of the trusted peers.
- * 	   Say A trusts T, then A can request a fresh list of friends of T:
+ * (II) 
+ * 	   **Friends-of-a-friend Protocol**
+ *     
+ *     A can request a fresh list of friends of T:
  * 	   
- * 	   [A shares a secret key KAT with T]
+ * 	   [A has T's broadcast key KT
+ * 		T has A's broadcast key KA]
  * 
- * 	   Discovery 1) A -> T : {"list of friends", N_A}_KAT [fresh N_A]
- * 	   Discovery 2) T -> A : {T, (B_0, ..., B_n), N_A}_KAT
+ * 	   Discovery 1) A -> T : PEnc(PKencT, ("list of friends", N_A)) [fresh N_A]
+ * 	   Discovery 2) T -> A : Sign(SKsignT, ("my friends", T, (B_0, ..., B_n), N_A)) //where (B_0, ...., B_n) are the friends of T
  *
  *	   [A holds a fresh list of friends of T]
  *
+ *     **Friend Protocol**
+ *
  * 	   Now A wants to establish a shared secret with B,
- * 	   where B has been reported by T as a friend by means of the Discovery protocol.
-
- *	   (TODO : draft, designed to be more practical for our setting, but still have to consider it rigorously)
- *	   Incorporates the exchange of the broadcast keys.
- *
- * 	   [A shares a secret key KAT with T,
- * 		B shares a secret key KBT with T,
- * 		A has broadcast key KA,
- * 		B has broadcast key KB]
- *  
- * 	   Friend 1)  A -> B : T, {"1", B, T, N_A, K_A}_KAT [fresh N_A]
- *	   Friend 2)  B -> T : {"1", B, T, N_A, K_A}_KAT, {"2", A, T, K_AB}_KBT  (if B wants to friend A) [fresh K_AB]
- *	   Friend 3)  T -> B : {"3a", A, T, K_AB, K_A}_KBT {"3b", B, T, K_AB, N_A, K_B}_KAT (B can start looking at A's posts even if A is unavailable)
- * 	   Friend 4)  B -> A : {"3b", B, T, K_AB, N_A, K_B}_KAT (A can start looking at B's post)
- *	   Friend 5)  A -> B : {"4", B}_KAB (if B doesn't receive this message during some interval,
- *										B decides that the protocol failed and stops looking at A's posts)
- *
- *	   [A and B share a fresh secret key KAB,
- *	   A has B's broadcast key KB,
- * 	   B has A's broadcast key KA]
- *
- *	   Note that if an adversary blocks message 4, then A cannot distinguish whether B has ignored the friend request or the protocol failed.
- *	   This is probably not a dangerous attack though.
- *	   Also note that if it is not security relevant that A and B have a consistent view on the state of their friendship, the last message can be dropped entirely.
- *
- *
- *	   Alternative (designed for higher availability and tries to avoid that B can be fooled into thinking A wants to be 
- *					his friend by a malicious friend T of B):
- *
- *     Note again that if all friends were to be trusted, any malicious friend could force B to use it in step 2,
- *     enabling it to fool B.
- *
- *    [A shares a secret key KAT with T,
- * 	   B shares a secret key KBT with T,
- * 	   A has broadcast key KA=(KEncA, KAuthA, (SKA, PKA)),
- * 	   B has broadcast key KB]
- *  
- * 	   Friend 1)  A -> B : Sign(SKA, {"Friend 1", B, N_A}_KA) [fresh N_A]
- *	   Friend 2)  B -> (T_1, ..., T_M) : Sign(SKA, {"1", B, N_A}_KA), Sign(SKB, {"1", A, N_B}_KB) (if B wants to friend A) [fresh N_B, for the common friends (T_1,...T_M)]
- *	   Friend 3)  T -> B : {"3a", A, N_B, KA}_KBT {"3b", B, N_A, KB}_KAT
- *																				(B chooses the majority vote on KA)
- * 	   Friend 4)  B -> A : {"3b", B, N_A, K_B}_KAT (for all T in (T_1,...,T_M))
- * 																			    (A chooses the majority vote on KB)
- *	   Friend 5)  A -> B : {"4", B}_KAB (if B doesn't receive this message during some interval,
- *										B decides that the protocol failed and stops looking at A's posts)
- *
- *	   [A has B's broadcast key KB,
- * 	    B has A's broadcast key KA]
+ * 	   where B has been reported as a friend-of-a-friend by means of the Discovery protocol.
  * 
- *     Version 3 ("Relaxed-Consensus on the public keys")
- * 
- * 	   [A, B have all the broadcast keys of their common friends (T_1, ..., T_M),
+ * 	   [A, B have the broadcast keys of their common friends (T_1, ..., T_M),
  *     The common friends of A and B have the broadcast keys of A and B,
  * 	   A has broadcast key KA,
  * 	   B has broadcast key KB]
  *  
- *     A public broadcast key KA is of the form (KSim, PKverify, PKenc))
- *     A private broadcast key KA is of the form (KSim, (SKsign, SKverify), (SKdec, PKenc))
- *  
- * 	   Friend 1)  A -> B : Sign(SKsignA, {"Friend 1", B, N_A}_KSimA) [fresh N_A]  //certificate stating that A wants to friend B
+ * 	   Friend 1)  A -> B : Sign(SKsignA, {"friend", B}_KSimA)  //certificate that A wants to friend B
  *	   
  *	   If B wants to friend A:
  *
- *	   Friend 2)  B -> A : Sign(SKsignB, {"1", A, N_B}_KsimB) [fresh N_B] //certificate that B wants to friend A
+ *	   Friend 2)  B -> A : Sign(SKsignB, {"friend", A}_KsimB)  //certificate that B wants to friend A
  *
- *     Both A and B perform the public key voting protocol to get their respective public keys
+ *     Friend 3a, 3b) Both A and B perform the Public Key Voting Protocol to get their respective public keys
  *	
  *	   [A has B's broadcast key KB,
  * 	    B has A's broadcast key KA]
  *
- *
- *	   Public Key Voting Protocol:
+ *	   **Public Key Voting Protocol**
  *
  *     Say B has a certificate from A that A wants to friend B.
- *     B wants to get trustworthy votes on the public key of A.
+ *     B wants to get trustworthy votes on the public key KA of A.
  *     
- *     [A, B have all the broadcast keys of their common friends (T_1, ..., T_M),
+ *     [B has the broadcast keys of his common friends (T_1, ..., T_M) with A,
  *     The common friends of A and B have the broadcast keys of A and B,
- * 	   A has broadcast key KA,
- * 	   B has broadcast key KB]
+ * 	   A has broadcast key KA]
  *     
- *	   For all the common friends T in (T_1,...,T_M) of A and B:
+ *     [fresh N_B]
+ *     
+ *	   For all the common friends T in (T_1,...,T_M) of A and B: 
  *
- *		   Voting 1)  B -> T : Sign(SKsignA, {"1", B, N_A}_KsimA),			  //certificate that A wants to friend B
+ *		   Voting 1)  B -> T : Sign(SKsignA, {"friend", B}_KsimA),	N_B		  //certificate that A wants to friend B
  *	   
- *		   Voting 2)  T -> B : Sign(SKSignT, PEnc(PKencB, "vote", A, N_B, KA)), //certificate that T believes A's key is KA, encrypted under B's public key
+ *		   Voting 2)  T -> B : Sign(SKSignT, PEnc(PKencB, "vote", A, KA, N_B)),   //certificate that T believes A's key is KA, encrypted under B's public key
  *		  
  *	   [B chooses the majority vote on KA]
  *
  *
  * (III) 
- * 
+ *   (TODO: specify implementation of the signing and public key cryptography)
  * 	 (TODO: specify if the public protocol header is also authenticated - probably not, as the security implications are not clear)
  *	 (a) Transmission of Protocol messages:
  *       
- *       In the protocols above, we have assumed the existence of a secure symmetric key message transmission mechanism.
+ *       In the some of the protocols above, we have assumed the existence of a secure symmetric key message transmission mechanism.
  *       We use an encrypt-then-authenticate approach.
  *       Using this approach with a CPA-secure private key encryption scheme and a secure MAC with unique tags gives CCA secure and authenticated communication.
  *       [Introduction to Modern Cryptography, Katz/Lindell, Theorem 4.25] 
@@ -193,7 +137,7 @@
  *       [p is transmitted securely, meaning CCA-secure and authenticated]
  *       
  *   (b) Transmission of Posts:
- *       
+ *       //TODO this section is out of date
  *       As already mentioned, posts are encrypted using the broadcast keys. This allows a peer to encrypt its posts once for all friends.
  *       The method is similar to (b), but we additionally sign the MACs:
  *       The signatures are necessary because the MAC can be generated by anyone who has the public broadcast key for A: this
