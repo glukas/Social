@@ -110,6 +110,70 @@
  *	   Also note that if it is not security relevant that A and B have a consistent view on the state of their friendship, the last message can be dropped entirely.
  *
  *
+ *	   Alternative (designed for higher availability and tries to avoid that B can be fooled into thinking A wants to be 
+ *					his friend by a malicious friend T of B):
+ *
+ *     Note again that if all friends were to be trusted, any malicious friend could force B to use it in step 2,
+ *     enabling it to fool B.
+ *
+ *    [A shares a secret key KAT with T,
+ * 	   B shares a secret key KBT with T,
+ * 	   A has broadcast key KA=(KEncA, KAuthA, (SKA, PKA)),
+ * 	   B has broadcast key KB]
+ *  
+ * 	   Friend 1)  A -> B : Sign(SKA, {"Friend 1", B, N_A}_KA) [fresh N_A]
+ *	   Friend 2)  B -> (T_1, ..., T_M) : Sign(SKA, {"1", B, N_A}_KA), Sign(SKB, {"1", A, N_B}_KB) (if B wants to friend A) [fresh N_B, for the common friends (T_1,...T_M)]
+ *	   Friend 3)  T -> B : {"3a", A, N_B, KA}_KBT {"3b", B, N_A, KB}_KAT
+ *																				(B chooses the majority vote on KA)
+ * 	   Friend 4)  B -> A : {"3b", B, N_A, K_B}_KAT (for all T in (T_1,...,T_M))
+ * 																			    (A chooses the majority vote on KB)
+ *	   Friend 5)  A -> B : {"4", B}_KAB (if B doesn't receive this message during some interval,
+ *										B decides that the protocol failed and stops looking at A's posts)
+ *
+ *	   [A has B's broadcast key KB,
+ * 	    B has A's broadcast key KA]
+ * 
+ *     Version 3 ("Relaxed-Consensus on the public keys")
+ * 
+ * 	   [A, B have all the broadcast keys of their common friends (T_1, ..., T_M),
+ *     The common friends of A and B have the broadcast keys of A and B,
+ * 	   A has broadcast key KA,
+ * 	   B has broadcast key KB]
+ *  
+ *     A public broadcast key KA is of the form (KSim, PKverify, PKenc))
+ *     A private broadcast key KA is of the form (KSim, (SKsign, SKverify), (SKdec, PKenc))
+ *  
+ * 	   Friend 1)  A -> B : Sign(SKsignA, {"Friend 1", B, N_A}_KSimA) [fresh N_A]  //certificate stating that A wants to friend B
+ *	   
+ *	   If B wants to friend A:
+ *
+ *	   Friend 2)  B -> A : Sign(SKsignB, {"1", A, N_B}_KsimB) [fresh N_B] //certificate that B wants to friend A
+ *
+ *     Both A and B perform the public key voting protocol to get their respective public keys
+ *	
+ *	   [A has B's broadcast key KB,
+ * 	    B has A's broadcast key KA]
+ *
+ *
+ *	   Public Key Voting Protocol:
+ *
+ *     Say B has a certificate from A that A wants to friend B.
+ *     B wants to get trustworthy votes on the public key of A.
+ *     
+ *     [A, B have all the broadcast keys of their common friends (T_1, ..., T_M),
+ *     The common friends of A and B have the broadcast keys of A and B,
+ * 	   A has broadcast key KA,
+ * 	   B has broadcast key KB]
+ *     
+ *	   For all the common friends T in (T_1,...,T_M) of A and B:
+ *
+ *		   Voting 1)  B -> T : Sign(SKsignA, {"1", B, N_A}_KsimA),			  //certificate that A wants to friend B
+ *	   
+ *		   Voting 2)  T -> B : Sign(SKSignT, PEnc(PKencB, "vote", A, N_B, KA)), //certificate that T believes A's key is KA, encrypted under B's public key
+ *		  
+ *	   [B chooses the majority vote on KA]
+ *
+ *
  * (III) 
  * 
  * 	 (TODO: specify if the public protocol header is also authenticated - probably not, as the security implications are not clear)
