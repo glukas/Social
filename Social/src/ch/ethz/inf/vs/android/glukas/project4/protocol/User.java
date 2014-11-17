@@ -11,7 +11,4 @@ public class User {
 	public User(byte[] uniqueId) {
 		this.id = uniqueId;
 	}
-	
-
-	
 }
