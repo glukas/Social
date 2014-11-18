@@ -51,18 +51,19 @@
  *   	 **DH-Key agreement protocol**
  *   	 
  *       The well-known Diffie-Hellman key exchange is done to derive a shared secret KAB between peers A and B.
- * 	     After a shared secret key KAB has been established by DH, the participants use the broadcast key request protocol
+ * 	     After a shared secret key KAB has been established by DH, the participants each run the symmetric key exchange protocol to get their respective keys.
  * 	     
- * 	     **Broadcast key request protocol**
+ * 	     **Symmetric key exchange protocol**
+ *		
+ *		 Say A and B share a fresh symmetric key KAB and they want to exchange their public keys:
  *
- *	  	 Say A wants to get B's current broadcast key:
  *	  	 [A and B share secret key KAB,
- *	 	 B has current broadcast key KB]
+ *		 A has broadcast key KA]
  *	
- *	  	 Request 1)  A -> B : {"key request", A, N_A}_KAB [fresh N_A]
- *	     Request 2)  B -> A : {"key response", N_A, KB}_KAB
+ *	  	 Exchange 1)  A -> B : {"key", A, KA}_KAB
+ *		 Exchange 2)  B -> A : {"key-ACK", B}_KAB
  *
- *	     [A has B's current broadcast key KB]
+ *	     [B has A's broadcast key KA]
  *
  * (II) 
  * 	   **Friends-of-a-friend Protocol**
@@ -73,7 +74,7 @@
  * 		T has A's broadcast key KA]
  * 
  * 	   Discovery 1) A -> T : PEnc(PKencT, ("list of friends", N_A)) [fresh N_A]
- * 	   Discovery 2) T -> A : Sign(SKsignT, ("my friends", T, (B_0, ..., B_n), N_A)) //where (B_0, ...., B_n) are the friends of T
+ * 	   Discovery 2) T -> A : Sign(SKsignT, (("my friends", T, (B_0, ..., B_n))_KT, N_A)) //where (B_0, ...., B_n) are the friends of T
  *
  *	   [A holds a fresh list of friends of T]
  *
@@ -150,10 +151,10 @@
  *       Posts must have unique identifiers, and include the owner of the wall and author of the post.
  *       Note that A=B is possible, in which case A->B is trivial.
  *       
- *       [A has private broadcast key ((SKA,PKA), KAEnc, KAAuth),
- *        B has private broadcast key ((SKB,PKB), KBEnc, KBAuth),
- *        A has B's public broadcast key (PKB, KBEnc, KBAuth),
- *        B has A's public broadcast key (PKA, KAEnc, KAAuth),
+ *       [A has private broadcast key ((KAEnc, KAAuth), (SKA,PKA), (SKEncA, PKEncA)),
+ *        B has private broadcast key ((KBEnc, KBAuth), (SKB,PKB), (SKEncB, PKEncB)),
+ *        A has B's public broadcast key ((KBEnc, KBAuth), PKB, PKencB),
+ *        B has A's public broadcast key ((KAEnc, KAAuth), PKA, PKencA),
  *       
  *       A -> B : Enc(KBEnc, m), Sign(SKA, MAC(KBAuth, Enc(KBEnc, m)))
  *       B -> (B_0, ...., B_N) :  Enc(KBEnc, m), Sign(SKA, MAC(KBAuth, Enc(KBEnc, m))), Sign(SKB, MAC(KBAuth, Enc(KBEnc, m)))
