@@ -23,10 +23,9 @@
  * Messages have the following public header: (TODO this is a draft)
  * 
  * -length of the message in bytes, including this header [4 bytes]
+ * -for future use [3 bytes]
+ * -status byte [1 byte]
  * -message id / "virtual clock" [4 bytes]
- * -number of milliseconds that have elapsed between midnight, January 1, 1970
- *  and the time the message was authored. [8 bytes] (TODO do we really need this in the public header, or
- *  												  can we base the application protocol on the virtual clocks?)
  * -sender [16 bytes]
  * -recipient [16 bytes]
  * 
@@ -45,6 +44,13 @@
  * 		 The keys (SKsign, SKverify) allow signatures, and (SKdec, PKenc) allows public key cryptography.
  * 		 To establish a friendship, peers exchange their public broadcast keys.
  * 		 Broadcast keys are used to encrypt the posts. They are also used to secure other protocol messages.
+ * 
+         Public-key encryption is done using RSA-OAEP (OEAP is a particular randomized padding)
+ *       Public-key signatures are done using RSA-SHA256 ("Hash and Sign")
+ *       The public keys are 2^11 bits (so a key pair has size 2^12 and both pairs have size 2^13).
+ * 
+ * 		 Private key encryption is done by combining a AES-256 in CBC mode and a HMAC based on SHA256 ("Encrypt-then-Authenticate")
+ * 		 So a private key is 256 bits, and the a key pair is 512 bits.
  * 
  * (I)   Key exchange in physical proximity:
  *  
@@ -110,9 +116,11 @@
  *
  *
  * (III) 
- *   (TODO: specify implementation of the signing and public key cryptography)
+ *   
  * 	 (TODO: specify if the public protocol header is also authenticated - probably not, as the security implications are not clear)
- *	 (a) Transmission of Protocol messages:
+ * 
+ *	
+ *  (a) Transmission of Protocol messages:
  *       
  *       In the some of the protocols above, we have assumed the existence of a secure symmetric key message transmission mechanism.
  *       We use an encrypt-then-authenticate approach.
@@ -136,6 +144,7 @@
  *       we sign the MACs, once for the author of the post, and once for the owner of the wall.
  *       
  *       So we do "Encrypt-Authenticate-Sign":
+ *       
  *       
  *       Say A wants to post m to B's wall, and B has friends (B_0, ..., B_N)
  *       Posts must have unique identifiers, and include the owner of the wall and author of the post.
