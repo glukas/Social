@@ -1,7 +1,8 @@
-package ch.ethz.inf.vs.android.glukas.project4.protocol;
+package ch.ethz.inf.vs.android.glukas.project4.security;
 
 import java.util.List;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.FailureReason;
+import ch.ethz.inf.vs.android.glukas.project4.protocol.User;
 
 /**
  * This class makes the link between the network calls back and above.

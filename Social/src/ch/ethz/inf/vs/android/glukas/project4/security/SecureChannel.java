@@ -1,4 +1,6 @@
-package ch.ethz.inf.vs.android.glukas.project4.protocol;
+package ch.ethz.inf.vs.android.glukas.project4.security;
+
+import ch.ethz.inf.vs.android.glukas.project4.protocol.User;
 
 public interface SecureChannel {
 
