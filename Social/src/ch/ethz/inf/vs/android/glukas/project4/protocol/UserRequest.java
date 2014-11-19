@@ -6,6 +6,11 @@ package ch.ethz.inf.vs.android.glukas.project4.protocol;
  */
 public class UserRequest {
 	
+	public UserRequest(RequestType type){
+		this.requestType = type;
+	}
+	
+	
 	public enum RequestType{
 		FRIENDSHIP,
 		POST_TEXT,
