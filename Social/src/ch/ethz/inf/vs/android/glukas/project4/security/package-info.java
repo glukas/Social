@@ -48,22 +48,12 @@
  * 
  * (I)   Key exchange in physical proximity:
  *  
- *   	 **DH-Key agreement protocol**
- *   	 
- *       The well-known Diffie-Hellman key exchange is done to derive a shared secret KAB between peers A and B.
- * 	     After a shared secret key KAB has been established by DH, the participants each run the symmetric key exchange protocol to get their respective keys.
- * 	     
- * 	     **Symmetric key exchange protocol**
+ * 	     **Simple key exchange protocol**
  *		
- *		 Say A and B share a fresh symmetric key KAB and they want to exchange their public keys:
- *
- *	  	 [A and B share secret key KAB,
- *		 A has broadcast key KA]
- *	
- *	  	 Exchange 1)  A -> B : {"key", A, KA}_KAB
- *		 Exchange 2)  B -> A : {"key-ACK", B}_KAB
- *
- *	     [B has A's broadcast key KA]
+ *       A and B exchange the public keys used for encryption and verification over the channel.
+ *       We assume no active attacker has access to the channel.
+ *       A sends her symmetric encryption key KsimA to B encrypted under B's public encryption key.
+ *       The same with reversed roles.
  *
  * (II) 
  * 	   **Friends-of-a-friend Protocol**
