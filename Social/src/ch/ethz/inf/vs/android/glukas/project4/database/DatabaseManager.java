@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.android.glukas.project4.database;
 
+import java.util.Date;
 import java.util.List;
 
 import ch.ethz.inf.vs.android.glukas.project4.Post;
@@ -53,6 +54,7 @@ public abstract class DatabaseManager extends SQLiteOpenHelper {
 	private Users mUsersHelper = new Users();
 	private Friends mFriendsHelper = new Friends();
 	private Posts mPostsHelper = new Posts();
+	private Walls mWallsHelper = new Walls();
 
 	// CREATION
 	public DatabaseManager(Context context) {
@@ -61,6 +63,7 @@ public abstract class DatabaseManager extends SQLiteOpenHelper {
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
+		// TODO: set limit constants
 		// Create tables.
 		db.execSQL(SQL_CREATE_USERS);
 		db.execSQL(SQL_CREATE_FRIENDS);
@@ -72,37 +75,100 @@ public abstract class DatabaseManager extends SQLiteOpenHelper {
 		// TODO: decide if needed and define upgrade policy in case it is
 	}
 
-	// USER MANAGEMENT
-	// Add User to Database (first usage of the app?)
-	public abstract void putUser(User user);
+	
+	/** USER MANAGEMENT
+	 * With user is meant the owner of the app.~
+	 * @param user
+	 */
+	// Add User to Database (first usage of the app?): yes!
+	public void putUser(User user) {
+		mUsersHelper.putUser(user);
+	}
 
-	// WALLS MANAGEMENT
+	// Get the whole wall of the user.
+	public Wall getUserWall() {
+		return mWallsHelper.getUserWall();
+	}
 
-	// Get the whole wall of the user
-	public abstract Wall getWall();
+	// Update the wall of the user with the given post.
+	public void putUserPost(Post post) {
+		mPostsHelper.putUserPost(post);
+	}
 
-	// FRIENDS MANAGEMENT
+	// Get a certain post from the user's wall.
+	public Post getUserPost(int id) {
+		return mPostsHelper.getUserPost(id);
+	}
 
+	// Get all the Posts in a Wall starting from id -> id or time?
+	public List<Post> getAllUserPostsFrom(int timestamp) {
+		return mPostsHelper.getAllUserPostsFrom(timestamp);
+	}
+
+	// Delete a certain post from the user's wall.
+	public void deleteUserPost(int id) {
+		mPostsHelper.deleteUserPost(id);
+	}
+	
+	
+	/** FRIENDS MANAGEMENT
+	 * 
+	 * @param user
+	 */	
+	/**
+	 * If we are going to store the wall of friends in our database we probably
+	 * need the methods below If we don't make a special case for the user
+	 * himself we could also use these methods instead of
+	 * 
+	 * @author youngban
+	 */
+	/**
+	 * I thought a little about it, and i concluded is safer to distinguish 
+	 * between the user and a friend by using separate methods.
+	 * 
+	 * @author alessiobaehler
+	 */
 	// Add a friend in the List of Friends of the user
-	public abstract void putFriend(User user);
+	public void putFriend(User friend) {
+		mFriendsHelper.putFriend(friend);
+	}
 
 	// Remove friend from the List of friends & everything associated with
 	// him/her
-	public abstract void deleteFriend(int id);
+	public void deleteFriend(int friendid) {
+		mFriendsHelper.deleteFriend(friendid);
+	}
+	
+	// Update the wall of a friend whose wall is saved on our phone
+	public void putFriendPost(Post post, int friendid) {
+		mPostsHelper.putFriendPost(post, friendid);
+	}
 
-	// POSTS MANAGEMENT
+	// Get the whole Wall of a certain friend
+	public Wall getFriendWall(int friendid) {
+		return mWallsHelper.getFriendWall(friendid);
+	}
 
-	// Update the wall of the user with the given post
-	public abstract void putPost(Post post);
+	// Get a certain Post from a certain friend
+	public Post getFriendPost(int postid, int friendid) {
+		return mPostsHelper.getFriendPost(postid, friendid);
+	}
 
-	// Get a certain post from the user's wall
-	public abstract Post getPost(int id);
+	// Get all Posts of a certain friend starting at a certain time/timestamp
+	public List<Post> getAllFriendPostsfrom(Date timestamp, int friendid) {
+		return mPostsHelper.getAllFriendPostsfrom(timestamp, friendid);
+	}
 
-	// Get all the Posts in a Wall starting from id
-	public abstract List<Post> getAllPostsfrom(int timestamp);
-
-	// Delete a certain post from the user's wall
-	public abstract void deletePost(int id);
+	// delete a certain Post of a certain friend
+	public void deleteFriendPost(int postid, int friendid) {
+		mPostsHelper.deleteFriendPost(postid, friendid);
+	}
+	
+	// delete the whole saved Wall of a certain friend
+	public void deleteFriendWall(int friendid) {
+		mWallsHelper.deleteFriendWall(friendid);
+	}
+	
 	
 	///
 	// Probably not needed
@@ -117,29 +183,6 @@ public abstract class DatabaseManager extends SQLiteOpenHelper {
 
 	// public abstract User getFriend(int id);
 
-	/**
-	 * If we are going to store the wall of friends in our database we probably
-	 * need the methods below If we dont make a special case for the user
-	 * himself we could also use these methods instead of
-	 * 
-	 * @author youngban
-	 */
-	// Update the wall of a friend whose wall is saved on our phone
-	public abstract void putFriendPost(Post post, int friendid);
 
-	// Get the whole Wall of a certain friend
-	public abstract Wall getFriendWall(int friendid);
-
-	// Get a certain Post from a certain friend
-	public abstract Post getFriendPost(int id, int friendid);
-
-	// Get all Posts of a certain friend starting at a certain time/timestamp
-	public abstract List<Post> getAllFriendPostsfrom(int timestamp, int friendid);
-
-	// delete a certain Post of a certain friend
-	public abstract void deleteFriendPost(int id, int friendid);
-	
-	// delete the whole saved Wall of a certain friend
-	public abstract void deleteFriendWall(int friendid);
 
 }
