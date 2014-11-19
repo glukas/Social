@@ -6,19 +6,38 @@ import android.util.Pair;
 
 /**
  * This class represents a chat user.
- *
+ * 
  */
 public class User {
-	
+
 	// author: Alessio
 	// just to begin
+
+	// User id
 	int id;
-	String name;
-	int age;
-	String ipAddress;
-	Pair<String,String> key;
-	List<User> friends;
+
+	// User name
+	String username;
+
+	// Wall of the user
 	Wall wall;
-	// others?
-	
+
+	// All friends of the user
+	List<User> friends;
+
+	// Key Pair from Diffie-Hellman?
+	Pair<String, String> key;
+
+	// Extra stuff
+	// int age;
+
+	// Constructor
+	public User(int id, String username, Wall wall, List<User> friends) {
+		this.id = id;
+		this.username = username;
+		this.wall = wall;
+		this.friends = friends;
+
+	}
+
 }
