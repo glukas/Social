@@ -48,13 +48,13 @@ public class FriendDiscoveryActivity extends Activity implements FriendDiscovery
 	@Override
 	public void onResume() {
 		super.onResume();
-		friendDiscovery.pauseDiscovery();
+		friendDiscovery.resumeDiscovery();
 	}
 	
 	@Override
 	public void onPause() {
 		super.onPause();
-		friendDiscovery.resumeDiscovery();
+		friendDiscovery.pauseDiscovery();
 	}
 	
 	////
