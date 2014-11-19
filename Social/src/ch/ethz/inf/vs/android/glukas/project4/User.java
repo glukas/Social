@@ -39,5 +39,26 @@ public class User {
 		this.friends = friends;
 
 	}
+	
+	// Getters.
+	public int getId() {
+		return this.id;
+	}
+	
+	// TODO: constraints? e.g. length, special characters, ...
+	public String getUsername() {
+		return username;
+	}
+	
+	public Wall getWall() {
+		return wall;
+	}
+	
+	public List<User> getFriends() {
+		return friends;
+	}
+	
+	// Setters.
+	// TODO: add, but only for fields that can be modified!
 
 }

@@ -11,22 +11,23 @@ public class Wall {
 
 	// author: Alessio
 	// just to begin
+	// List of all posts contained in the wall.
 	public List<Post> posts;
 
+	// Add a Post to the Wall.
 	public void putPost(Post post) {
 
-		// Add a Post to the Wall
+	}
+
+	// Get Post with the specified id.
+	public void getPostatId(int id) {	
 
 	}
 
-	public void getPostatId(int id) {
-
-		// Get Post with the specified id
-
-	}
-
+	// Get all Posts in the Wall from a certain starting id.
 	public void getAllPostsfromId(int id) {
+		
 	}
 
-	// Get all Posts in the Wall from a certain starting id
+
 }

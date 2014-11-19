@@ -1,7 +1,8 @@
-package ch.ethz.inf.vs.android.glukas.project4.protocol;
+package ch.ethz.inf.vs.android.glukas.project4.security;
 
 import java.util.List;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.FailureReason;
+import ch.ethz.inf.vs.android.glukas.project4.protocol.User;
 
 /**
  * This class makes the link between the network calls back and above.
@@ -20,18 +21,18 @@ public interface SecureChannelDelegate {
 	 * The previous search for peers is successful
 	 * @param peers
 	 */
-	public void onPeersDiscovered(List<User> peers);
+	//public void onPeersDiscovered(List<User> peers);
 	
 	/**
 	 * The previous search has failed
 	 * @param reason
 	 */
-	public void onPeerDiscoveryFailed(FailureReason reason);
+	//public void onPeerDiscoveryFailed(FailureReason reason);
 	
 	/**
 	 * The user accepted the friendship.
 	 * @param user
 	 */
-	public void onFriendshipAccepted(User user);
+	//public void onFriendshipAccepted(User user);
 
 }
