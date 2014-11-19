@@ -1,0 +1,26 @@
+=========
+
+Abstract Schedule of Young and Vincent (Protocol Layer)
+
+==========
+
+Week 17 - 23 November :
+
+	Implementation of the model 'the server doesn't drop any messages'. 
+
+	-Young :
+		-React to user requests
+		-Stores post of the user into DB
+		
+
+	-Vincent :
+		-Create JSONObjects from user's requests and pass them to Security Layer
+		-Receive messages from Security Layer and pass them, as a Post object, to UI
+
+Week 24 - 30 November :
+
+	Implementation of the model 'the server can drop any message at any time'
+
+Week 1 - 7 December
+
+	Testing, add functionalities. It's highly probable that there will be delay of the previous week.
