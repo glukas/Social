@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ch.ethz.inf.vs.android.glukas.networking.FriendDiscovery;
+import ch.ethz.inf.vs.android.glukas.networking.FriendDiscovery.Peer;
 import ch.ethz.inf.vs.android.glukas.networking.FriendDiscoveryDelegate;
 import android.app.Activity;
 import android.bluetooth.BluetoothManager;
@@ -40,7 +41,12 @@ public class FriendDiscoveryActivity extends Activity implements FriendDiscovery
 	}
 	
 	@Override
-	public void onFriendsDiscoveredChanged(List<String> discoveredFriends) {
+	public void onPeersDiscoveredChanged(List<Peer> discoveredPeers) {
+		// TODO (Samuel) display
+	}
+
+	@Override
+	public void onFriendshipRequestAccepted(Peer peer) {
 		// TODO (Samuel) display
 	}
 	

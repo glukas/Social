@@ -1,7 +1,9 @@
 package ch.ethz.inf.vs.android.glukas.networking;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 
 import android.bluetooth.BluetoothAdapter;
@@ -18,6 +20,7 @@ public class FriendDiscovery implements LeScanCallback {
 	private Context context;
 	
 	private BluetoothAdapter bluetoothAdapter;
+	private static UUID[] friendServices = {FriendService.friendServiceId};
 	
 	public FriendDiscovery(FriendDiscoveryDelegate delegate, Context context) {
 		assert(context != null);
@@ -29,19 +32,37 @@ public class FriendDiscovery implements LeScanCallback {
 	}
 	
 	public void resumeDiscovery() {
-		bluetoothAdapter.startLeScan(this);
+		bluetoothAdapter.startLeScan(friendServices, this);
 	}
 	
 	public void pauseDiscovery() {
 		bluetoothAdapter.stopLeScan(this);
 	}
+	
+	public void requestFriendship(Peer peer) {
+		
+	}
+	
+	/**
+	 * Encapsulates a peer that was discovered.
+	 * Used as a handle to later initiate a friendship request.
+	 */
+	public class Peer {
+		public final String peerUsername;
+		Peer(String username) {
+			peerUsername = username;
+		}
+		BigInteger userId;
+		BluetoothDevice userDevice;
+	}
 
 	@Override
 	public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
+		//TODO (Lukas) is it necessary to synchronize this?
 		if (!devices.contains(device)) {
 			devices.add(device);
 			deviceNames.add(device.getName());
-			//device.connectGatt(context, false, new FriendGattCallback(this));//TODO
+			device.connectGatt(context, false, new FriendGattCallback(this));
 		}
 	}
 	
