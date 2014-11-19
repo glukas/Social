@@ -26,7 +26,7 @@ public class FriendService extends Service {
 	/**
 	 * @param profileMessage the string that other peers can see when discovering this peer
 	 */
-	public FriendService(String profileMessage) {
+	public FriendService() {
 		bluetoothManager = (BluetoothManager) getSystemService(BLUETOOTH_SERVICE);
 		bluetoothAdapter = bluetoothManager.getAdapter();
 		if (bluetoothAdapter == null || !bluetoothAdapter.isEnabled()) {
@@ -34,7 +34,7 @@ public class FriendService extends Service {
 		}
 		
 		BluetoothGattServer gattServer = bluetoothManager.openGattServer(getApplicationContext(), friendCallback);
-		gattServer.addService(constructFriendGattService(profileMessage));
+		gattServer.addService(constructFriendGattService("TODO::profile message"));
 		
 		friendCallback = new FriendGattServerCallback(gattServer);
 	}

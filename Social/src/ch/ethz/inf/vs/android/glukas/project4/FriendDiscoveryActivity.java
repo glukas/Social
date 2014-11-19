@@ -1,31 +1,48 @@
 package ch.ethz.inf.vs.android.glukas.project4;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import ch.ethz.inf.vs.android.glukas.networking.FriendDiscovery;
 import ch.ethz.inf.vs.android.glukas.networking.FriendDiscovery.Peer;
 import ch.ethz.inf.vs.android.glukas.networking.FriendDiscoveryDelegate;
 import android.app.Activity;
-import android.bluetooth.BluetoothManager;
-import android.content.Context;
 import android.os.Bundle;
-import android.widget.Toast;
+import android.view.Menu;
+import android.view.MenuItem;
 
-/**
- * Displays a list of nearby peers to the user
- */
 public class FriendDiscoveryActivity extends Activity implements FriendDiscoveryDelegate {
 
-	FriendDiscovery friendDiscovery;
+	private FriendDiscovery friendDiscovery;
+	
+	////
+	//ACTIVITY
+	////
 	
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		//TODO check for bluetooth availability, and ask user to enable bluetooth if necessary
+		setContentView(R.layout.activity_friend_discovery);
 		
-		// Gets the Bluetooth Adapter
 		friendDiscovery = new FriendDiscovery(this, this);
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.friend_discovery, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle action bar item clicks here. The action bar will
+		// automatically handle clicks on the Home/Up button, so long
+		// as you specify a parent activity in AndroidManifest.xml.
+		int id = item.getItemId();
+		if (id == R.id.action_settings) {
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
 	}
 	
 	@Override
@@ -40,6 +57,10 @@ public class FriendDiscoveryActivity extends Activity implements FriendDiscovery
 		friendDiscovery.resumeDiscovery();
 	}
 	
+	////
+	//FRIEND DISCOVERY DELEGATE
+	////
+	
 	@Override
 	public void onPeersDiscoveredChanged(List<Peer> discoveredPeers) {
 		// TODO (Samuel) display
@@ -49,5 +70,4 @@ public class FriendDiscoveryActivity extends Activity implements FriendDiscovery
 	public void onFriendshipRequestAccepted(Peer peer) {
 		// TODO (Samuel) display
 	}
-	
 }
