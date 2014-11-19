@@ -17,6 +17,7 @@ public class FriendDiscovery implements LeScanCallback {
 	
 	private List<BluetoothDevice> devices = new ArrayList<BluetoothDevice>();
 	private List<String> deviceNames = new ArrayList<String>();
+	private FriendDiscoveryDelegate discoveryDelegate;
 	private Context context;
 	
 	private BluetoothAdapter bluetoothAdapter;
@@ -26,12 +27,15 @@ public class FriendDiscovery implements LeScanCallback {
 		assert(context != null);
 		assert(delegate != null);
 		
+		discoveryDelegate = delegate;
 		this.context = context;
 		devices = new ArrayList<BluetoothDevice>();
 		bluetoothAdapter = ((BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE)).getAdapter();
 	}
 	
 	public void resumeDiscovery() {
+		devices.clear();
+		deviceNames.clear();
 		bluetoothAdapter.startLeScan(friendServices, this);
 	}
 	
@@ -40,7 +44,7 @@ public class FriendDiscovery implements LeScanCallback {
 	}
 	
 	public void requestFriendship(Peer peer) {
-		
+		//TODO (Lukas)
 	}
 	
 	/**

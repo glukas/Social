@@ -15,17 +15,17 @@ class Walls {
 
 	// Get the whole wall of the user
 	public Wall getUserWall() {
-		
+		return null;
 	}
 	
 	// Get all the Posts in a Wall starting from id -> id or time?
 	public List<Post> getAllPostsUserFrom(int timestamp) {
-		
+		return null;
 	}
 	
 	// Get the whole Wall of a certain friend
 	public Wall getFriendWall(int friendid) {
-		
+		return null;
 	}
 	
 	// delete the whole saved Wall of a certain friend

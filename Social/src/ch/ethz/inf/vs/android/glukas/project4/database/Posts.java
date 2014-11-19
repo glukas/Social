@@ -19,7 +19,7 @@ class Posts {
 	
 	// Get a certain post from the user's wall
 	public Post getUserPost(int id) {
-		
+		return null;
 	}
 	
 	// Delete a certain post from the user's wall
@@ -29,7 +29,7 @@ class Posts {
 	
 	// Get all the Posts in a Wall starting from id -> id or time?
 	public List<Post> getAllUserPostsFrom(int timestamp) {
-		
+		return null;
 	}
 	
 	// Update the wall of a friend whose wall is saved on our phone
@@ -39,12 +39,12 @@ class Posts {
 	
 	// Get a certain Post from a certain friend
 	public Post getFriendPost(int postid, int friendid) {
-		
+		return null;
 	}
 	
 	// Get all Posts of a certain friend starting at a certain time/timestamp
 	public List<Post> getAllFriendPostsfrom(Date timestamp, int friendid) {
-		
+		return null;
 	}
 	
 	// delete a certain Post of a certain friend

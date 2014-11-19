@@ -1,6 +1,7 @@
-package ch.ethz.inf.vs.android.glukas.project4.protocol;
+package ch.ethz.inf.vs.android.glukas.networking;
 
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.FailureReason;
+import ch.ethz.inf.vs.android.glukas.project4.protocol.User;
 
 public interface MessageRelayDelegate {
 
