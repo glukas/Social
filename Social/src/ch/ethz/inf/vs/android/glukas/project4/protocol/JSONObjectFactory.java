@@ -12,6 +12,22 @@ import ch.ethz.inf.vs.android.glukas.project4.protocol.UserRequest.RequestType;
 public class JSONObjectFactory {
 	
 	////
+	//Friendship
+	////
+	
+	public static JSONObject getFriendshipBroadcastMessage() {
+		JSONObject obj = new JSONObject();
+		try{
+			obj.put(Cmds.USER.getStr(), "USER-STATIC");
+		} catch (JSONException ex) {
+			obj = null;
+			ex.printStackTrace();
+		}
+		return obj;
+	}
+	
+	
+	////
 	//UserRequest
 	//
 	//the package-info gives more informations about how JSONObjects should be defined

@@ -2,6 +2,8 @@ package ch.ethz.inf.vs.android.glukas.networking;
 
 import java.util.UUID;
 
+import ch.ethz.inf.vs.android.glukas.project4.protocol.JSONObjectFactory;
+
 
 import android.app.Service;
 import android.content.Intent;
@@ -34,7 +36,7 @@ public class FriendService extends Service {
 		}
 		
 		BluetoothGattServer gattServer = bluetoothManager.openGattServer(getApplicationContext(), friendCallback);
-		gattServer.addService(constructFriendGattService("TODO::profile message"));
+		gattServer.addService(constructFriendGattService(JSONObjectFactory.getFriendshipBroadcastMessage().toString()));
 		
 		friendCallback = new FriendGattServerCallback(gattServer);
 	}
