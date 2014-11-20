@@ -13,7 +13,7 @@ import ch.ethz.inf.vs.android.glukas.project4.security.SecureChannelDelegate;
  * It linked together request from the user, through implementing the UserDelegate. On an other hand,
  * it handles calls back from the network, through implementing SecureChannelDelegate.
  */
-public class Protocol implements UserDelegate, SecureChannelDelegate {
+public class Protocol implements ProtocolDelegate, SecureChannelDelegate {
 	
 	////
 	//Life cycle

@@ -9,7 +9,7 @@ import ch.ethz.inf.vs.android.glukas.project4.exceptions.NetworkException;
  * It provides method to post new data on the user's wall, to ask for another user's wall
  * to connect and disconnect from the connected list on server.
  */
-public interface UserDelegate {
+public interface ProtocolDelegate {
 	
 	/**
 	 * Connect the user to the network.
