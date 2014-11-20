@@ -1,6 +1,8 @@
 package ch.ethz.inf.vs.android.glukas.project4;
 
 import ch.ethz.inf.vs.android.glukas.networking.FriendService;
+import ch.ethz.inf.vs.android.glukas.project4.protocol.Protocol;
+import ch.ethz.inf.vs.android.glukas.project4.protocol.UserDelegate;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;

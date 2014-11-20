@@ -1,20 +1,20 @@
 package ch.ethz.inf.vs.android.glukas.networking;
 
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.FailureReason;
-import ch.ethz.inf.vs.android.glukas.project4.protocol.User;
+import ch.ethz.inf.vs.android.glukas.project4.protocol.UserId;
 
 public interface MessageRelayDelegate {
 
 	/**
 	 * Connection of the user to the server succeeded
 	 */
-	public void onRegistrationSucceeded(User self, User other);
+	public void onRegistrationSucceeded(UserId self, UserId other);
 	
 	/**
 	 * Connection of the user to the server failed
 	 * @param reason
 	 */
-	public void onRegistrationFailed(User self, User other, FailureReason reason);
+	public void onRegistrationFailed(UserId self, UserId other, FailureReason reason);
 	
 	/**
 	 * Disconnection of the user from the server succeeded

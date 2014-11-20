@@ -47,11 +47,8 @@ public interface UserDelegate {
 	public void askFriendship(String DistUsername) throws NetworkException;
 
 	/**
-	 * Search for someone over the network
-	 * @param DistUsername, the supposed username
-	 * @throws NetworkException, if network is not accessible
+	 * Search for accessible persons on the local bluetooth network
 	 */
-	public void searchUser(String DistUsername) throws NetworkException;
-	
+	public void discoverFriends() throws NetworkException;
 	
 }
