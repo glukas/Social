@@ -27,7 +27,6 @@ public final class DatabaseContract {
 		public static final String TABLE_NAME = "users";
 		public static final String NAME = "name";
 //		public static final String AGE = "age";
-		public static final String WALL_ID = "wall_id";
 		public static final String PRIVATE_KEY = "private_key";
 		public static final String PUBLIC_KEY = "public_key";
 		// ...
@@ -38,6 +37,7 @@ public final class DatabaseContract {
 	public static abstract class PostsEntry implements BaseColumns {
 		public static final String TABLE_NAME = "posts";
 		public static final String WALL_ID = "wall_id";
+		public static final String DATE_TIME = "date_time";
 		public static final String TEXT = "text";
 		public static final String IMAGE = "image";
 	}

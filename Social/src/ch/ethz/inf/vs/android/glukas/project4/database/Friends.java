@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.android.glukas.project4.database;
 
+import android.database.sqlite.SQLiteDatabase;
 import ch.ethz.inf.vs.android.glukas.project4.User;
 
 /**
@@ -9,14 +10,14 @@ import ch.ethz.inf.vs.android.glukas.project4.User;
  */
 class Friends {
 
-	// Add a friend in the List of Friends of the user
-	public void putFriend(User user) {
+	// TODO: Add a friend in the List of Friends of the user
+	public void putFriend(User user, SQLiteDatabase db) {
 		
 	}
 	
-	// Remove friend from the List of friends & everything associated with
+	// TODO: Remove friend from the List of friends & everything associated with
 	// him/her
-	public void deleteFriend(int id) {
+	public void deleteFriend(int id, SQLiteDatabase db) {
 		
 	}
 }

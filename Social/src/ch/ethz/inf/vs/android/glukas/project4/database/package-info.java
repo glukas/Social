@@ -1,13 +1,13 @@
 /**
  * The package contains all necessary classes to manage and interact with the database.
  * In order to use the provided functionalities only the class DatabaseManeger should be instantiated.
+ * Furthermore the 
  * 
  * DATABASE INFORMATIONS:
- * The database is composed of 4 tables:
+ * The database is composed of 3 tables:
  * 		- FRIENDS: 	| user_id | friend_id |
- * 		- USERS:	| user_id | name | age | ip_address | key | wall_id | ... |
- * 		- WALLS:	| wall_id | post_id | -> Not needed!!
- * 		- POSTS:	| post_id | text | image | ... |
+ * 		- USERS:	| user_id | name | key | ... |
+ * 		- POSTS:	| post_id | wall_id | text | image | ... |
  * 		- ...
  */
 /**
