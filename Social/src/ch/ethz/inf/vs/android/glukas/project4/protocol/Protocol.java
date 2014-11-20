@@ -1,9 +1,11 @@
 package ch.ethz.inf.vs.android.glukas.project4.protocol;
 
+import android.content.Context;
 import ch.ethz.inf.vs.android.glukas.networking.MessageRelay;
 import ch.ethz.inf.vs.android.glukas.networking.MessageRelayDelegate;
 import ch.ethz.inf.vs.android.glukas.project4.Post;
 import ch.ethz.inf.vs.android.glukas.project4.UserDelegate;
+import ch.ethz.inf.vs.android.glukas.project4.UserId;
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseDelegate;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.DatabaseException;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.FailureReason;
@@ -25,20 +27,22 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate, Messag
 	////
 	
 	private static Protocol instance;
+	private static Context context;
 	
 	/**
 	 * Get a instance of Protocol. If it's the first time, it can take some time. (Has to retrieve data
 	 * from the database.)
 	 */
-	public static Protocol getInstance() {
+	public static Protocol getInstance(Context context) {
 		if (instance == null) {
-			return new Protocol();
+			return new Protocol(context);
 		} else {
+			Protocol.context = context;
 			return instance;
 		}
 	}
 	
-	private Protocol(){
+	private Protocol(Context context){
 		//TODO : set delegates (user, security and database layers)
 		//TODO : instantiate delegates (user, security and database layers)
 		//TODO : set calls back
@@ -78,6 +82,7 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate, Messag
 	
 	@Override
 	public void postPost(Post post) throws DatabaseException {
+		//TODO : save in database. Sent to the owner of the wall
 		secureChannel.broadcastMessage(null, null);
 	}
 

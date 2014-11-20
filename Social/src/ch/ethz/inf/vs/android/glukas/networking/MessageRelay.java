@@ -1,7 +1,7 @@
 package ch.ethz.inf.vs.android.glukas.networking;
 
+import ch.ethz.inf.vs.android.glukas.project4.UserId;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.PublicHeader;
-import ch.ethz.inf.vs.android.glukas.project4.protocol.UserId;
 
 /**
  * Used to coordinate the reception of messages through a server that relays messages between peers.

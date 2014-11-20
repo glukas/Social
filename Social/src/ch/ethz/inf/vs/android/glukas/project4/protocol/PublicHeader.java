@@ -1,5 +1,7 @@
 package ch.ethz.inf.vs.android.glukas.project4.protocol;
 
+import ch.ethz.inf.vs.android.glukas.project4.UserId;
+
 /**
  * This is the abstraction of a public header.
  * Defined in package-info

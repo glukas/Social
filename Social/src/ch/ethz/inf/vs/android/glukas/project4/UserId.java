@@ -1,4 +1,4 @@
-package ch.ethz.inf.vs.android.glukas.project4.protocol;
+package ch.ethz.inf.vs.android.glukas.project4;
 
 import java.math.BigInteger;
 

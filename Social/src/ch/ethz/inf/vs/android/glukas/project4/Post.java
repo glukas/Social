@@ -1,8 +1,6 @@
 package ch.ethz.inf.vs.android.glukas.project4;
 
 import java.util.Date;
-import java.util.List;
-
 import android.graphics.Bitmap;
 
 /**
@@ -11,47 +9,54 @@ import android.graphics.Bitmap;
 
 public class Post {
 
-	// author: Alessio
-	// just to begin
-	// Post's id.
-//	int id;
-	
-	// Id of the wall it belongs to
-//	int wallId;
-	
-	// Text of the post
-	String text;
-	
-	// Image Binary
-	// Image of the post. Let max 1 or more?
-	Bitmap image;
+	private String text;
+	// It would be nice if we can manage to have multiple images per post. But maybe it make things to 
+	// complicate
+	private Bitmap image;
+	//the id is crucial for sorting, it needs to be DB-consistent. Thus, on the TODO . =)
+	private int id;
+	//date will not be used for sorting, but can provide friendly user content
+	private Date datetime;
+	private PostType postType;
+	private Wall owner;
 
-	// Id of the Post
-	public int id;
-
-	// Lamport timestamp instead of real time
-	// they are unique for each user
-	public int timestamp;
-	
-	// Real time or timestamp? (Young)
-	// Date and time when the message was sent/received
-//	Date datetime;
-
-	public Date datetime;
-
-	public Post(String text, Bitmap image, int id, int timestamp) {
+	/**
+	 * Create new Image Post
+	 * @param text
+	 * @param image
+	 * @param datetime
+	 */
+	public Post(String text, Bitmap image, Date datetime, Wall wall) {
+		this.id = -1;
 		this.text = text;
 		this.image = image;
-		this.id = id;
-		this.timestamp = timestamp;
+		this.datetime = datetime;
+		this.postType = PostType.PICTURE;
 	}
 	
-	// metadata: visited times, ...
+	/**
+	 * Create new Text Post
+	 * @param text
+	 * @param datetime
+	 */
+	public Post(String text, Date datetime, Wall wall) {
+		this.id = -1;
+		this.text = text;
+		this.image = null;
+		this.datetime = datetime;
+		this.postType = PostType.TEXT;
+	}
 	
-	// Constructor.
+	/**
+	 * Create new Post. This constructor is used by the database to retrieve some already stored
+	 * posts, not for creating new Posts.
+	 * @param id
+	 * @param text
+	 * @param image
+	 * @param datetime
+	 */
 	public Post(int id, String text, Bitmap image, Date datetime) {
 		this.id = id;
-//		this.wallId = wallId;
 		this.text = text;
 		this.image = image;
 		this.datetime = datetime;
@@ -72,5 +77,18 @@ public class Post {
 	
 	public Date getDateTime() {
 		return this.datetime;
+	}
+	
+	public PostType getPostType() {
+		return this.postType;
+	}
+	
+	public Wall getOwner() {
+		return this.owner;
+	}
+	
+	public enum PostType {
+		PICTURE,
+		TEXT;
 	}
 }
