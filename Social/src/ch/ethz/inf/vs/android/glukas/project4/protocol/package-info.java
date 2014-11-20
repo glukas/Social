@@ -1,32 +1,28 @@
-/**
- * Protocol Goals :
- * 
- * Abstract :
- * 
- * The purpose of this package is to make the link between networking, user interface, database and security.
- * It's the main logic of the project; it's in charge of retrieve data from the distributed network created
- * by the other users. Furthermore, it relays data asked by the network to be stored in/retrieved from its own 
- * database. Everything should be encrypted, i.e. data can not be accessed without identification.
- * 
- * Local Requirements :
- * 
- * 	(I) The database should not increase more than a given size defined by the user.
- * 
- * 	(II) If data stored on local copy not belongs to a friend, user shouldn't be able to read it.
- * 
- * Global Requirements :
- * 
- * 	(I) User should be able to access his / her friends' data with a highly percentage. (we defined this as
- *  >95%, but not that there's a trivial solution where it's not possible : everyone is never connected. The whole
- *  principle is based on the fact that people are more and more connected at every time.)
+/**  
+ *  Abstract :
  *  
- *  (II) User should be able to make new friends. This can be done by physical proximity or by trusting
- *  a common friend.
+ *  This package is the central part of the project (but not the main). It links every pieces together and
+ *  ensures relay between user interface, database and security-network. It deals with consistency issues and
+ *  data reachability.
  *  
- *  Non-functional Requirements :
  *  
- *  (I) Each user updates a clock which gives an identity at all his / her messages and create a partial
- *  order to sort messages.
+ *  
+ *  Packets Header :
+ *  
+ *  -----------------------------------------------
+ *  | Sender  |  Receiver  |  Consistency  |  id  |
+ *  -----------------------------------------------
+ *  | /    /    /    /    /    /    /    /    /   |
+ *  | /    /    /  CONTENT     /    /    /    /   |
+ *  | /    /    /    /    /    /    /    /    /   |
+ *  -----------------------------------------------  
+ *  
+ *  Where:
+ *  
+ *  Sender, id of the sender (128 bits)
+ *  Receiver, id of the receiver (128 bits)
+ *  Consistency, byte used for consistency (8 bits)
+ *  id, not unique id of the message (32 bits)
  *  
  *  
  *  
@@ -49,63 +45,50 @@
  *  and where names and values in lower case are strings
  *  
  *  connection message (to server):
- *  cmd :: connect
+ *  	cmd :: connect
  *  
  *  disconnection message (from server):
- *  cmd :: disconnect
+ *  	cmd :: disconnect
  *  
  *  accept friendship message:
- *  cmd :: replyFriendship
- *  response :: accept
- *  target :: USERNAME
+ *  	cmd :: replyFriendship
+ *  	response :: accept
  *  
  *  refuse friendship message:
- *  
- *  cmd :: replyFriendship
- *  response :: reject
- *  target :: USERNAME
+ *  	cmd :: replyFriendship
+ *  	response :: reject
  *  
  *  demand friendship message:
- *  
- *  cmd :: askFriendship
- *  target :: USERNAME
+ *  	cmd :: askFriendship
+ *  	from :: USERNAME
  *  
  *  get someone's wall:
- *  
- *  cmd :: getWall
- *  target :: USERNAME
+ *  	cmd :: getWall
  *  
  *  post text message on someone's wall:
- *  
- *  cmd :: postText
- *  target :: USERNAME
- *  id :: INT
- *  text :: TEXT
+ *  	cmd :: postText
+ *  	id :: INT
+ *  	text :: TEXT
  *  
  *  post picture message on someone's wall:
- *  
- *  cmd :: postPicture
- *  target :: USERNAME
- *  id :: INT
- *  text :: TEXT
- *  picture :: LINK
+ *  	cmd :: postPicture
+ *  	id :: INT
+ *  	text :: TEXT
+ *  	picture :: LINK
  *  
  *  send a text message to someone:
- *  
- *  cmd :: sendText
- *  target :: USERNAME
- *  owner :: USERNAME
- *  id :: INT
- *  text :: TEXT
+ *  	cmd :: sendText
+ *  	id :: INT
+ *  	text :: TEXT
  *  
  *  send a picture message to someone:
+ *  	cmd :: sendPicture
+ *  	id :: INT
+ *  	text :: TEXT
+ *  	picture :: LINK
  *  
- *  cmd :: sendPicture
- *  target :: USERNAME
- *  owner :: USERNAME
- *  id :: INT
- *  text :: TEXT
- *  picture :: LINK
+ *  broadcast user's name
+ *  	user :: USERNAME
  *  
  */
 

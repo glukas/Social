@@ -2,6 +2,7 @@ package ch.ethz.inf.vs.android.glukas.project4.database;
 
 import java.util.List;
 
+import android.database.sqlite.SQLiteDatabase;
 import ch.ethz.inf.vs.android.glukas.project4.Post;
 import ch.ethz.inf.vs.android.glukas.project4.Wall;
 
@@ -13,23 +14,23 @@ import ch.ethz.inf.vs.android.glukas.project4.Wall;
 
 class Walls {
 
-	// Get the whole wall of the user
-	public Wall getUserWall() {
+	// TODO: Get the whole wall of the user.
+	public Wall getUserWall(SQLiteDatabase db) {
 		return null;
 	}
 	
-	// Get all the Posts in a Wall starting from id -> id or time?
-	public List<Post> getAllPostsUserFrom(int timestamp) {
+	// TODO: Get all the Posts in a Wall starting from id -> id or time?
+	public List<Post> getAllPostsUserFrom(int timestamp, SQLiteDatabase db) {
 		return null;
 	}
 	
-	// Get the whole Wall of a certain friend
-	public Wall getFriendWall(int friendid) {
+	// TODO: Get the whole Wall of a certain friend.
+	public Wall getFriendWall(int friendid, SQLiteDatabase db) {
 		return null;
 	}
 	
-	// delete the whole saved Wall of a certain friend
-	public void deleteFriendWall(int friendid) {
+	// TODO: Delete the whole saved Wall of a certain friend
+	public void deleteFriendWall(int friendid, SQLiteDatabase db) {
 		
 	}
 }

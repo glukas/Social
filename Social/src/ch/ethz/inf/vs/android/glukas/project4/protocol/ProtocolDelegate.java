@@ -9,7 +9,7 @@ import ch.ethz.inf.vs.android.glukas.project4.exceptions.NetworkException;
  * It provides method to post new data on the user's wall, to ask for another user's wall
  * to connect and disconnect from the connected list on server.
  */
-public interface UserDelegate {
+public interface ProtocolDelegate {
 	
 	/**
 	 * Connect the user to the network.
@@ -37,21 +37,18 @@ public interface UserDelegate {
 	 * @param DistUsername, the user to get the wall
 	 * @throws NetworkException, if network is not accessible
 	 */
-	public void getUserWall(String DistUsername) throws NetworkException;
+	public void getUserWall(String distUsername) throws NetworkException;
 	
 	/**
 	 * Ask an user to be friend
 	 * @param DistUsername
 	 * @throws NetworkException, if network is not accessible
 	 */
-	public void askFriendship(String DistUsername) throws NetworkException;
+	public void askFriendship(String distUsername) throws NetworkException;
 
 	/**
-	 * Search for someone over the network
-	 * @param DistUsername, the supposed username
-	 * @throws NetworkException, if network is not accessible
+	 * Search for accessible persons on the local bluetooth network
 	 */
-	public void searchUser(String DistUsername) throws NetworkException;
-	
+	public void discoverFriends() throws NetworkException;
 	
 }

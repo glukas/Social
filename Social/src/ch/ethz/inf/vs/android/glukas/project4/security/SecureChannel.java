@@ -1,6 +1,6 @@
 package ch.ethz.inf.vs.android.glukas.project4.security;
 
-import ch.ethz.inf.vs.android.glukas.project4.protocol.User;
+import ch.ethz.inf.vs.android.glukas.project4.protocol.PublicHeader;
 
 public interface SecureChannel {
 
@@ -13,8 +13,9 @@ public interface SecureChannel {
 	/**
 	 * Broadcast a message to all friends
 	 * @param message
+	 * @param header
 	 */
-	void broadcastMessage(String message);
+	void broadcastMessage(String message, PublicHeader header);
 	
 	/**
 	 * Precondition: user was discovered by onPeersDiscovered

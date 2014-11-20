@@ -1,5 +1,10 @@
 package ch.ethz.inf.vs.android.glukas.project4.database;
 
+import java.util.Date;
+
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+
 class Utility {
 	
 	// SQLite constants.
@@ -12,10 +17,36 @@ class Utility {
 	public static final String CREATE_TABLE = "CREATE TABLE";
 	public static final String DROP_TABLE = "DROP TABLE";
 	public static final String IF_EXISTS = "IF EXISTS";
+	public static final String FOREIGN_KEY = "FOREIGN_KEY";
+	public static final String REFERENCES = "REFERENCES";
 	
 	// Implementation constants.
 	public static final int MAX_BLOB_SIZE = 0;	// TODO: define # of bytes needed for a blob (images + keys + big text?)
 	public static final int MAX_DATABASE_SIZE = 0;	// TODO: define # of bytes needed for the DB
+	
+	public static int userID = 0;
+	
+	/**
+	 * Transforms a byte[] representing an image into a bitmap.
+	 * @param blobImage byte[] representing an image.
+	 * @return bitmap image
+	 */
+	public static final Bitmap toBitmap(byte[] blobImage) {
+		return BitmapFactory.decodeByteArray(blobImage, 0, blobImage.length);
+	}
+	
+	/** TODO
+	 * 
+	 * @param sqlDate Date in SQLite String format
+	 * @return Java Date object
+	 */
+	public static final Date toJavaDate(String sqlDate) {
+		return null;
+	}
+	
+	public static final Date toSQLiteDate(String javaDate) {
+		return null;
+	}
 	
 	
 }
