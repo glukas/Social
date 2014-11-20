@@ -10,7 +10,9 @@ import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseDelegate;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.DatabaseException;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.FailureReason;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.NetworkException;
-import ch.ethz.inf.vs.android.glukas.project4.protocol.UserRequest.RequestType;
+import ch.ethz.inf.vs.android.glukas.project4.protocol.Message.MessageType;
+import ch.ethz.inf.vs.android.glukas.project4.protocol.parsing.JSONObjectFactory;
+import ch.ethz.inf.vs.android.glukas.project4.protocol.parsing.MessageParser;
 import ch.ethz.inf.vs.android.glukas.project4.security.SecureChannel;
 import ch.ethz.inf.vs.android.glukas.project4.security.SecureChannelDelegate;
 
@@ -68,14 +70,14 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate, Messag
 	
 	@Override
 	public void connect() throws NetworkException {
-		String msg = JSONObjectFactory.createJSONObject(new UserRequest(RequestType.CONNECT)).toString();
+		String msg = JSONObjectFactory.createJSONObject(new UserMessage(MessageType.CONNECT)).toString();
 		PublicHeader header = new PublicHeader(localUserId, null, ConsistencyByte.CONNECTION.getState(), 0);
 		messageRelay.connect(msg, header);
 	}
 
 	@Override
 	public void disconnect() throws NetworkException {
-		String msg = JSONObjectFactory.createJSONObject(new UserRequest(RequestType.DISCONNECT)).toString();
+		String msg = JSONObjectFactory.createJSONObject(new UserMessage(MessageType.DISCONNECT)).toString();
 		PublicHeader header = new PublicHeader(localUserId, null, ConsistencyByte.CONNECTION.getState(), 0);
 		messageRelay.disconnect(msg, header);
 	}
@@ -108,7 +110,10 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate, Messag
 
 	@Override
 	public void onMessageReceived(String message, PublicHeader header) {
-		userHandler.onPostReceived(null);
+		NetworkMessage msg = MessageParser.parseMessage(message, header);
+		if (msg.getMessageType().equals(MessageType.ACK)) {
+			// do something clever
+		}
 	}
 
 	////

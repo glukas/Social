@@ -1,14 +1,14 @@
 package ch.ethz.inf.vs.android.glukas.project4.exceptions;
 
-import ch.ethz.inf.vs.android.glukas.project4.protocol.UserRequest.RequestType;
+import ch.ethz.inf.vs.android.glukas.project4.protocol.Message.MessageType;
 
 public class UnknowRequestType extends Exception {
 
 	private static final long serialVersionUID = 1L;
 	
-	RequestType type;
+	MessageType type;
 	
-	public UnknowRequestType(RequestType type){
+	public UnknowRequestType(MessageType type){
 		this.type = type;
 	}
 

@@ -2,7 +2,7 @@ package ch.ethz.inf.vs.android.glukas.networking;
 
 import java.util.UUID;
 
-import ch.ethz.inf.vs.android.glukas.project4.protocol.JSONObjectFactory;
+import ch.ethz.inf.vs.android.glukas.project4.protocol.parsing.JSONObjectFactory;
 
 
 import android.app.Service;

@@ -88,6 +88,7 @@
  *  	picture :: LINK
  *  
  *  broadcast user's name
+ *  	cmd :: broadcast
  *  	user :: USERNAME
  *  
  */
