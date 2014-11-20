@@ -1,6 +1,7 @@
 package ch.ethz.inf.vs.android.glukas.project4;
 
 import java.util.Date;
+import java.util.List;
 
 import android.graphics.Bitmap;
 
@@ -9,11 +10,11 @@ import android.graphics.Bitmap;
  */
 
 public class Post {
-	
+
 	// author: Alessio
 	// just to begin
 	// Post's id.
-	int id;
+//	int id;
 	
 	// Id of the wall it belongs to
 //	int wallId;
@@ -21,11 +22,29 @@ public class Post {
 	// Text of the post
 	String text;
 	
+	// Image Binary
 	// Image of the post. Let max 1 or more?
 	Bitmap image;
+
+	// Id of the Post
+	public int id;
+
+	// Lamport timestamp instead of real time
+	// they are unique for each user
+	public int timestamp;
 	
+	// Real time or timestamp? (Young)
 	// Date and time when the message was sent/received
-	Date datetime;
+//	Date datetime;
+
+	public Date datetime;
+
+	public Post(String text, Bitmap image, int id, int timestamp) {
+		this.text = text;
+		this.image = image;
+		this.id = id;
+		this.timestamp = timestamp;
+	}
 	
 	// metadata: visited times, ...
 	
@@ -54,5 +73,4 @@ public class Post {
 	public Date getDateTime() {
 		return this.datetime;
 	}
-	
 }

@@ -1,4 +1,6 @@
-package ch.ethz.inf.vs.android.glukas.project4.protocol;
+package ch.ethz.inf.vs.android.glukas.networking;
+
+import ch.ethz.inf.vs.android.glukas.project4.protocol.UserId;
 
 /**
  * Used to coordinate the reception of messages through a server that relays messages between peers.
@@ -18,17 +20,17 @@ public interface MessageRelay {
 	 * or onRegistrationFailed(FailureReason reason) to be called on the delegate
 	 * Registering will trigger future 
 	 */
-	void registerForReception(User self, User other);
+	void registerForReception(UserId self, UserId other);
 	
 	/**
 	 * Will asynchronously trigger onDeregistrationSucceeded();
 	 * or onDeregistrationFailed(FailureReason reason) to be called on the delegate
 	 */
-	void deregisterForReception(User self);
+	void deregisterForReception(UserId self);
 	
 	/**
  	 * Asks the server to deliver all new messages for the given sender
 	 * @param sender
 	 */
-	void pollForNewMessages(User self, User other);
+	void pollForNewMessages(UserId self, UserId other);
 }

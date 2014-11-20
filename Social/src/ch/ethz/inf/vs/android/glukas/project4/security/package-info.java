@@ -23,10 +23,9 @@
  * Messages have the following public header: (TODO this is a draft)
  * 
  * -length of the message in bytes, including this header [4 bytes]
+ * -for future use [3 bytes]
+ * -status byte [1 byte]
  * -message id / "virtual clock" [4 bytes]
- * -number of milliseconds that have elapsed between midnight, January 1, 1970
- *  and the time the message was authored. [8 bytes] (TODO do we really need this in the public header, or
- *  												  can we base the application protocol on the virtual clocks?)
  * -sender [16 bytes]
  * -recipient [16 bytes]
  * 
@@ -46,23 +45,21 @@
  * 		 To establish a friendship, peers exchange their public broadcast keys.
  * 		 Broadcast keys are used to encrypt the posts. They are also used to secure other protocol messages.
  * 
+         Public-key encryption is done using RSA-OAEP (OEAP is a particular randomized padding)
+ *       Public-key signatures are done using RSA-SHA256 ("Hash and Sign")
+ *       The public keys are 2^11 bits (so a key pair has size 2^12 and both pairs have size 2^13).
+ * 
+ * 		 Private key encryption is done by combining a AES-256 in CBC mode and a HMAC based on SHA256 ("Encrypt-then-Authenticate")
+ * 		 So a private key is 256 bits, and the a key pair is 512 bits.
+ * 
  * (I)   Key exchange in physical proximity:
  *  
- *   	 **DH-Key agreement protocol**
- *   	 
- *       The well-known Diffie-Hellman key exchange is done to derive a shared secret KAB between peers A and B.
- * 	     After a shared secret key KAB has been established by DH, the participants use the broadcast key request protocol
- * 	     
- * 	     **Broadcast key request protocol**
- *
- *	  	 Say A wants to get B's current broadcast key:
- *	  	 [A and B share secret key KAB,
- *	 	 B has current broadcast key KB]
- *	
- *	  	 Request 1)  A -> B : {"key request", A, N_A}_KAB [fresh N_A]
- *	     Request 2)  B -> A : {"key response", N_A, KB}_KAB
- *
- *	     [A has B's current broadcast key KB]
+ * 	     **Simple key exchange protocol**
+ *		
+ *       A and B exchange the public keys used for encryption and verification over the channel.
+ *       We assume no active attacker has access to the channel.
+ *       A sends her symmetric encryption key KsimA to B encrypted under B's public encryption key.
+ *       The same with reversed roles.
  *
  * (II) 
  * 	   **Friends-of-a-friend Protocol**
@@ -73,7 +70,7 @@
  * 		T has A's broadcast key KA]
  * 
  * 	   Discovery 1) A -> T : PEnc(PKencT, ("list of friends", N_A)) [fresh N_A]
- * 	   Discovery 2) T -> A : Sign(SKsignT, ("my friends", T, (B_0, ..., B_n), N_A)) //where (B_0, ...., B_n) are the friends of T
+ * 	   Discovery 2) T -> A : Sign(SKsignT, (("my friends", T, (B_0, ..., B_n))_KT, N_A)) //where (B_0, ...., B_n) are the friends of T
  *
  *	   [A holds a fresh list of friends of T]
  *
@@ -119,9 +116,11 @@
  *
  *
  * (III) 
- *   (TODO: specify implementation of the signing and public key cryptography)
+ *   
  * 	 (TODO: specify if the public protocol header is also authenticated - probably not, as the security implications are not clear)
- *	 (a) Transmission of Protocol messages:
+ * 
+ *	
+ *  (a) Transmission of Protocol messages:
  *       
  *       In the some of the protocols above, we have assumed the existence of a secure symmetric key message transmission mechanism.
  *       We use an encrypt-then-authenticate approach.
@@ -146,14 +145,15 @@
  *       
  *       So we do "Encrypt-Authenticate-Sign":
  *       
+ *       
  *       Say A wants to post m to B's wall, and B has friends (B_0, ..., B_N)
  *       Posts must have unique identifiers, and include the owner of the wall and author of the post.
  *       Note that A=B is possible, in which case A->B is trivial.
  *       
- *       [A has private broadcast key ((SKA,PKA), KAEnc, KAAuth),
- *        B has private broadcast key ((SKB,PKB), KBEnc, KBAuth),
- *        A has B's public broadcast key (PKB, KBEnc, KBAuth),
- *        B has A's public broadcast key (PKA, KAEnc, KAAuth),
+ *       [A has private broadcast key ((KAEnc, KAAuth), (SKA,PKA), (SKEncA, PKEncA)),
+ *        B has private broadcast key ((KBEnc, KBAuth), (SKB,PKB), (SKEncB, PKEncB)),
+ *        A has B's public broadcast key ((KBEnc, KBAuth), PKB, PKencB),
+ *        B has A's public broadcast key ((KAEnc, KAAuth), PKA, PKencA),
  *       
  *       A -> B : Enc(KBEnc, m), Sign(SKA, MAC(KBAuth, Enc(KBEnc, m)))
  *       B -> (B_0, ...., B_N) :  Enc(KBEnc, m), Sign(SKA, MAC(KBAuth, Enc(KBEnc, m))), Sign(SKB, MAC(KBAuth, Enc(KBEnc, m)))

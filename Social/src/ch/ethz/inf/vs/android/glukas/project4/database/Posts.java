@@ -49,7 +49,7 @@ class Posts {
 	public void deleteUserPost(int postid, SQLiteDatabase db) {
 		deleteFriendPost(postid, Utility.userID, db);
 	}
-	
+
 	// TODO: Get all the Posts in a Wall starting from id -> id or time?
 	public List<Post> getAllUserPostsFrom(int timestamp, SQLiteDatabase db) {
 		return null;

@@ -2,9 +2,13 @@ package ch.ethz.inf.vs.android.glukas.project4.protocol;
 
 /**
  * A request from the GUI encapsulation
- *
  */
 public class UserRequest {
+	
+	public UserRequest(RequestType type){
+		this.requestType = type;
+	}
+	
 	
 	public enum RequestType{
 		FRIENDSHIP,
@@ -20,6 +24,7 @@ public class UserRequest {
 	private RequestType requestType;
 	private String usernameSender;
 	private String usernameReceiver;
+	private String message;
 	private int postId;
 	private String httpLink;
 	
@@ -41,5 +46,9 @@ public class UserRequest {
 
 	public String getHttpLink() {
 		return httpLink;
+	}
+	
+	public String getMessage() {
+		return message;
 	}
 }
