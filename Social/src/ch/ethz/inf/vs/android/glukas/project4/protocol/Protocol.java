@@ -1,8 +1,6 @@
 package ch.ethz.inf.vs.android.glukas.project4.protocol;
 
 import android.content.Context;
-import ch.ethz.inf.vs.android.glukas.networking.MessageRelay;
-import ch.ethz.inf.vs.android.glukas.networking.MessageRelayDelegate;
 import ch.ethz.inf.vs.android.glukas.project4.Post;
 import ch.ethz.inf.vs.android.glukas.project4.UserDelegate;
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
@@ -10,6 +8,8 @@ import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseDelegate;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.DatabaseException;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.FailureReason;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.NetworkException;
+import ch.ethz.inf.vs.android.glukas.project4.networking.MessageRelay;
+import ch.ethz.inf.vs.android.glukas.project4.networking.MessageRelayDelegate;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.Message.MessageType;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.Message;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.parsing.JSONObjectFactory;
