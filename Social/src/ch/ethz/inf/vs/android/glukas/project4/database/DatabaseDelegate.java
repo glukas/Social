@@ -36,7 +36,7 @@ public interface DatabaseDelegate {
 	 * Get the upper bound over the partial order of actual posts for the user.
 	 * @return the upper bound.
 	 */
-	public int getUserMaxPostId();
+	public int getUserMaxPostsId();
 	
 	
 	////
@@ -57,12 +57,12 @@ public interface DatabaseDelegate {
 	 */
 	public int getFriendMaxId(UserId id);
 	
-	/**
+	/** TODO: check with @Lukas for use in Security Layer (friends of friends)
 	 * Create a friendship relation between the user and a new friend.
 	 * @param id the id of the friend (128 bits)
 	 * @param username the user name of the added friend
 	 */
-	public void addFriendship(UserId id, String username);
+	public void putFriendship(UserId id, String username);
 	
 	/**
 	 * Get an user name from an user id

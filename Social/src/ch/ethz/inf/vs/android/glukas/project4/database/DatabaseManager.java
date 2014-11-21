@@ -5,6 +5,7 @@ import java.util.List;
 
 import ch.ethz.inf.vs.android.glukas.project4.Post;
 import ch.ethz.inf.vs.android.glukas.project4.User;
+import ch.ethz.inf.vs.android.glukas.project4.UserId;
 import ch.ethz.inf.vs.android.glukas.project4.Wall;
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseContract.FriendsEntry;
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseContract.PostsEntry;
@@ -17,7 +18,7 @@ import android.util.Log;
 
 /**
  * Provides the interface with the database.
- * 
+ * TODO: check performance of getWrite/ReadableDatabase() and if too slow use AsyncTask to execuTe them.
  * @author alessiobaehler
  * @comment these will be the basic functionalities, more will be added.
  */
@@ -98,85 +99,107 @@ public abstract class DatabaseManager extends SQLiteOpenHelper implements Databa
 		// TODO: decide if needed and define upgrade policy in case it is
 	}
 
-	/** USER MANAGEMENT
+	/**
+	 * USER MANAGEMENT
 	 * With user is meant the owner of the app.~
 	 */
-	// Add User to Database (first usage of the app? yes!)
+	// Add User to Database
 	@Override
 	public void putUser(User user) {
 		Users.putUser(user, this.getWritableDatabase());
 	}
 
-	// Get the whole wall of the user.
+	// TODO: Get the upper bound of the number of posts in the user's wall.
 	@Override
-	public Wall getUserWall() {
-		return Walls.getUserWall(this.getReadableDatabase());
+	public int getUserPostsCount() {
+//		return Users
+		return 0;
 	}
-
+	
+	// TODO: Get the upper bound of the number of posts in the user's wall.
+	@Override
+	public int getUserMaxPostsId() {
+		// return Users
+		return 0;
+	}
+	
+	
+	/**
+	 * FRIENDS MANAGEMENT
+	 */
+	// TODO: Get the upper bound of the number of posts in the friend's wall.
+	@Override
+	public int getFriendPostsCount(UserId id) {
+		return 0;
+	}
+	
+	// TODO: Get the upper bound over the partial order of actual posts for the friend.
+	@Override
+	public int getFriendMaxId(UserId id) {
+		return 0;
+	}
+	
+	// TODO: Create a friendship relation between the user and a new friend.
+	public void putFriendship(UserId id, String username) {
+		
+	}
+	
+	// TODO: Get an user name from an user id
+	@Override
+	public String getFriendUsername(UserId id) {
+		return null;
+	}
+	
+	// TODO: Get an user id from an user name (cannot ensures uniqueness)
+	public List<UserId> getFriendId(String username) {
+		return null;
+	}
+	
+	// Add a friend in the List of Friends of the user
+	@Override
+	public void putFriend(User friend) {
+		Friends.putFriend(friend, this.getWritableDatabase());
+	}
+	
+	// TODO: Remove friend from the List of friends & everything associated with him/her
+	@Override
+	public void deleteFriend(UserId id) {
+//		Friends.deleteFriend(id, this.getWritableDatabase());
+	}
+	
+	
+	/**
+	 * POSTS MANAGEMENT
+	 */
 	// Update the wall of the user with the given post.
 	@Override
 	public void putUserPost(Post post) {
 		Posts.putUserPost(post, this.getWritableDatabase());
 	}
+	
+	// TODO: Get all the Posts in a Wall starting from id -> id or time?
+	@Override
+	public List<Post> getAllUserPostsFrom(int from) {
+//	return Posts.getAllUserPostsFrom(timestamp, this.getReadableDatabase());
+		return null;
+	}
 
+	// Delete a certain post from the user's wall.
+	@Override
+	public void deleteUserPost(int postid) {
+		Posts.deleteUserPost(postid, this.getWritableDatabase());
+	}
+	
 	// Get a certain post from the user's wall.
 	@Override
 	public Post getUserPost(int postid) {
 		return Posts.getUserPost(postid, this.getReadableDatabase());
 	}
 
-	// Get all the Posts in a Wall starting from id -> id or time?
-//	@Override TODO
-	public List<Post> getAllUserPostsFrom(int friendid, int postid) {
-//		return Posts.getAllUserPostsFrom(timestamp, this.getReadableDatabase());
-		return null;
-	}
-
-	// Delete a certain post from the user's wall.
-	@Override
-	public void deleteUserPost(int id) {
-		Posts.deleteUserPost(id, this.getWritableDatabase());
-	}
-	
-	// TODO: check performance of getWrite/ReadableDatabase() and if too slow use AsyncTask to execue them.
-	/** FRIENDS MANAGEMENT
-	 */	
-	/**
-	 * If we are going to store the wall of friends in our database we probably
-	 * need the methods below If we don't make a special case for the user
-	 * himself we could also use these methods instead of
-	 * 
-	 * @author youngban
-	 */
-	/**
-	 * I thought a little about it, and i concluded is safer to distinguish 
-	 * between the user and a friend by using separate methods.
-	 * 
-	 * @author alessiobaehler
-	 */
-	// Add a friend in the List of Friends of the user
-	@Override
-	public void putFriend(User friend) {
-		Friends.putFriend(friend, this.getWritableDatabase());
-	}
-
-	// Remove friend from the List of friends & everything associated with
-	// him/her
-//	@Override TODO
-	public void deleteFriend(int friendid) {
-		Friends.deleteFriend(friendid, this.getWritableDatabase());
-	}
-	
 	// Update the wall of a friend whose wall is saved on our phone
 	@Override
 	public void putFriendPost(Post post, int friendid) {
 		Posts.putFriendPost(post, friendid, this.getWritableDatabase());
-	}
-
-	// Get the whole Wall of a certain friend
-	@Override
-	public Wall getFriendWall(int friendid) {
-		return Walls.getFriendWall(friendid, this.getReadableDatabase());
 	}
 
 	// Get a certain Post from a certain friend
@@ -198,7 +221,29 @@ public abstract class DatabaseManager extends SQLiteOpenHelper implements Databa
 		Posts.deleteFriendPost(postid, friendid, this.getWritableDatabase());
 	}
 	
-	// delete the whole saved Wall of a certain friend
+	/**
+	 * WALLS MANAGEMENT
+	 */
+	
+	// Get the whole wall of the user.
+	@Override
+	public Wall getUserWall() {
+		return Walls.getUserWall(this.getReadableDatabase());
+	}
+	
+	// TODO: Delete user's wall.
+	@Override
+	public void deleteUserWall() {
+		
+	}
+	
+	// Get the whole Wall of a certain friend
+	@Override
+	public Wall getFriendWall(int friendid) {
+		return Walls.getFriendWall(friendid, this.getReadableDatabase());
+	}
+	
+	// Delete the whole saved Wall of a certain friend
 	@Override
 	public void deleteFriendWall(int friendid) {
 		Walls.deleteFriendWall(friendid, this.getWritableDatabase());
