@@ -1,4 +1,4 @@
-package ch.ethz.inf.vs.android.glukas.networking;
+package ch.ethz.inf.vs.android.glukas.project4.networking;
 
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.PublicHeader;

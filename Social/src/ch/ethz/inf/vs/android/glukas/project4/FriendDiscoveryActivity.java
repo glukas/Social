@@ -2,17 +2,17 @@ package ch.ethz.inf.vs.android.glukas.project4;
 
 import java.util.List;
 
-import ch.ethz.inf.vs.android.glukas.networking.FriendDiscovery;
-import ch.ethz.inf.vs.android.glukas.networking.FriendDiscovery.Peer;
-import ch.ethz.inf.vs.android.glukas.networking.FriendDiscoveryDelegate;
+import ch.ethz.inf.vs.android.glukas.project4.networking.FriendRequestMessageCallback;
+
 import android.app.Activity;
+import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class FriendDiscoveryActivity extends Activity implements FriendDiscoveryDelegate {
+public class FriendDiscoveryActivity extends Activity  {
 
-	private FriendDiscovery friendDiscovery;
+	FriendRequestMessageCallback NfcCallback;
 	
 	////
 	//ACTIVITY
@@ -22,8 +22,10 @@ public class FriendDiscoveryActivity extends Activity implements FriendDiscovery
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_friend_discovery);
-		
-		friendDiscovery = new FriendDiscovery(this, this);
+		NfcAdapter adapter = NfcAdapter.getDefaultAdapter(this);
+		NfcCallback = new FriendRequestMessageCallback();
+		adapter.setNdefPushMessageCallback(NfcCallback, this);
+		adapter.setOnNdefPushCompleteCallback(NfcCallback, this);
 	}
 
 	@Override
@@ -48,26 +50,11 @@ public class FriendDiscoveryActivity extends Activity implements FriendDiscovery
 	@Override
 	public void onResume() {
 		super.onResume();
-		friendDiscovery.resumeDiscovery();
 	}
 	
 	@Override
 	public void onPause() {
 		super.onPause();
-		friendDiscovery.pauseDiscovery();
-	}
-	
-	////
-	//FRIEND DISCOVERY DELEGATE
-	////
-	
-	@Override
-	public void onPeersDiscoveredChanged(List<Peer> discoveredPeers) {
-		// TODO (Samuel) display
 	}
 
-	@Override
-	public void onFriendshipRequestAccepted(Peer peer) {
-		// TODO (Samuel) display
-	}
 }
