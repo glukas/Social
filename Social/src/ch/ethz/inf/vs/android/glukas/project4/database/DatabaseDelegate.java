@@ -21,7 +21,7 @@ public interface DatabaseDelegate {
 	////
 	
 	/**
-	 * Add User to Database (first usage of the app? yes!).
+	 * Add User to Database.
 	 * @param user to insert.
 	 */
 	public void putUser(User user);
@@ -43,24 +43,26 @@ public interface DatabaseDelegate {
 	// Friends management
 	////
 	
-	/** TODO
-	 * 
-	 * @return
+	/**
+	 * Get the upper bound of the number of posts in the friend's wall.
+	 * @param id the id of the friend
+	 * @return the upper bound.
 	 */
-	public int getFriendPostsCount();
+	public int getFriendPostsCount(UserId id);
 	
-	/** TODO
-	 * 
-	 * @return
+	/**
+	 * Get the upper bound over the partial order of actual posts for the friend.
+	 * @param id the id of the friend
+	 * @return the upper bound.
 	 */
-	public int getFriendMaxId();
+	public int getFriendMaxId(UserId id);
 	
-	/** TODO
-	 * Add a friend.
+	/**
+	 * Create a friendship relation between the user and a new friend.
 	 * @param id the id of the friend (128 bits)
 	 * @param username the user name of the added friend
 	 */
-	public void addFriend(UserId id, String username);
+	public void addFriendship(UserId id, String username);
 	
 	/**
 	 * Get an user name from an user id
@@ -76,78 +78,77 @@ public interface DatabaseDelegate {
 	 */
 	public List<UserId> getFriendId(String username);
 	
-	/** TODO
-	 * Delete a friend
-	 * @param id
-	 * @param username
+	/**
+	 * Insert a friend.
+	 * @param friend the friend object
 	 */
 	public void putFriend(User friend);
 	
-	/** TODO
-	 * 
-	 * @param friendid
+	/** 
+	 * Delete a friend recursively. This means any data related to him
+	 * (data, friendships, posts) will be removed from the database.
+	 * @param id the id of the friend to delete.
 	 */
-	public void deleteFriend(UserId friendid);
+	public void deleteFriend(UserId id);
+	
 	
 	////
 	//Posts management
 	////
 	
 	/**
-	 * Add a post to the database
-	 * @param post, should be self-contained. (Contain owner wall, id)
+	 * Add a user post to the database
+	 * @param post
 	 */
 	public void putUserPost(Post post);
 	
-	/** TODO
-	 * Get multiple posts of a wall
-	 * @param wall
-	 * @param from
+	/**
+	 * Get multiple posts from the user's wall
+	 * @param the least message id to consider
 	 * @return a list of Posts matched by arguments
 	 */
 	public List<Post> getAllUserPostsFrom(int from);
 	
 	/**
-	 * Delete a post.
-	 * @param postId, should be self-contained. (Contain owner wall, id)
-	 * @param userId, needed to identify uniquely the post.
+	 * Delete a user post.
+	 * @param id the id of the post to delete 
 	 */
-	public void deleteUserPost(int postId);
+	public void deleteUserPost(int id);
 	
-	/** TODO
-	 * 
-	 * @param postid
-	 * @return
+	/**
+	 * Get a user post.
+	 * @param id the id of the post to retrieve
+	 * @return the requested post
 	 */
-	public Post getUserPost(int postid);
+	public Post getUserPost(int id);
 	
-	/** TODO
-	 * 
-	 * @param post
-	 * @param friendid
+	/**
+	 * Add a friend post to the database.
+	 * @param post the post to add
+	 * @param id the id of the friend
 	 */
-	public void putFriendPost(Post post, int friendid);
+	public void putFriendPost(Post post, int id);
 
-	/** TODO
-	 * 
-	 * @param postid
-	 * @param friendid
+	/**
+	 * Get a post of a friend
+	 * @param postid the id of the post to retrieve
+	 * @param friendid the friend who owns the post
 	 * @return
 	 */
 	public Post getFriendPost(int postid, int friendid);
 	
-	/** TODO
-	 * 
-	 * @param friendid
-	 * @param postid
-	 * @return
+	/**
+	 * Get all post of a friend with at least 'from' as post's number
+	 * @param id the friends id
+	 * @param from the least post id to consider
+	 * @return a list of all matching posts (not sorted)
 	 */
-	public List<Post> getAllFriendPostsFrom(int friendid, int postid);
+	public List<Post> getAllFriendPostsFrom(int id, int from);
 	
-	/** TODO
-	 * 
-	 * @param postid
-	 * @param friendid
+	/**
+	 * Delete a friend's post.
+	 * @param postid the id of the post to delete
+	 * @param friendid the id of the friend
 	 */
 	public void deleteFriendPost(int postid, int friendid);
 	
@@ -156,30 +157,28 @@ public interface DatabaseDelegate {
 	//Walls management
 	////
 	
-	/** TODO
-	 * Get the wall of an user
-	 * @param id, owner of the wall
+	/**
+	 * Get the user's wall
 	 * @return wall of user
 	 */
 	public Wall getUserWall();
 	
-	/** TODO
-	 * Delete the wall of an user
-	 * @param id, owner of the wall
+	/**
+	 * Delete the user's wall
 	 */
 	public void deleteUserWall();
 	
-	/** TODO
-	 * 
-	 * @param friendid
-	 * @return
+	/**
+	 * Get the wall of a friend.
+	 * @param id the friend's id
+	 * @return the friend's wall object
 	 */
-	public Wall getFriendWall(int friendid);
+	public Wall getFriendWall(int id);
 	
-	/** TODO
-	 * 
-	 * @param friendid
+	/**
+	 * Delete the wall of a friend.
+	 * @param id the id of the friend whose wall is to delete
 	 */
-	public void deleteFriendWall(int friendid);
+	public void deleteFriendWall(int id);
 
 }
