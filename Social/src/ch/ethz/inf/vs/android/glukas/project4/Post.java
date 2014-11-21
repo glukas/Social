@@ -18,7 +18,7 @@ public class Post {
 	//date will not be used for sorting, but can provide friendly user content
 	private Date datetime;
 	private PostType postType;
-	private Wall owner;
+	private UserId poster;
 
 	/**
 	 * Create new Image Post
@@ -83,8 +83,8 @@ public class Post {
 		return this.postType;
 	}
 	
-	public Wall getOwner() {
-		return this.owner;
+	public  UserId getPoster() {
+		return this.poster;
 	}
 	
 	public enum PostType {

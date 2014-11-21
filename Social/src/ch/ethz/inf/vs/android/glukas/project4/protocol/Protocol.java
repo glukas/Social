@@ -65,7 +65,7 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate, Messag
 	private UserId localUserId;
 	
 	////
-	//MessageRelay
+	//ProtocolDelegate
 	////
 	
 	@Override
@@ -102,6 +102,10 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate, Messag
 
 	@Override
 	public void discoverFriends() throws NetworkException {
+	}
+	
+	@Override
+	public void setDelegate(UserDelegate delegate) {
 	}
 
 	////

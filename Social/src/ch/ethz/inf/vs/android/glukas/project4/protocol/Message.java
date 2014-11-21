@@ -2,6 +2,7 @@ package ch.ethz.inf.vs.android.glukas.project4.protocol;
 
 /**
  * A Message used by the protocol send over the network. (Either by the user or received from outside world)
+ * It's used to do the internal logic inside the protocol.
  */
 public class Message {
 	
@@ -81,5 +82,3 @@ public class Message {
 		UNKOWN;
 	}
 }
-
-

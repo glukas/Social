@@ -1,6 +1,7 @@
 package ch.ethz.inf.vs.android.glukas.project4.protocol;
 
 import ch.ethz.inf.vs.android.glukas.project4.Post;
+import ch.ethz.inf.vs.android.glukas.project4.UserDelegate;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.DatabaseException;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.NetworkException;
 
@@ -10,6 +11,12 @@ import ch.ethz.inf.vs.android.glukas.project4.exceptions.NetworkException;
  * to connect and disconnect from the connected list on server.
  */
 public interface ProtocolDelegate {
+	
+	/**
+	 * Set a delegate for calls back from the below components
+	 * @param delegate
+	 */
+	public void setDelegate(UserDelegate delegate);
 	
 	/**
 	 * Connect the user to the network.
