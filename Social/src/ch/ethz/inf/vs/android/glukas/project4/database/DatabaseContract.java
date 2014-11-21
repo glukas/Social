@@ -39,8 +39,7 @@ public final class DatabaseContract {
 		public static final String WALL_ID = "wall_id";
 		public static final String TEXT = "text";
 		public static final String IMAGE = "image";
-//		public static final String DATE_TIME = "date_time";
-		public static final String TIMESTAMP = "timestamp";
+		public static final String DATE_TIME = "date_time";
 	}
 
 }

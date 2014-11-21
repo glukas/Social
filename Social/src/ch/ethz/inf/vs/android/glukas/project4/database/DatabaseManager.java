@@ -22,7 +22,7 @@ import android.util.Log;
  * @comment these will be the basic functionalities, more will be added.
  */
 
-public abstract class DatabaseManager extends SQLiteOpenHelper {
+public abstract class DatabaseManager extends SQLiteOpenHelper implements DatabaseDelegate{
 
 	private static final String TAG = "----DATABASE----";
 	// DB Metadata
@@ -69,9 +69,8 @@ public abstract class DatabaseManager extends SQLiteOpenHelper {
 			+ PostsEntry.TEXT + " " + Utility.TEXT_TYPE + ", "
 			// Index 3: image
 			+ PostsEntry.IMAGE + " " + Utility.BLOB_TYPE + ", "
-//			+ PostsEntry.DATE_TIME + " " + Utility.TEXT_TYPE 
-			// INdex 4: timestamp
-			+PostsEntry.TIMESTAMP + " " + Utility.INTEGER_TYPE
+			// Index 4: datetime
+			+ PostsEntry.DATE_TIME + " " + Utility.TEXT_TYPE 
 			+ Utility.FOREIGN_KEY + "(" + PostsEntry.WALL_ID + ")" + " " + Utility.REFERENCES + " " + UsersEntry.TABLE_NAME + "(" + UsersEntry._ID + ")" 
 			+ ");";
 

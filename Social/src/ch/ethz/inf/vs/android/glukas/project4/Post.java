@@ -17,8 +17,11 @@ public class Post {
 	private int id;
 	//date will not be used for sorting, but can provide friendly user content
 	private Date datetime;
-	private PostType postType;
+	// Id of the user that posted the message
 	private UserId poster;
+	// 
+	private int postsCount;
+	private int maxId;
 
 	/**
 	 * Create new Image Post
@@ -31,7 +34,6 @@ public class Post {
 		this.text = text;
 		this.image = image;
 		this.datetime = datetime;
-		this.postType = PostType.PICTURE;
 	}
 	
 	/**
@@ -44,7 +46,6 @@ public class Post {
 		this.text = text;
 		this.image = null;
 		this.datetime = datetime;
-		this.postType = PostType.TEXT;
 	}
 	
 	/**
@@ -79,16 +80,8 @@ public class Post {
 		return this.datetime;
 	}
 	
-	public PostType getPostType() {
-		return this.postType;
-	}
 	
 	public  UserId getPoster() {
 		return this.poster;
-	}
-	
-	public enum PostType {
-		PICTURE,
-		TEXT;
 	}
 }
