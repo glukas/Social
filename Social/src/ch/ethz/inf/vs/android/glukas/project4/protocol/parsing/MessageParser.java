@@ -4,7 +4,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import ch.ethz.inf.vs.android.glukas.project4.protocol.Message.MessageType;
-import ch.ethz.inf.vs.android.glukas.project4.protocol.NetworkMessage;
+import ch.ethz.inf.vs.android.glukas.project4.protocol.Message;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.PublicHeader;
 
 /**
@@ -12,13 +12,13 @@ import ch.ethz.inf.vs.android.glukas.project4.protocol.PublicHeader;
  */
 public class MessageParser {
 	
-	public static NetworkMessage parseMessage(String message, PublicHeader header) {
+	public static Message parseMessage(String message, PublicHeader header) {
 		
 		JSONObject obj = null;
-		NetworkMessage msg = null;
+		Message msg = null;
 		try {
 			 obj = new JSONObject(message);
-			 msg = new NetworkMessage(parseMessageType(obj.getString(Cmds.CMD.getStr())));
+			 msg = new Message(parseMessageType(obj.getString(Cmds.CMD.getStr())));
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
@@ -28,18 +28,16 @@ public class MessageParser {
 	
 	private static MessageType parseMessageType(String type){
 		
-		if (type.equals(Args.ACK.getStr())){
-			return MessageType.ACK;
-		} else if (type.equals(Args.BROADCAST.getStr())) {
+		// TODO : rewrite that
+		
+		if (type.equals(Args.BROADCAST.getStr())) {
 			return MessageType.BROADCAST;
 		} else if (type.equals(Args.CONNECT.getStr())) {
 			return MessageType.CONNECT;
 		} else if (type.equals(Args.DISCONNECT.getStr())) {
 			return MessageType.DISCONNECT;
-		} else if (type.equals(Args.DEM_FRIEND.getStr())) {
-			return MessageType.FRIENDSHIP;
-		} else if (type.equals(Args.GET_WALL.getStr())) {
-			return MessageType.GET_WALL;
+		} else if (type.equals(Args.GET_POSTS.getStr())) {
+			return MessageType.GET_POSTS;
 		} else if (type.equals(Args.POST_PIC.getStr())) {
 			return MessageType.POST_PICTURE;
 		} else if (type.equals(Args.POST_TXT.getStr())) {

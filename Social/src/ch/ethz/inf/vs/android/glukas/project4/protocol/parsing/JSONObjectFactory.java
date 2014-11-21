@@ -4,7 +4,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.UnknowRequestType;
-import ch.ethz.inf.vs.android.glukas.project4.protocol.UserMessage;
+import ch.ethz.inf.vs.android.glukas.project4.protocol.Message;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.Message.MessageType;
 
 /**
@@ -38,18 +38,18 @@ public class JSONObjectFactory {
 	/**
 	 * Create a JSONObject from an UserRequest to be used to send messages over the network
 	 */
-	public static JSONObject createJSONObject(UserMessage request) {
+	public static JSONObject createJSONObject(Message request) {
 		
 		JSONObject obj = new JSONObject();
+		
+		// TODO : rewrite that
 		
 		try {
 			if (request.getMessageType().equals(MessageType.CONNECT)){
 				setConnectObj(request, obj);
 			} else if (request.getMessageType().equals(MessageType.DISCONNECT)){
 				setDisconnectObj(request, obj);
-			} else if (request.getMessageType().equals(MessageType.FRIENDSHIP)){
-				setFriendshipObj(request, obj);
-			} else if (request.getMessageType().equals(MessageType.GET_WALL)){
+			}  else if (request.getMessageType().equals(MessageType.GET_POSTS)){
 				setGetWallObj(request, obj);
 			} else if (request.getMessageType().equals(MessageType.SEARCH_USER)){
 				setSearchUserObj(request, obj);
@@ -72,39 +72,34 @@ public class JSONObjectFactory {
 		return obj;
 	}
 	
-	private static void setConnectObj(UserMessage request, JSONObject obj) throws JSONException{
+	private static void setConnectObj(Message request, JSONObject obj) throws JSONException{
 		obj.put(Cmds.CMD.getStr(), Args.CONNECT.getStr());
 	}
 	
-	private static void setDisconnectObj(UserMessage request, JSONObject obj) throws JSONException{
+	private static void setDisconnectObj(Message request, JSONObject obj) throws JSONException{
 		obj.put(Cmds.CMD.getStr(), Args.DISCONNECT.getStr());
 	}
 	
-	private static void setFriendshipObj(UserMessage request, JSONObject obj) throws JSONException{
-		obj.put(Cmds.CMD.getStr(), Args.DEM_FRIEND.getStr());
-		obj.put(Cmds.FROM.getStr(), request.getUsernameSender());
+	private static void setGetWallObj(Message request, JSONObject obj) throws JSONException{
+		obj.put(Cmds.CMD.getStr(), Args.GET_POSTS.getStr());
 	}
 	
-	private static void setGetWallObj(UserMessage request, JSONObject obj) throws JSONException{
-		obj.put(Cmds.CMD.getStr(), Args.GET_WALL.getStr());
-	}
-	
-	private static void setSearchUserObj(UserMessage request, JSONObject obj) throws JSONException{
+	private static void setSearchUserObj(Message request, JSONObject obj) throws JSONException{
 		obj.put(Cmds.USER.getStr(), request.getUsernameSender());
 	}
 	
-	private static void setShowImageObj(UserMessage request, JSONObject obj){
+	private static void setShowImageObj(Message request, JSONObject obj){
 		//not a JSON request, thus the object associated to this request is empty
 	}
 	
-	private static void setPostPictureObj(UserMessage request, JSONObject obj) throws JSONException{
+	private static void setPostPictureObj(Message request, JSONObject obj) throws JSONException{
 		obj.put(Cmds.CMD.getStr(), Args.POST_PIC.getStr());
 		obj.put(Cmds.ID.getStr(), request.getPostId());
 		obj.put(Cmds.TEXT.getStr(), request.getMessage());
 		obj.put(Cmds.PIC.getStr(), request.getHttpLink());
 	}
 	
-	private static void setPostTextObj(UserMessage request, JSONObject obj) throws JSONException{
+	private static void setPostTextObj(Message request, JSONObject obj) throws JSONException{
 		obj.put(Cmds.CMD.getStr(), Args.POST_TXT.getStr());
 		obj.put(Cmds.ID.getStr(), request.getPostId());
 		obj.put(Cmds.TEXT.getStr(), request.getMessage());

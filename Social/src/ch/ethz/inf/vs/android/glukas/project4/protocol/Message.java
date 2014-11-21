@@ -3,15 +3,27 @@ package ch.ethz.inf.vs.android.glukas.project4.protocol;
 /**
  * A Message used by the protocol send over the network. (Either by the user or received from outside world)
  */
-public abstract class Message {
+public class Message {
 	
-	protected MessageType requestType;
+	/**
+	 * Create new simple Message 
+	 * @param type of the message. (Should only be subset of all types)
+	 */
+	public Message(MessageType type) {
+		this.requestType = type;
+	}
+	
+	//header
 	protected String usernameSender;
 	protected String usernameReceiver;
-	protected String message;
 	protected int postId;
+	protected MessageType requestType;
+	
+	//content
+	protected String message;
 	protected String httpLink;
 	
+	//getters
 	public MessageType getMessageType(){
 		return requestType;
 	}
@@ -39,17 +51,33 @@ public abstract class Message {
 	/**
 	 * Different types of messages
 	 */
-	public enum MessageType{
-		FRIENDSHIP,
-		POST_TEXT,
-		POST_PICTURE,
-		GET_WALL,
-		SHOW_IMAGE,
+	public enum MessageType {
+		
+		//server
 		CONNECT,
 		DISCONNECT,
+		
+		//friends
+		ACCEPT_FRIENDSHIP,
+		REFUSE_FRIENDSHIP,
+		ASK_FRIENDSHIP,
 		SEARCH_USER,
-		ACK,
 		BROADCAST,
+		
+		//post new messages
+		POST_PICTURE,
+		POST_TEXT,
+		ACK_POST,
+		
+		//retrieve data
+		GET_POSTS,
+		SHOW_IMAGE,
+		SEND_PICTURE,
+		SEND_TEXT,
+		GET_STATE,
+		SEND_STATE,
+		
+		//unknown
 		UNKOWN;
 	}
 }

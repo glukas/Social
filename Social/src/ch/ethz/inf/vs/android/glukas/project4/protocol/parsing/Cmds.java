@@ -10,7 +10,9 @@ enum Cmds{
 	ID("id"),
 	TEXT("text"),
 	PIC("picture"),
-	ACK("ack");
+	ACK("ack"),
+	RESPONSE("response"),
+	NUM_M("numMessages");
 	
 	private String name;
 	
