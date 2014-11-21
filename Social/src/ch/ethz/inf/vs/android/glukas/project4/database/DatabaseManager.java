@@ -13,7 +13,6 @@ import ch.ethz.inf.vs.android.glukas.project4.exceptions.DatabaseException;
 import android.content.Context;
 import android.database.SQLException;
 import android.database.sqlite.*;
-import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.util.Log;
 
 /**
@@ -37,7 +36,9 @@ public abstract class DatabaseManager extends SQLiteOpenHelper {
 	 */
 	private static final String SQL_CREATE_FRIENDS = Utility.CREATE_TABLE + " " + FriendsEntry.TABLE_NAME + " (" 
 			+ FriendsEntry._ID + " " + Utility.INTEGER_TYPE + " PRIMARY KEY AUTOINCREMENT, "
+			// Index 0: user_id 
 			+ FriendsEntry.USER_ID + " " + Utility.INTEGER_TYPE + ", "
+			// Index 1: friend_id
 			+ FriendsEntry.FRIEND_ID + " " + Utility.INTEGER_TYPE 
 			+ Utility.FOREIGN_KEY + "(" + FriendsEntry.USER_ID + ")" + " " + Utility.REFERENCES + " " + UsersEntry.TABLE_NAME + "(" + UsersEntry._ID + ")" 
 			+ Utility.FOREIGN_KEY + "(" + FriendsEntry.FRIEND_ID + ")" + " " + Utility.REFERENCES + " " + UsersEntry.TABLE_NAME + "(" + UsersEntry._ID + ")" 
@@ -48,7 +49,9 @@ public abstract class DatabaseManager extends SQLiteOpenHelper {
 	 * TODO: add update/delete options, integrity checks and remaining columns
 	 */
 	private static final String SQL_CREATE_USERS = Utility.CREATE_TABLE + " " + UsersEntry.TABLE_NAME + " (" 
+			// Index 0: _id
 			+ UsersEntry._ID + " " + Utility.INTEGER_TYPE + " PRIMARY KEY, "
+			// Index 1: name
 			+ UsersEntry.NAME + " " + Utility.TEXT_TYPE + ");"; //", "
 //			+ UsersEntry.PRIVATE_KEY + " " + Utility.BLOB_TYPE + ", "
 //			+ UsersEntry.PUBLIC_KEY + " " + Utility.BLOB_TYPE + ")";
@@ -58,19 +61,19 @@ public abstract class DatabaseManager extends SQLiteOpenHelper {
 	 * TODO: add update/delete options and integrity checks
 	 */
 	private static final String SQL_CREATE_POSTS = Utility.CREATE_TABLE + " " + PostsEntry.TABLE_NAME + " (" 
+			// Index 0: _id
 			+ PostsEntry._ID + " " + Utility.INTEGER_TYPE + " PRIMARY KEY, "
+			// INdex 1: wall_id
 			+ PostsEntry.WALL_ID + " " + Utility.INTEGER_TYPE + ", "
+			// Index 2: text
 			+ PostsEntry.TEXT + " " + Utility.TEXT_TYPE + ", "
+			// Index 3: image
 			+ PostsEntry.IMAGE + " " + Utility.BLOB_TYPE + ", "
-			+ PostsEntry.DATE_TIME + " " + Utility.TEXT_TYPE 
+//			+ PostsEntry.DATE_TIME + " " + Utility.TEXT_TYPE 
+			// INdex 4: timestamp
+			+PostsEntry.TIMESTAMP + " " + Utility.INTEGER_TYPE
 			+ Utility.FOREIGN_KEY + "(" + PostsEntry.WALL_ID + ")" + " " + Utility.REFERENCES + " " + UsersEntry.TABLE_NAME + "(" + UsersEntry._ID + ")" 
 			+ ");";
-
-	// Helper classes
-	private Users mUsersHelper = new Users();
-	private Friends mFriendsHelper = new Friends();
-	private Posts mPostsHelper = new Posts();
-	private Walls mWallsHelper = new Walls();
 
 	// CREATION
 	public DatabaseManager(Context context) {
@@ -101,32 +104,32 @@ public abstract class DatabaseManager extends SQLiteOpenHelper {
 	 */
 	// Add User to Database (first usage of the app? yes!)
 	public void putUser(User user) {
-		mUsersHelper.putUser(user, this.getWritableDatabase());
+		Users.putUser(user, this.getWritableDatabase());
 	}
 
 	// Get the whole wall of the user.
 	public Wall getUserWall() {
-		return mWallsHelper.getUserWall(this.getReadableDatabase());
+		return Walls.getUserWall(this.getReadableDatabase());
 	}
 
 	// Update the wall of the user with the given post.
 	public void putUserPost(Post post) {
-		mPostsHelper.putUserPost(post, this.getWritableDatabase());
+		Posts.putUserPost(post, this.getWritableDatabase());
 	}
 
 	// Get a certain post from the user's wall.
 	public Post getUserPost(int postid) {
-		return mPostsHelper.getUserPost(postid, this.getReadableDatabase());
+		return Posts.getUserPost(postid, this.getReadableDatabase());
 	}
 
 	// Get all the Posts in a Wall starting from id -> id or time?
 	public List<Post> getAllUserPostsFrom(int timestamp) {
-		return mPostsHelper.getAllUserPostsFrom(timestamp, this.getReadableDatabase());
+		return Posts.getAllUserPostsFrom(timestamp, this.getReadableDatabase());
 	}
 
 	// Delete a certain post from the user's wall.
 	public void deleteUserPost(int id) {
-		mPostsHelper.deleteUserPost(id, this.getWritableDatabase());
+		Posts.deleteUserPost(id, this.getWritableDatabase());
 	}
 	
 	// TODO: check performance of getWrite/ReadableDatabase() and if too slow use AsyncTask to execue them.
@@ -147,43 +150,43 @@ public abstract class DatabaseManager extends SQLiteOpenHelper {
 	 */
 	// Add a friend in the List of Friends of the user
 	public void putFriend(User friend) {
-		mFriendsHelper.putFriend(friend, this.getWritableDatabase());
+		Friends.putFriend(friend, this.getWritableDatabase());
 	}
 
 	// Remove friend from the List of friends & everything associated with
 	// him/her
 	public void deleteFriend(int friendid) {
-		mFriendsHelper.deleteFriend(friendid, this.getWritableDatabase());
+		Friends.deleteFriend(friendid, this.getWritableDatabase());
 	}
 	
 	// Update the wall of a friend whose wall is saved on our phone
 	public void putFriendPost(Post post, int friendid) {
-		mPostsHelper.putFriendPost(post, friendid, this.getWritableDatabase());
+		Posts.putFriendPost(post, friendid, this.getWritableDatabase());
 	}
 
 	// Get the whole Wall of a certain friend
 	public Wall getFriendWall(int friendid) {
-		return mWallsHelper.getFriendWall(friendid, this.getReadableDatabase());
+		return Walls.getFriendWall(friendid, this.getReadableDatabase());
 	}
 
 	// Get a certain Post from a certain friend
 	public Post getFriendPost(int postid, int friendid) {
-		return mPostsHelper.getFriendPost(postid, friendid, this.getReadableDatabase());
+		return Posts.getFriendPost(postid, friendid, this.getReadableDatabase());
 	}
 
 	// Get all Posts of a certain friend starting at a certain time/timestamp
 	public List<Post> getAllFriendPostsfrom(Date timestamp, int friendid) {
-		return mPostsHelper.getAllFriendPostsfrom(timestamp, friendid, this.getReadableDatabase());
+		return Posts.getAllFriendPostsfrom(timestamp, friendid, this.getReadableDatabase());
 	}
 
 	// delete a certain Post of a certain friend
 	public void deleteFriendPost(int postid, int friendid) {
-		mPostsHelper.deleteFriendPost(postid, friendid, this.getWritableDatabase());
+		Posts.deleteFriendPost(postid, friendid, this.getWritableDatabase());
 	}
 	
 	// delete the whole saved Wall of a certain friend
 	public void deleteFriendWall(int friendid) {
-		mWallsHelper.deleteFriendWall(friendid, this.getWritableDatabase());
+		Walls.deleteFriendWall(friendid, this.getWritableDatabase());
 	}
 	
 	

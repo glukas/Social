@@ -13,7 +13,7 @@ import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseContract.UsersEnt
 class Users {
 
 	// TODO: Add User to Database (first usage of the app?): yes!
-	public void putUser(User user, SQLiteDatabase db) {
+	public static void putUser(User user, SQLiteDatabase db) {
 		// Get data.
 		String username = user.getUsername();
 		

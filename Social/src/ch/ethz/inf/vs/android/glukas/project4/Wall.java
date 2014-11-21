@@ -8,17 +8,9 @@ import java.util.List;
  */
 
 public class Wall {
-
-	// author: Alessio
-	// just to begin
+	
 	// List of all posts contained in the wall.
 	public List<Post> posts;
-
-	// Add a Post to the Wall. To maintain consistency also the DB has to be updated!!
-	public void putPost(Post post) {
-		posts.add(post);
-		
-	}
 
 	// Get Post with the specified id.
 	public void getPostatId(int id) {	

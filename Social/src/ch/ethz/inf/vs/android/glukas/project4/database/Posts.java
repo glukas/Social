@@ -1,6 +1,7 @@
 package ch.ethz.inf.vs.android.glukas.project4.database;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -10,6 +11,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import ch.ethz.inf.vs.android.glukas.project4.Post;
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseContract.PostsEntry;
+import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseContract.UsersEntry;
 
 /**
  * Helper class that implements all functionalities of table Posts.
@@ -24,7 +26,7 @@ class Posts {
 	 * @param post the post to insert
 	 * @param db the SQLiteDatabase
 	 */
-	public void putUserPost(Post post, SQLiteDatabase db) {
+	public static void putUserPost(Post post, SQLiteDatabase db) {
 		// Avoid code duplication by calling this function.
 		putFriendPost(post, Utility.userID, db);
 	}
@@ -36,7 +38,7 @@ class Posts {
 	 * @param db SQLliteDatabase to query
 	 * @return a Post object if it was found, else null
 	 */
-	public Post getUserPost(int postid, SQLiteDatabase db) {
+	public static Post getUserPost(int postid, SQLiteDatabase db) {
 		// Avoid code duplication by calling this function.
 		return getFriendPost(postid, Utility.userID, db);
 	}
@@ -46,13 +48,39 @@ class Posts {
 	 * @param id the id of the post to delete
 	 * @param db SQLliteDatabase to query
 	 */
-	public void deleteUserPost(int postid, SQLiteDatabase db) {
+	public static void deleteUserPost(int postid, SQLiteDatabase db) {
 		deleteFriendPost(postid, Utility.userID, db);
 	}
 
-	// TODO: Get all the Posts in a Wall starting from id -> id or time?
-	public List<Post> getAllUserPostsFrom(int timestamp, SQLiteDatabase db) {
-		return null;
+	// TODO: Get all the Posts in a Wall starting from timestamp
+	public static List<Post> getAllUserPostsFrom(int timestamp, SQLiteDatabase db) {
+		String[] projection = {PostsEntry._ID, PostsEntry.TEXT, PostsEntry.IMAGE, PostsEntry.TIMESTAMP};
+		String selection = PostsEntry.WALL_ID + " == ? AND " + PostsEntry.TIMESTAMP + " > ?";
+		String[] selectionArgs = {Integer.toString(Utility.userID), Integer.toString(timestamp)};
+		
+		Cursor cursor = db.query(PostsEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, null);
+		
+		List<Post> posts = new ArrayList<Post>();
+		
+		// Create Post object to return.
+		if(cursor.moveToFirst()) {
+			do {
+				int id = cursor.getInt(0);
+				String text = cursor.getString(2);
+				Bitmap image = Utility.toBitmap(cursor.getBlob(3));
+	//			Date datetime = Utility.toJavaDate(cursor.getString(4));	// still to implement
+				int ts = cursor.getInt(4);
+				posts.add(new Post(id, text, image, ts));
+			} while(cursor.moveToNext());
+			
+			// Close cursor
+			cursor.close();
+			return posts;
+		}
+		else {
+			cursor.close();
+			return null;
+		}	
 	}
 	
 
@@ -62,11 +90,12 @@ class Posts {
 	 * @param friendid
 	 * @param db
 	 */
-	public void putFriendPost(Post post, int friendid, SQLiteDatabase db) {
+	public static void putFriendPost(Post post, int friendid, SQLiteDatabase db) {
 		// Get data.
 		String text = post.getText();
 		Bitmap image = post.getImage();
-		Date datetime = post.getDateTime();
+//		Date datetime = post.getDateTime();
+		int timestamp = post.getTimestamp();
 		
 		// Transform bitmap to byte[]
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -75,17 +104,18 @@ class Posts {
 		
 		// Convert datetime into string format accepted by SQLite
 		// TODO: use simpledateformat
-		String dtNew = 
-				Integer.toString(datetime.getYear()) + "-" + Integer.toString(datetime.getMonth()) + 
-				"-" + Integer.toString(datetime.getDay()) + " " + Integer.toString(datetime.getHours()) + 
-				":" + Integer.toString(datetime.getMinutes()) + ":" + Integer.toString(datetime.getSeconds());
+//		String dtNew = 
+//				Integer.toString(datetime.getYear()) + "-" + Integer.toString(datetime.getMonth()) + 
+//				"-" + Integer.toString(datetime.getDay()) + " " + Integer.toString(datetime.getHours()) + 
+//				":" + Integer.toString(datetime.getMinutes()) + ":" + Integer.toString(datetime.getSeconds());
 		
 		// Create content to insert.
 		ContentValues values = new ContentValues();
 		values.put(PostsEntry.TEXT, text);
 		values.put(PostsEntry.IMAGE, bArray);
 		values.put(PostsEntry.WALL_ID, friendid);
-		values.put(PostsEntry.DATE_TIME, dtNew);
+		values.put(PostsEntry.TIMESTAMP, timestamp);
+//		values.put(PostsEntry.DATE_TIME, dtNew);
 		
 		// Insert content.
 		db.insert(PostsEntry.TABLE_NAME, null, values);
@@ -98,9 +128,9 @@ class Posts {
 	 * @param db
 	 * @return
 	 */
-	public Post getFriendPost(int postid, int friendid, SQLiteDatabase db) {
+	public static Post getFriendPost(int postid, int friendid, SQLiteDatabase db) {
 		// Columns to project.
-		String[] projection = {PostsEntry._ID, PostsEntry.TEXT, PostsEntry.IMAGE, PostsEntry.DATE_TIME};
+		String[] projection = {PostsEntry._ID, PostsEntry.TEXT, PostsEntry.IMAGE, PostsEntry.TIMESTAMP};
 		
 		// SQL WHERE clause.
 		String selection = PostsEntry._ID + " == ? AND" + PostsEntry.WALL_ID + " == ?";
@@ -116,10 +146,11 @@ class Posts {
 			int id = cursor.getInt(0);
 			String text = cursor.getString(2);
 			Bitmap image = Utility.toBitmap(cursor.getBlob(3));
-			Date datetime = Utility.toJavaDate(cursor.getString(4));	// still to implement
+//			Date datetime = Utility.toJavaDate(cursor.getString(4));	// still to implement
+			int timestamp = cursor.getInt(4);
 			// Close cursor
 			cursor.close();
-			return new Post(id, text, image, datetime);
+			return new Post(id, text, image, timestamp);
 		}
 		else {
 			cursor.close();
@@ -134,7 +165,7 @@ class Posts {
 	 * @param db
 	 * @return
 	 */
-	public List<Post> getAllFriendPostsfrom(Date timestamp, int friendid, SQLiteDatabase db) {
+	public static List<Post> getAllFriendPostsfrom(Date timestamp, int friendid, SQLiteDatabase db) {
 		return null;
 	}
 	
@@ -144,7 +175,7 @@ class Posts {
 	 * @param friendid
 	 * @param db
 	 */
-	public void deleteFriendPost(int postid, int friendid, SQLiteDatabase db) {
+	public static void deleteFriendPost(int postid, int friendid, SQLiteDatabase db) {
 		// SQL WHERE clause.
 		String selection = PostsEntry._ID + " == ? AND" + PostsEntry.WALL_ID + " == ?";
 		
