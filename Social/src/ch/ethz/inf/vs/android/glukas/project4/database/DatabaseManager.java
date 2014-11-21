@@ -102,31 +102,38 @@ public abstract class DatabaseManager extends SQLiteOpenHelper implements Databa
 	 * With user is meant the owner of the app.~
 	 */
 	// Add User to Database (first usage of the app? yes!)
+	@Override
 	public void putUser(User user) {
 		Users.putUser(user, this.getWritableDatabase());
 	}
 
 	// Get the whole wall of the user.
+	@Override
 	public Wall getUserWall() {
 		return Walls.getUserWall(this.getReadableDatabase());
 	}
 
 	// Update the wall of the user with the given post.
+	@Override
 	public void putUserPost(Post post) {
 		Posts.putUserPost(post, this.getWritableDatabase());
 	}
 
 	// Get a certain post from the user's wall.
+	@Override
 	public Post getUserPost(int postid) {
 		return Posts.getUserPost(postid, this.getReadableDatabase());
 	}
 
 	// Get all the Posts in a Wall starting from id -> id or time?
-	public List<Post> getAllUserPostsFrom(int timestamp) {
-		return Posts.getAllUserPostsFrom(timestamp, this.getReadableDatabase());
+//	@Override TODO
+	public List<Post> getAllUserPostsFrom(int friendid, int postid) {
+//		return Posts.getAllUserPostsFrom(timestamp, this.getReadableDatabase());
+		return null;
 	}
 
 	// Delete a certain post from the user's wall.
+	@Override
 	public void deleteUserPost(int id) {
 		Posts.deleteUserPost(id, this.getWritableDatabase());
 	}
@@ -148,60 +155,52 @@ public abstract class DatabaseManager extends SQLiteOpenHelper implements Databa
 	 * @author alessiobaehler
 	 */
 	// Add a friend in the List of Friends of the user
+	@Override
 	public void putFriend(User friend) {
 		Friends.putFriend(friend, this.getWritableDatabase());
 	}
 
 	// Remove friend from the List of friends & everything associated with
 	// him/her
+//	@Override TODO
 	public void deleteFriend(int friendid) {
 		Friends.deleteFriend(friendid, this.getWritableDatabase());
 	}
 	
 	// Update the wall of a friend whose wall is saved on our phone
+	@Override
 	public void putFriendPost(Post post, int friendid) {
 		Posts.putFriendPost(post, friendid, this.getWritableDatabase());
 	}
 
 	// Get the whole Wall of a certain friend
+	@Override
 	public Wall getFriendWall(int friendid) {
 		return Walls.getFriendWall(friendid, this.getReadableDatabase());
 	}
 
 	// Get a certain Post from a certain friend
+	@Override
 	public Post getFriendPost(int postid, int friendid) {
 		return Posts.getFriendPost(postid, friendid, this.getReadableDatabase());
 	}
 
 	// Get all Posts of a certain friend starting at a certain time/timestamp
-	public List<Post> getAllFriendPostsfrom(Date timestamp, int friendid) {
-		return Posts.getAllFriendPostsfrom(timestamp, friendid, this.getReadableDatabase());
+	@Override
+	public List<Post> getAllFriendPostsFrom(int friendid, int postid) {
+//		return Posts.getAllFriendPostsfrom(timestamp, friendid, this.getReadableDatabase());
+		return null;
 	}
 
 	// delete a certain Post of a certain friend
+	@Override
 	public void deleteFriendPost(int postid, int friendid) {
 		Posts.deleteFriendPost(postid, friendid, this.getWritableDatabase());
 	}
 	
 	// delete the whole saved Wall of a certain friend
+	@Override
 	public void deleteFriendWall(int friendid) {
 		Walls.deleteFriendWall(friendid, this.getWritableDatabase());
 	}
-	
-	
-	///
-	// Probably not needed
-	///
-	// public abstract User getUser(int id);
-
-	// public abstract void deleteUser(int id);
-
-	// public abstract void putWall(Wall wall);
-
-	// public abstract void deleteWall(int id);
-
-	// public abstract User getFriend(int id);
-
-
-
 }

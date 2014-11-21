@@ -1,58 +1,93 @@
 package ch.ethz.inf.vs.android.glukas.project4.database;
 
+import java.util.Date;
 import java.util.List;
 
 import ch.ethz.inf.vs.android.glukas.project4.Post;
+import ch.ethz.inf.vs.android.glukas.project4.User;
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
 import ch.ethz.inf.vs.android.glukas.project4.Wall;
 
 /**
- * List of all functionalities offered by the database
+ * Abstract list of all functionalities offered by the database.
+ * Please refer to this and add here new functions you need.
+ * Please consider all methods with a TODO as still having a non 
+ * (complete) meaningful declaration.
  */
 public interface DatabaseDelegate {
-	
-	//TODO @Vincent : talk with Alessio and Young about all that stuff 
-	
-	/*
-	 * One idea would be to write here all methods that the Protocol Layer needs and you can implement
-	 * this interface in DatabaseManager. It has the advantage to separate clearly what client and
-	 * provider see. Else, it will help us to see clearly which methods we can use.
-	 */
 
 	////
-	//Friends management
+	// User management
 	////
 	
 	/**
-	 * Add a friend
+	 * Add User to Database (first usage of the app? yes!).
+	 * @param user to insert.
+	 */
+	public void putUser(User user);
+	
+	/**
+	 * Get the upper bound of the number of posts in the user's wall.
+	 * @return the upper bound.
+	 */
+	public int getUserPostsCount();
+	
+	/**
+	 * Get the upper bound over the partial order of actual posts for the user.
+	 * @return the upper bound.
+	 */
+	public int getUserMaxPostId();
+	
+	
+	////
+	// Friends management
+	////
+	
+	/** TODO
+	 * 
+	 * @return
+	 */
+	public int getFriendPostsCount();
+	
+	/** TODO
+	 * 
+	 * @return
+	 */
+	public int getFriendMaxId();
+	
+	/** TODO
+	 * Add a friend.
 	 * @param id the id of the friend (128 bits)
 	 * @param username the user name of the added friend
 	 */
-	//alternatively, addFriend(User user);
-	public void addMapping(UserId id, String username);
+	public void addFriend(UserId id, String username);
 	
 	/**
 	 * Get an user name from an user id
-	 * @param id
+	 * @param id the id of the friend to retrieve the username
 	 * @return A String representation of the user
 	 */
-	public String getUsername(UserId id);
+	public String getFriendUsername(UserId id);
 	
 	/**
 	 * Get an user id from an user name (cannot ensures uniqueness)
-	 * @param username
+	 * @param username the username of the friend to retrieve the id
 	 * @return A list of different users matched by provided user name
 	 */
-	public List<UserId> getUserid(String username);
+	public List<UserId> getFriendId(String username);
 	
-	/**
+	/** TODO
 	 * Delete a friend
 	 * @param id
 	 * @param username
 	 */
-	//alternatively, deleteFriend(User user);
-	public void deleteMapping(UserId id, String username);
+	public void putFriend(User friend);
 	
+	/** TODO
+	 * 
+	 * @param friendid
+	 */
+	public void deleteFriend(UserId friendid);
 	
 	////
 	//Posts management
@@ -62,37 +97,89 @@ public interface DatabaseDelegate {
 	 * Add a post to the database
 	 * @param post, should be self-contained. (Contain owner wall, id)
 	 */
-	public void addPost(Post post);
+	public void putUserPost(Post post);
 	
-	/**
+	/** TODO
 	 * Get multiple posts of a wall
 	 * @param wall
 	 * @param from
 	 * @return a list of Posts matched by arguments
 	 */
-	public List<Post> getPostsFrom(Wall wall, int from);
+	public List<Post> getAllUserPostsFrom(int from);
 	
 	/**
 	 * Delete a post.
 	 * @param postId, should be self-contained. (Contain owner wall, id)
 	 * @param userId, needed to identify uniquely the post.
 	 */
-	public void deletePost(int postId, UserId userId);
+	public void deleteUserPost(int postId);
+	
+	/** TODO
+	 * 
+	 * @param postid
+	 * @return
+	 */
+	public Post getUserPost(int postid);
+	
+	/** TODO
+	 * 
+	 * @param post
+	 * @param friendid
+	 */
+	public void putFriendPost(Post post, int friendid);
+
+	/** TODO
+	 * 
+	 * @param postid
+	 * @param friendid
+	 * @return
+	 */
+	public Post getFriendPost(int postid, int friendid);
+	
+	/** TODO
+	 * 
+	 * @param friendid
+	 * @param postid
+	 * @return
+	 */
+	public List<Post> getAllFriendPostsFrom(int friendid, int postid);
+	
+	/** TODO
+	 * 
+	 * @param postid
+	 * @param friendid
+	 */
+	public void deleteFriendPost(int postid, int friendid);
+	
 	
 	////
 	//Walls management
 	////
 	
-	/**
+	/** TODO
 	 * Get the wall of an user
 	 * @param id, owner of the wall
 	 * @return wall of user
 	 */
-	public Wall getWall(UserId id);
+	public Wall getUserWall();
 	
-	/**
+	/** TODO
 	 * Delete the wall of an user
 	 * @param id, owner of the wall
 	 */
-	public void deleteWall(UserId id);
+	public void deleteUserWall();
+	
+	/** TODO
+	 * 
+	 * @param friendid
+	 * @return
+	 */
+	public Wall getFriendWall(int friendid);
+	
+	/** TODO
+	 * 
+	 * @param friendid
+	 */
+	public void deleteFriendWall(int friendid);
+
 }
