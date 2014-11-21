@@ -24,7 +24,7 @@
  *  Consistency, byte used for consistency (8 bits)
  *  id, not unique id of the message (32 bits)
  *  
- *  
+ *  i.e. Server has identity 0
  *  
  *  
  *  JSON Protocol :
@@ -62,8 +62,17 @@
  *  	cmd :: askFriendship
  *  	from :: USERNAME
  *  
- *  get someone's wall:
- *  	cmd :: getWall
+ *  get someone's posts
+ *  	cmd :: getPosts
+ *  	id :: INT
+ *  
+ *  get someone's current state
+ *  	cmd :: getState
+ *  
+ *  send current state
+ *  	cmd :: sendState
+ *  	id :: INT
+ *  	numMessages :: INT
  *  
  *  post text message on someone's wall:
  *  	cmd :: postText
@@ -87,8 +96,13 @@
  *  	text :: TEXT
  *  	picture :: LINK
  *  
- *  broadcast user's name
+ *  broadcast user's name:
+ *  	cmd :: broadcast
  *  	user :: USERNAME
+ *  
+ *  acknowledge a post:
+ *  	ack :: post
+ *  	id :: INT
  *  
  */
 

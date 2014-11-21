@@ -37,14 +37,14 @@ public interface ProtocolDelegate {
 	 * @param DistUsername, the user to get the wall
 	 * @throws NetworkException, if network is not accessible
 	 */
-	public void getUserWall(String DistUsername) throws NetworkException;
+	public void getUserWall(String distUsername) throws NetworkException;
 	
 	/**
 	 * Ask an user to be friend
 	 * @param DistUsername
 	 * @throws NetworkException, if network is not accessible
 	 */
-	public void askFriendship(String DistUsername) throws NetworkException;
+	public void askFriendship(String distUsername) throws NetworkException;
 
 	/**
 	 * Search for accessible persons on the local bluetooth network

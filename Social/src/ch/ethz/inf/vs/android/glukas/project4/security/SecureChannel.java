@@ -18,20 +18,6 @@ public interface SecureChannel {
 	void broadcastMessage(String message, PublicHeader header);
 	
 	/**
-	 * Connect an user to the server
-	 * @param message
-	 * @param header
-	 */
-	void connect(String message, PublicHeader header);
-	
-	/**
-	 * Disconnect an user from the server
-	 * @param message
-	 * @param header
-	 */
-	void disconnect(String message, PublicHeader header);
-	
-	/**
 	 * Precondition: user was discovered by onPeersDiscovered
 	 * @param user
 	 */
