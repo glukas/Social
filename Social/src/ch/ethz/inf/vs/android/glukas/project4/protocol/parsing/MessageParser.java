@@ -3,7 +3,6 @@ package ch.ethz.inf.vs.android.glukas.project4.protocol.parsing;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import ch.ethz.inf.vs.android.glukas.project4.UserId;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.Message.MessageType;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.Message;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.PublicHeader;

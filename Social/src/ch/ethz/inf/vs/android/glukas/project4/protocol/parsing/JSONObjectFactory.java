@@ -43,7 +43,7 @@ public class JSONObjectFactory {
 	 * Create a JSONObject from an UserRequest to be used to send messages over
 	 * the network
 	 */
-	public static JSONObject createJSONObject(Message request) {
+	public static JSONObject createJSONObject(Message request , int numberofmessages) {
 
 		JSONObject obj = new JSONObject();
 
@@ -92,7 +92,7 @@ public class JSONObjectFactory {
 			} else if (request.getMessageType().equals(MessageType.SEND_TEXT)) {
 				setSendTextObj(request, obj);
 			} else if (request.getMessageType().equals(MessageType.SEND_STATE)) {
-				setSendStateObj(request, obj);
+				setSendStateObj(request, obj, numberofmessages);
 			} else if (request.getMessageType().equals(MessageType.GET_STATE)) {
 				setGetStateObj(request, obj);
 
@@ -218,12 +218,12 @@ public class JSONObjectFactory {
 
 	}
 
-	private static void setSendStateObj(Message request, JSONObject obj)
+	private static void setSendStateObj(Message request ,JSONObject obj,  int numberofmessages)
 			throws JSONException {
 		obj.put(Cmds.CMD.toString(), Args.SEND_STATE.toString());
 		obj.put(Cmds.ID.getStr(), String.valueOf(request.getPostId()));
-		// TODO: What integer for Number of Messages?
-		obj.put(Cmds.NUM_M.getStr(), 0);
+		// TODO: Recheck
+		obj.put(Cmds.NUM_M.getStr(), String.valueOf(numberofmessages));
 
 	}
 
