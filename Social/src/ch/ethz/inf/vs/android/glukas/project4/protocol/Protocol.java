@@ -85,7 +85,7 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate, Messag
 	@Override
 	public void postPost(Post post) throws DatabaseException {
 		//TODO : save in database. Sent to the owner of the wall
-		secureChannel.broadcastMessage(null, null);
+		secureChannel.sendMessage(null, null);
 	}
 
 	@Override
