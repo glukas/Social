@@ -32,6 +32,8 @@ public class MainActivity extends Activity {
         }
         
 		FriendshipOutgoingRequest request = new FriendshipOutgoingRequest();
+		//TODO (Vincent)
+		request.setResponseApplicationPayload("Alice");
 		nfcAdapter.setNdefPushMessageCallback(request, this);
 		nfcAdapter.setOnNdefPushCompleteCallback(request, this);
 	}

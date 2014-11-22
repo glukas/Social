@@ -68,6 +68,8 @@ public class IncomingFriendshipActivity extends Activity {
         // only one message sent during the beam
         NdefMessage msg = (NdefMessage) rawMsgs[0];
         request = new FriendshipIncomingRequest(msg);
+        //TODO (Vincent) replace "Bob"
+        request.setResponseApplicationPayload("Bob");
         displayRequest(request);
         
 		nfcAdapter = NfcAdapter.getDefaultAdapter(this);
@@ -86,8 +88,9 @@ public class IncomingFriendshipActivity extends Activity {
 	private void displayRequest(FriendshipIncomingRequest request) {
 		// TODO (Samuel) could be nicer
 		
-		usernameTextView.setText(request.usernameOfRequestingPeer);
-    	Log.d(this.getClass().toString(), "Friend request " + request.usernameOfRequestingPeer);
+		//TODO (Vincent) parse application payload
+		usernameTextView.setText(request.getApplicationPayload());
+    	Log.d(this.getClass().toString(), "Friend request " + request.getApplicationPayload());
 	}
 
 	/*

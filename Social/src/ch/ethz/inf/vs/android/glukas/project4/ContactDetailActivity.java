@@ -68,7 +68,7 @@ public class ContactDetailActivity extends Activity {
 
 		private void displayRequest(FriendshipResponse response) {
 			// TODO (Samuel) could be nicer
-			contactTextView.setText(response.friendsUsername);
+			contactTextView.setText(response.getApplicationPayload());
 	    	Log.d(this.getClass().toString(), "Friend request accepted : ");
 		}
 }

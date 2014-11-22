@@ -14,12 +14,9 @@ public class FriendshipOutgoingRequest extends FriendshipMessage implements Crea
 	
 	@Override
 	public NdefMessage createNdefMessage(NfcEvent event) {
-		//TODO replace with getOwnUsernamePayload();
-		String usernamePayload = "Alice";
-		String mimeTypeName = applicationMime()+REQUEST_TYPE;
-		NdefRecord payload = NdefRecord.createMime(mimeTypeName, usernamePayload.getBytes());
 		
-		NdefRecord appRecord = NdefRecord.createApplicationRecord(APPLICATION_NAME);
+		NdefRecord payload = getApplicationTextPayload(MessageType.Request);
+		NdefRecord appRecord = getApplicationRecord();
 		NdefMessage message = new NdefMessage(payload, appRecord);
 		return message;
 	}

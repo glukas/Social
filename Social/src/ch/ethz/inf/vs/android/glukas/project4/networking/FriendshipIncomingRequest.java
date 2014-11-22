@@ -9,14 +9,11 @@ import android.util.Log;
 
 public class FriendshipIncomingRequest extends FriendshipMessage implements CreateNdefMessageCallback, OnNdefPushCompleteCallback {
 
-	public final String usernameOfRequestingPeer;
-	
 	/**
 	 * @param request A friendship request received over NFC
 	 */
 	public FriendshipIncomingRequest(NdefMessage request) {
-		String usernameProtocolMessage = new String(request.getRecords()[0].getPayload());
-        usernameOfRequestingPeer = usernameProtocolMessage;//TODO(Vincent) parse usernameProtocolMessage
+        applicationTextPayload = parseApplicationTextPayload(request);
 	}
 	
 	/**
@@ -26,12 +23,8 @@ public class FriendshipIncomingRequest extends FriendshipMessage implements Crea
 	 */
 	@Override
 	public NdefMessage createNdefMessage(NfcEvent event) {
-		//TODO replace with getOwnUsernamePayload();
-		String usernamePayload = "Bob";
-		String mimeTypeName = applicationMime()+RESPONSE_TYPE;
-		NdefRecord payload = NdefRecord.createMime(mimeTypeName, usernamePayload.getBytes());
-		
-		NdefRecord appRecord = NdefRecord.createApplicationRecord(APPLICATION_NAME);
+		NdefRecord payload = getApplicationTextPayload(MessageType.Response);
+		NdefRecord appRecord = getApplicationRecord();
 		NdefMessage message = new NdefMessage(payload, appRecord);
 		return message;
 	}
@@ -39,7 +32,7 @@ public class FriendshipIncomingRequest extends FriendshipMessage implements Crea
 	@Override
 	public void onNdefPushComplete(NfcEvent event) {
 		// TODO Auto-generated method stub
-		Log.d(this.getClass().toString(), "successfully friended " + usernameOfRequestingPeer);
+		Log.d(this.getClass().toString(), "successfully friended " + applicationTextPayload);
 	}
 	
 }

@@ -4,11 +4,8 @@ import android.nfc.NdefMessage;
 
 public class FriendshipResponse extends FriendshipMessage {
 
-	public final String friendsUsername;
-	
 	public FriendshipResponse(NdefMessage response) {
-		String usernameProtocolMessage = new String(response.getRecords()[0].getPayload());
-        friendsUsername = usernameProtocolMessage;//TODO(Vincent) parse usernameProtocolMessage
+        applicationTextPayload = parseApplicationTextPayload(response);
 	}
 	
 	public boolean isAccepting() {
