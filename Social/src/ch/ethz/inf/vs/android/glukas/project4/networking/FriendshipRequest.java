@@ -23,7 +23,7 @@ public class FriendshipRequest extends FriendshipMessage {
 	 */
 	public FriendshipRequest(User sender) {
 		this.messageType = MessageType.Request;
-		this.applicationTextPayload = sender.getUsername();
+		this.sender = sender;
 		this.communicationHandle = KeyGeneration.getInstance().getPseudorandom(16);
 		Log.v(this.getClass().toString(), "create comm handle : " + new BigInteger(communicationHandle));
 	}

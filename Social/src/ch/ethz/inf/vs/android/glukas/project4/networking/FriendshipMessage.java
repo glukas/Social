@@ -3,6 +3,7 @@ package ch.ethz.inf.vs.android.glukas.project4.networking;
 import java.math.BigInteger;
 
 import ch.ethz.inf.vs.android.glukas.project4.User;
+import ch.ethz.inf.vs.android.glukas.project4.UserId;
 import ch.ethz.inf.vs.android.glukas.project4.security.KeyGeneration;
 
 import android.nfc.NdefMessage;
@@ -23,7 +24,7 @@ public abstract class FriendshipMessage implements CreateNdefMessageCallback {
 	 */
 	public User getSender() {
 		//TODO (Vincent) 
-		return new User(null, applicationTextPayload, null, null);
+		return sender;
 	}
 	
 	////
@@ -32,7 +33,7 @@ public abstract class FriendshipMessage implements CreateNdefMessageCallback {
 	
 	protected static final String APPLICATION_NAME = "ch.ethz.inf.vs.android.glukas.project4";
 	
-	protected String applicationTextPayload;
+	protected User sender;
 	protected byte[] communicationHandle;
 	protected MessageType messageType;
 
@@ -48,7 +49,8 @@ public abstract class FriendshipMessage implements CreateNdefMessageCallback {
 	}
 	
 	private enum ExternalType {
-		CommunicationHandle("comm");
+		CommunicationHandle("comm"),
+		UserId("userId");
 		
 		public final String typeName;
 		
@@ -66,28 +68,37 @@ public abstract class FriendshipMessage implements CreateNdefMessageCallback {
 	}
 	
 	protected NdefRecord createApplicationTextPayload(MessageType type) {
-		String usernamePayload = applicationTextPayload;
+		String usernamePayload = sender.getUsername();
 		String mimeTypeName = applicationMime()+type.typeName;
 		NdefRecord payload = NdefRecord.createMime(mimeTypeName, usernamePayload.getBytes());
 		return payload;
 	}
 	
-	protected NdefRecord createCommunicationHandle(byte [] handle) {
+	protected NdefRecord createCommunicationHandleRecord(byte [] handle) {
 		return NdefRecord.createExternal(APPLICATION_NAME, ExternalType.CommunicationHandle.typeName, handle);
 	}
 	
-	protected void parseMessage(NdefMessage message) {
-		this.applicationTextPayload = new String(message.getRecords()[0].getPayload());
-		this.communicationHandle = message.getRecords()[1].getPayload();
+	protected NdefRecord createUserIdRecord() {
+		return NdefRecord.createExternal(APPLICATION_NAME, ExternalType.UserId.typeName, sender.getId().getId().toByteArray());
 	}
 	
+	protected void parseMessage(NdefMessage message) {
+		NdefRecord[] records = message.getRecords();
+		String username = new String(records[0].getPayload());
+		this.communicationHandle = records[1].getPayload();
+		byte[] userId = records[2].getPayload();
+		this.sender = new User(new UserId(userId), username, null, null);
+	}
+	
+
 	@Override
 	public NdefMessage createNdefMessage(NfcEvent event) {
 		NdefRecord payload = createApplicationTextPayload(messageType);
-		NdefRecord commHandle = createCommunicationHandle(communicationHandle);
+		NdefRecord commHandle = createCommunicationHandleRecord(communicationHandle);
+		NdefRecord userId = createUserIdRecord();
 		NdefRecord appRecord = createApplicationRecord();
 		
-		NdefMessage message = new NdefMessage(payload, commHandle, appRecord);
+		NdefMessage message = new NdefMessage(payload, commHandle, userId, appRecord);
 		return message;
 	}
 }

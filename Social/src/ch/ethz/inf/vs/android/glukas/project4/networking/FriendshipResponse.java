@@ -14,7 +14,7 @@ public class FriendshipResponse extends FriendshipMessage {
 	//Others should call createAcceptingResponse on a FriendshipRequest to get a response to that request.
 	FriendshipResponse(User user, byte[] communicationHandle) {
 		this.messageType = MessageType.Response;
-		this.applicationTextPayload = user.getUsername();
+		this.sender = user;
 		this.communicationHandle = communicationHandle;
 	}
 	

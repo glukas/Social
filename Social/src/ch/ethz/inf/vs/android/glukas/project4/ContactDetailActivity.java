@@ -74,12 +74,12 @@ public class ContactDetailActivity extends Activity {
 
 		private void displayFailure() {
 			contactTextView.setText("Friendship request failed. Please try again");
-	    	Log.d(this.getClass().toString(), "Friend request failed : ");
+	    	Log.d(this.getClass().toString(), "Friend request failed.");
 		}
 
 		private void displayRequest(FriendshipResponse response) {
 			// TODO (Samuel) could be nicer
 			contactTextView.setText(response.getSender().getUsername());
-	    	Log.d(this.getClass().toString(), "Friend request accepted : ");
+	    	Log.d(this.getClass().toString(), "Friend request accepted : " + response.getSender().getUsername());
 		}
 }

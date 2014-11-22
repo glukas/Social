@@ -8,11 +8,15 @@ import java.math.BigInteger;
 public class UserId {
 
 	private BigInteger id;
-	
+
 	public UserId(String value) {
 		id = new BigInteger(value);
 	}
 	
+	public UserId(byte[] twosComplement) {
+		id = new BigInteger(twosComplement);
+	}
+
 	public BigInteger getId(){
 		return id;
 	}
