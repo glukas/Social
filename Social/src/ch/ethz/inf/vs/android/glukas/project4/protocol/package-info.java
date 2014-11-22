@@ -64,7 +64,7 @@
  *  
  *  get someone's posts
  *  	cmd :: getPosts
- *  	id :: INT
+ *  	id :: INT // not needed here right?
  *  
  *  get someone's current state
  *  	cmd :: getState

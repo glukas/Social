@@ -5,13 +5,16 @@ package ch.ethz.inf.vs.android.glukas.project4.protocol.parsing;
  */
 public enum Args{
 	CONNECT("connect"),
-	DEM_FRIEND("askFriendship"),
+	//DEM_FRIEND("askFriendship"),
 	DISCONNECT("disconnect"),
 	GET_POSTS("getPosts"),
 	POST_TXT("postText"),
 	POST_PIC("postPicture"),
 	BROADCAST("broadcast"),
+	SEARCH("search"),
+	ACK("acknowledge"),
 	REP_FRIEND("replyFriendship"),
+	ASK_FRIEND("askFriendship"),
 	ACCEPT("accept"),
 	REJECT("reject"),
 	GET_STATE("getState"),
