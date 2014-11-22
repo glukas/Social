@@ -5,6 +5,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
+import android.nfc.NfcAdapter.OnNdefPushCompleteCallback;
+import android.nfc.NfcEvent;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.Log;
@@ -16,7 +18,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class IncomingFriendshipActivity extends Activity {
+public class IncomingFriendshipActivity extends Activity implements OnNdefPushCompleteCallback {
 
 	TextView usernameTextView;
 	FriendshipIncomingRequest request;
@@ -81,7 +83,7 @@ public class IncomingFriendshipActivity extends Activity {
         }
         
 		nfcAdapter.setNdefPushMessageCallback(request, this);
-		nfcAdapter.setOnNdefPushCompleteCallback(request, this);
+		nfcAdapter.setOnNdefPushCompleteCallback(this, this);
 
 	}
 
@@ -93,6 +95,12 @@ public class IncomingFriendshipActivity extends Activity {
     	Log.d(this.getClass().toString(), "Friend request " + request.getApplicationPayload());
 	}
 
+	@Override
+	public void onNdefPushComplete(NfcEvent event) {
+		//TODO (Lukas) we would actually have to make sure that the correct recipient was reached
+		Log.d(this.getClass().toString(), "successfully friended");
+	}
+	
 	/*
 	@Override
 	public void onClick(View v) {

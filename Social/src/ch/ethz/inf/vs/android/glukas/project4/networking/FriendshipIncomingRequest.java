@@ -7,13 +7,13 @@ import android.nfc.NfcAdapter.OnNdefPushCompleteCallback;
 import android.nfc.NfcEvent;
 import android.util.Log;
 
-public class FriendshipIncomingRequest extends FriendshipMessage implements CreateNdefMessageCallback, OnNdefPushCompleteCallback {
+public class FriendshipIncomingRequest extends FriendshipMessage implements CreateNdefMessageCallback {
 
 	/**
 	 * @param request A friendship request received over NFC
 	 */
 	public FriendshipIncomingRequest(NdefMessage request) {
-        applicationTextPayload = parseApplicationTextPayload(request);
+        parsedMessage = parseMessage(request);
 	}
 	
 	/**
@@ -23,16 +23,11 @@ public class FriendshipIncomingRequest extends FriendshipMessage implements Crea
 	 */
 	@Override
 	public NdefMessage createNdefMessage(NfcEvent event) {
-		NdefRecord payload = getApplicationTextPayload(MessageType.Response);
-		NdefRecord appRecord = getApplicationRecord();
-		NdefMessage message = new NdefMessage(payload, appRecord);
+		NdefRecord payload = createApplicationTextPayload(MessageType.Response);
+		NdefRecord commHandle = createCommunicationHandle(this.parsedMessage.communicationHandle);
+		NdefRecord appRecord = createApplicationRecord();
+		NdefMessage message = new NdefMessage(payload, commHandle, appRecord);
 		return message;
-	}
-
-	@Override
-	public void onNdefPushComplete(NfcEvent event) {
-		// TODO Auto-generated method stub
-		Log.d(this.getClass().toString(), "successfully friended " + applicationTextPayload);
 	}
 	
 }
