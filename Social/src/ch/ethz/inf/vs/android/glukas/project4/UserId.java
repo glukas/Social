@@ -20,4 +20,8 @@ public class UserId {
 	public BigInteger getId(){
 		return id;
 	}
+	
+	public String toString() {
+		return "userId : " + id;
+	}
 }

@@ -91,7 +91,7 @@ public class IncomingFriendshipActivity extends Activity implements OnNdefPushCo
 
 	private void displayRequest(FriendshipRequest request) {
 		usernameTextView.setText(request.getSender().getUsername());
-    	Log.d(this.getClass().toString(), "Friend request " + request.getSender().getUsername());
+    	Log.d(this.getClass().toString(), "Friend request " + request.getSender().getUsername() + " id : " + request.getSender().getId());
 	}
 
 	@Override

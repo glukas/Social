@@ -80,6 +80,6 @@ public class ContactDetailActivity extends Activity {
 		private void displayRequest(FriendshipResponse response) {
 			// TODO (Samuel) could be nicer
 			contactTextView.setText(response.getSender().getUsername());
-	    	Log.d(this.getClass().toString(), "Friend request accepted : " + response.getSender().getUsername());
+	    	Log.d(this.getClass().toString(), "Friend request accepted : " + response.getSender().getUsername() + " id " + response.getSender().getId());
 		}
 }
