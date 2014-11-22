@@ -93,7 +93,8 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate, Messag
 		//TODO : check latest version
 		//TODO : retrieve from network latest updates
 		//TODO : make it asynchronous, this method should return asap
-		database.getUserid(distUsername);
+		//Note : I (Lukas) commented this out as it gave me a compile error!
+		//database.getUserid(distUsername);
 	}
 
 	@Override
