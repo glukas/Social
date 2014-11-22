@@ -2,25 +2,20 @@ package ch.ethz.inf.vs.android.glukas.project4.networking;
 
 import java.math.BigInteger;
 
+import ch.ethz.inf.vs.android.glukas.project4.User;
+import ch.ethz.inf.vs.android.glukas.project4.security.KeyGeneration;
+
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
+import android.nfc.NfcEvent;
+import android.nfc.NfcAdapter.CreateNdefMessageCallback;
 import android.util.Log;
 
-public abstract class FriendshipMessage {
-
-	/**
-	 * @return the payload that was sent in the message passed to this object at construction
-	 */
-	public String getApplicationPayload() {
-		return parsedMessage.applicationTextPayload;
-	}
+public abstract class FriendshipMessage implements CreateNdefMessageCallback {
 	
-	/**
-	 * @param payload the payload that should be sent when a NdefMessage is instantiated in order to request/respond
-	 * 		  this is something like the profile information of the owner of the phone executing this code
-	 */
-	public void setResponseApplicationPayload(String payload) {
-		this.outgoingApplicationTextPayload = payload;
+	public User getSender() {
+		//TODO (Vincent) 
+		return new User(null, applicationTextPayload, null, null);
 	}
 	
 	////
@@ -29,11 +24,10 @@ public abstract class FriendshipMessage {
 	
 	protected static final String APPLICATION_NAME = "ch.ethz.inf.vs.android.glukas.project4";
 	
-	protected String outgoingApplicationTextPayload;
+	protected String applicationTextPayload;
 	protected byte[] communicationHandle;
-	
-	protected ParsedFriendshipMessage parsedMessage;
-	
+	protected MessageType messageType;
+
 	protected enum MessageType {
 		Request(".request"),
 		Response(".response");
@@ -42,16 +36,6 @@ public abstract class FriendshipMessage {
 		
 		MessageType(String type) {
 			typeName = type;
-		}
-	}
-	
-	protected class ParsedFriendshipMessage {
-		final String applicationTextPayload;
-		final byte[] communicationHandle;
-		
-		ParsedFriendshipMessage(String applicationPayload, byte[] commHandle) {
-			this.applicationTextPayload = applicationPayload;
-			this.communicationHandle = commHandle;
 		}
 	}
 	
@@ -74,7 +58,7 @@ public abstract class FriendshipMessage {
 	}
 	
 	protected NdefRecord createApplicationTextPayload(MessageType type) {
-		String usernamePayload = outgoingApplicationTextPayload;
+		String usernamePayload = applicationTextPayload;
 		String mimeTypeName = applicationMime()+type.typeName;
 		NdefRecord payload = NdefRecord.createMime(mimeTypeName, usernamePayload.getBytes());
 		return payload;
@@ -84,11 +68,18 @@ public abstract class FriendshipMessage {
 		return NdefRecord.createExternal(APPLICATION_NAME, ExternalType.CommunicationHandle.typeName, handle);
 	}
 	
-	protected ParsedFriendshipMessage parseMessage(NdefMessage message) {
-		String payload = new String(message.getRecords()[0].getPayload());
-		byte[] commHandle = message.getRecords()[1].getPayload();
-		return new ParsedFriendshipMessage(payload, commHandle);
+	protected void parseMessage(NdefMessage message) {
+		this.applicationTextPayload = new String(message.getRecords()[0].getPayload());
+		this.communicationHandle = message.getRecords()[1].getPayload();
 	}
 	
-	
+	@Override
+	public NdefMessage createNdefMessage(NfcEvent event) {
+		NdefRecord payload = createApplicationTextPayload(messageType);
+		NdefRecord commHandle = createCommunicationHandle(communicationHandle);
+		NdefRecord appRecord = createApplicationRecord();
+		
+		NdefMessage message = new NdefMessage(payload, commHandle, appRecord);
+		return message;
+	}
 }

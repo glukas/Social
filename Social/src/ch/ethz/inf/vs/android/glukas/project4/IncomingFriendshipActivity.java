@@ -1,6 +1,7 @@
 package ch.ethz.inf.vs.android.glukas.project4;
 
-import ch.ethz.inf.vs.android.glukas.project4.networking.FriendshipIncomingRequest;
+import ch.ethz.inf.vs.android.glukas.project4.networking.FriendshipRequest;
+import ch.ethz.inf.vs.android.glukas.project4.networking.FriendshipResponse;
 import android.app.Activity;
 import android.content.Intent;
 import android.nfc.NdefMessage;
@@ -21,7 +22,8 @@ import android.widget.Toast;
 public class IncomingFriendshipActivity extends Activity implements OnNdefPushCompleteCallback {
 
 	TextView usernameTextView;
-	FriendshipIncomingRequest request;
+	FriendshipRequest request;
+	FriendshipResponse response;
 	NfcAdapter nfcAdapter;
 	
 	@Override
@@ -69,11 +71,10 @@ public class IncomingFriendshipActivity extends Activity implements OnNdefPushCo
 		Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
         // only one message sent during the beam
         NdefMessage msg = (NdefMessage) rawMsgs[0];
-        request = new FriendshipIncomingRequest(msg);
-        //TODO (Vincent) replace "Bob"
-        request.setResponseApplicationPayload("Bob");
-        displayRequest(request);
-        
+        request = new FriendshipRequest(msg);
+        //TODO (Vincent?/Young?/Samuel?) replace with this device's user
+        response = request.createAcceptingResponse(new User(null, "Bob", null, null));
+ 
 		nfcAdapter = NfcAdapter.getDefaultAdapter(this);
 		//TODO better error handling
         if (nfcAdapter == null) {
@@ -82,17 +83,15 @@ public class IncomingFriendshipActivity extends Activity implements OnNdefPushCo
             return;
         }
         
-		nfcAdapter.setNdefPushMessageCallback(request, this);
+		nfcAdapter.setNdefPushMessageCallback(response, this);
 		nfcAdapter.setOnNdefPushCompleteCallback(this, this);
 
+        displayRequest(request);
 	}
 
-	private void displayRequest(FriendshipIncomingRequest request) {
-		// TODO (Samuel) could be nicer
-		
-		//TODO (Vincent) parse application payload
-		usernameTextView.setText(request.getApplicationPayload());
-    	Log.d(this.getClass().toString(), "Friend request " + request.getApplicationPayload());
+	private void displayRequest(FriendshipRequest request) {
+		usernameTextView.setText(request.getSender().getUsername());
+    	Log.d(this.getClass().toString(), "Friend request " + request.getSender().getUsername());
 	}
 
 	@Override

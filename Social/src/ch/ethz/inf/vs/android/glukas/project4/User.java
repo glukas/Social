@@ -14,8 +14,6 @@ public class User {
 	private String username;
 	private Wall wall;
 	private List<User> friends;
-	// What is it used for?
-	private Pair<String, String> key;
 	
 	// Extra stuff. For the moment, I propose that we just ignore extra stuff.
 	// It will be easy to add specialties on the top of everything.

@@ -1,6 +1,6 @@
 package ch.ethz.inf.vs.android.glukas.project4;
 
-import ch.ethz.inf.vs.android.glukas.project4.networking.FriendshipOutgoingRequest;
+import ch.ethz.inf.vs.android.glukas.project4.networking.FriendshipRequest;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.Protocol;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.ProtocolDelegate;
 import android.app.Activity;
@@ -21,7 +21,7 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 
 	NfcAdapter nfcAdapter;
 	
-	FriendshipOutgoingRequest nextRequest;
+	FriendshipRequest nextRequest;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -41,9 +41,9 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 	
 	
 	private void createNextRequest() {
-		nextRequest = new FriendshipOutgoingRequest();
+		//TODO (Vincent?/Young?/Samuel?) replace with this device's user
+		nextRequest = new FriendshipRequest(new User(null, "Alice", null, null));
 		//TODO (Vincent)
-		nextRequest.setResponseApplicationPayload("Alice");
 		nfcAdapter.setNdefPushMessageCallback(nextRequest, this);
 		nfcAdapter.setOnNdefPushCompleteCallback(this, this);
 	}
@@ -57,9 +57,8 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 
 	@Override
 	public void onNdefPushComplete(NfcEvent event) {
-		// TODO Auto-generated method stub
 		Log.d(this.getClass().toString(), "onNdefPushComplete");
-		FriendshipOutgoingRequest.setCurrentRequest(nextRequest);
+		FriendshipRequest.setCurrentRequest(nextRequest);
 		createNextRequest();
 	}
 	

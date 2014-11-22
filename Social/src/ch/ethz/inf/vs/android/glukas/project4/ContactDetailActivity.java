@@ -1,6 +1,6 @@
 package ch.ethz.inf.vs.android.glukas.project4;
 
-import ch.ethz.inf.vs.android.glukas.project4.networking.FriendshipOutgoingRequest;
+import ch.ethz.inf.vs.android.glukas.project4.networking.FriendshipRequest;
 import ch.ethz.inf.vs.android.glukas.project4.networking.FriendshipResponse;
 import android.app.Activity;
 import android.content.Intent;
@@ -64,7 +64,7 @@ public class ContactDetailActivity extends Activity {
 	        // only one message sent during the beam
 	        NdefMessage msg = (NdefMessage) rawMsgs[0];
 	        response = new FriendshipResponse(msg);
-	        if (response.isMatching(FriendshipOutgoingRequest.getCurrentRequest())) {
+	        if (response.isMatching(FriendshipRequest.getCurrentRequest())) {
 	        	displayRequest(response);
 	        } else {
 	        	displayFailure();
@@ -79,7 +79,7 @@ public class ContactDetailActivity extends Activity {
 
 		private void displayRequest(FriendshipResponse response) {
 			// TODO (Samuel) could be nicer
-			contactTextView.setText(response.getApplicationPayload());
+			contactTextView.setText(response.getSender().getUsername());
 	    	Log.d(this.getClass().toString(), "Friend request accepted : ");
 		}
 }
