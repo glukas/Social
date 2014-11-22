@@ -16,6 +16,11 @@ public class FriendshipRequest extends FriendshipMessage {
 
 	private static FriendshipRequest currentRequest;
 	
+	/**
+	 * Create a request, intended to be sent over the network via Android Beam.
+	 * The sender should be the user of the device this code is running on.
+	 * @param sender
+	 */
 	public FriendshipRequest(User sender) {
 		this.messageType = MessageType.Request;
 		this.applicationTextPayload = sender.getUsername();
@@ -23,13 +28,17 @@ public class FriendshipRequest extends FriendshipMessage {
 		Log.v(this.getClass().toString(), "create comm handle : " + new BigInteger(communicationHandle));
 	}
 	
+	/**
+	 * Parses a request that was received over the network.
+	 * @param request
+	 */
 	public FriendshipRequest(NdefMessage request) {
 		parseMessage(request);
 	}
 	
 	/**
-	 * @param usernamePayload the application protocol message that will be sent to the other peer
-	 * @return a response that can be used to accept this request.
+	 * @param acceptingUser the user of the device this code is running on
+	 * @return a response that can be used to accept this request. Intended to be sent over AndroidBeam.
 	 */
 	public FriendshipResponse createAcceptingResponse(User acceptingUser) {
 		FriendshipResponse response = new FriendshipResponse(acceptingUser, communicationHandle);

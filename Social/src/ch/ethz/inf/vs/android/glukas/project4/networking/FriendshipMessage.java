@@ -11,8 +11,16 @@ import android.nfc.NfcEvent;
 import android.nfc.NfcAdapter.CreateNdefMessageCallback;
 import android.util.Log;
 
+/**
+ * The protocol runs over NFC:
+ * Request)   A -> B : A, key_A
+ * Response)  B -> A : B, key_B
+ */
 public abstract class FriendshipMessage implements CreateNdefMessageCallback {
 	
+	/**
+	 * @return the sender of this message
+	 */
 	public User getSender() {
 		//TODO (Vincent) 
 		return new User(null, applicationTextPayload, null, null);
