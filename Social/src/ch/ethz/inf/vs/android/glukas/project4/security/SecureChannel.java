@@ -6,7 +6,9 @@ import ch.ethz.inf.vs.android.glukas.project4.protocol.PublicHeader;
 public class SecureChannel {
 
 	private SecureChannelDelegate secureChannelDelegate;
-
+	public final MessageRelay messageRelay = null;//TODO relay used to send/receive messages
+	private MessageCryptography crypto;
+	
 	/**
 	 * @return the relay used to send and receive message over the net
 	 */
@@ -28,7 +30,7 @@ public class SecureChannel {
 	 * @param message
 	 * @param header
 	 */
-	public void sendMessage(String message, PublicHeader header) {
+	public void sendMessage(NetworkMessage message) {
 		
 		//For broadcasts:
 		//TODO encrypt & authenticate using symmetric broadcast key of receiver
@@ -44,7 +46,8 @@ public class SecureChannel {
 		//TODO send over the network
 	}
 	
-	MessageRelay messageRelay;//relay used to send/receive messages
+	
+	
 	
 	/**
 	 * Precondition: user was discovered by onPeersDiscovered

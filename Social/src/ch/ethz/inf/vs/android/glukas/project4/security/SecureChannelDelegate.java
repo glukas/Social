@@ -14,9 +14,8 @@ public interface SecureChannelDelegate {
 	/**
 	 * A protocol message was received.
 	 * @param message
-	 * @param header the public header of the packet
 	 */
-	public void onMessageReceived(String message, PublicHeader header);
+	public void onMessageReceived(NetworkMessage message);
 	
 	/**
 	 * The previous search for peers is successful

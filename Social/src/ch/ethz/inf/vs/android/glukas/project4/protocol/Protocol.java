@@ -15,6 +15,7 @@ import ch.ethz.inf.vs.android.glukas.project4.protocol.Message;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.parsing.JSONObjectFactory;
 import ch.ethz.inf.vs.android.glukas.project4.security.SecureChannel;
 import ch.ethz.inf.vs.android.glukas.project4.security.SecureChannelDelegate;
+import ch.ethz.inf.vs.android.glukas.project4.security.NetworkMessage;
 
 /**
  * This is the main part of the package, where most of the protocol is implemented.
@@ -70,14 +71,16 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate, Messag
 	
 	@Override
 	public void connect() throws NetworkException {
-		String msg = JSONObjectFactory.createJSONObject(new Message(MessageType.CONNECT)).toString();
+		//TODO Note: I just added -1, since it gave me a compile error. Please do not commit code that does not compile! Kind Regards, Lukas
+		String msg = JSONObjectFactory.createJSONObject(new Message(MessageType.CONNECT), -1).toString();
 		PublicHeader header = new PublicHeader(localUserId, null, ConsistencyByte.CONNECTION.getState(), 0);
 		messageRelay.connect(msg, header);
 	}
 
 	@Override
 	public void disconnect() throws NetworkException {
-		String msg = JSONObjectFactory.createJSONObject(new Message(MessageType.DISCONNECT)).toString();
+		//TODO Note: I just added -1, since it gave me a compile error. Please do not commit code that does not compile! Kind Regards, Lukas
+		String msg = JSONObjectFactory.createJSONObject(new Message(MessageType.DISCONNECT), -1).toString();
 		PublicHeader header = new PublicHeader(localUserId, null, ConsistencyByte.CONNECTION.getState(), 0);
 		messageRelay.disconnect(msg, header);
 	}
@@ -85,7 +88,7 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate, Messag
 	@Override
 	public void postPost(Post post) throws DatabaseException {
 		//TODO : save in database. Sent to the owner of the wall
-		secureChannel.sendMessage(null, null);
+		secureChannel.sendMessage(null);
 	}
 
 	@Override
@@ -114,7 +117,7 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate, Messag
 	////
 
 	@Override
-	public void onMessageReceived(String message, PublicHeader header) {
+	public void onMessageReceived(NetworkMessage message) {
 	}
 
 	////
@@ -136,4 +139,5 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate, Messag
 	@Override
 	public void onDeregistrationFailed(FailureReason reason) {
 	}
+	
 }

@@ -5,11 +5,13 @@ import java.security.SecureRandom;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 public class KeyGeneration {
 
-	static final KeyGeneration keyGen = new KeyGeneration();
-	
+	private static final KeyGeneration keyGen = new KeyGeneration();
+	private static final String encryptionAlgorithm = "AES";
+	private static final String authenticationAlgorithm = "HmacSHA256";
 	
 	public static final KeyGeneration getInstance() {
 		return keyGen;
@@ -24,8 +26,10 @@ public class KeyGeneration {
 	
 	private KeyGeneration() {
 		try {
-			encryptionKeyGenerator = KeyGenerator.getInstance("AES");
+			encryptionKeyGenerator = KeyGenerator.getInstance(encryptionAlgorithm);
+			encryptionKeyGenerator.init(128, secureRandom);
 			macKeyGenerator = KeyGenerator.getInstance("HmacSHA256");
+			macKeyGenerator.init(secureRandom);
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 		}
@@ -39,6 +43,16 @@ public class KeyGeneration {
 	
 	public byte[] generateUserId() {
 		return getPseudorandom(16);
+	}
+	
+	public SecretKey decodeAuthenticationKey(byte[] authenticationKey) {
+		SecretKeySpec spec = new SecretKeySpec(authenticationKey, authenticationAlgorithm);
+		return spec;
+	}
+	
+	public SecretKey decodeEncryptionKey(byte[] encryptionKey) {
+		SecretKeySpec spec = new SecretKeySpec(encryptionKey, encryptionAlgorithm);
+		return spec;
 	}
 	
 	public SecretKey generateEncryptionKey() {
