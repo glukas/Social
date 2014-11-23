@@ -14,15 +14,12 @@ public class User {
 	private String username;
 	private Wall wall;
 	private List<User> friends;
-<<<<<<< HEAD
 	// What is it used for? Just as placeholder :)
 	private Pair<String, String> key;
 	// Number of posts (partial order)
 	private int postsCount;
 	// Max post id
 	private int maxId;
-=======
->>>>>>> branch 'master' of https://github.com/glukas/Social
 	
 	// Extra stuff. For the moment, I propose that we just ignore extra stuff.
 	// It will be easy to add specialties on the top of everything.
