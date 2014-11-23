@@ -6,10 +6,10 @@ Week 0:
 
 Week 1: (due 23.11)
 -Contact Exchange over NFC (done)
--Symmetric Key Exchange over NFC
--Key Generation
--Key storage 
--Interfaces 
+-Symmetric Key Exchange over NFC (done)
+-(Symmetric) Key Generation (done)
+-(Symmetric) Key storage (done)
+-Interfaces (mostly in place now)
 
 Week 2: (due 30.11)
 -Provide Null Cypher
