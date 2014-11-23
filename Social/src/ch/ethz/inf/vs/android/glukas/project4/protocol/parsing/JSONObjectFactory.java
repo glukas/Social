@@ -11,14 +11,16 @@ import ch.ethz.inf.vs.android.glukas.project4.protocol.Message.MessageType;
  * Factory to create JSONObject
  */
 public class JSONObjectFactory {
+
 	
-	////
-	//Friendship
-	////
-	
+	/* TODO: Probably not needed anymore
+	// //
+	// Friendship
+	// //
+
 	public static JSONObject getFriendshipBroadcastMessage() {
 		JSONObject obj = new JSONObject();
-		try{
+		try {
 			obj.put(Cmds.CMD.getStr(), Args.BROADCAST.getStr());
 			obj.put(Cmds.USER.getStr(), "USER-STATIC");
 		} catch (JSONException ex) {
@@ -27,38 +29,74 @@ public class JSONObjectFactory {
 		}
 		return obj;
 	}
-	
-	
-	////
-	//UserRequest
-	//
-	//the package-info gives more informations about how JSONObjects should be defined
-	////
-	
-	/**
-	 * Create a JSONObject from an UserRequest to be used to send messages over the network
 	 */
-	public static JSONObject createJSONObject(Message request) {
-		
+	
+	
+	// //
+	// UserRequest
+	//
+	// the package-info gives more informations about how JSONObjects should be
+	// defined
+	// //
+
+	/**
+	 * Create a JSONObject from an UserRequest to be used to send messages over
+	 * the network
+	 */
+	public static JSONObject createJSONObject(Message request , int numberofmessages) {
+
 		JSONObject obj = new JSONObject();
-		
-		// TODO : rewrite that
-		
+
+		// TODO: Check if anything is missing
+
 		try {
-			if (request.getMessageType().equals(MessageType.CONNECT)){
+			// Server
+			if (request.getMessageType().equals(MessageType.CONNECT)) {
 				setConnectObj(request, obj);
-			} else if (request.getMessageType().equals(MessageType.DISCONNECT)){
+			} else if (request.getMessageType().equals(MessageType.DISCONNECT)) {
 				setDisconnectObj(request, obj);
-			}  else if (request.getMessageType().equals(MessageType.GET_POSTS)){
-				setGetWallObj(request, obj);
-			} else if (request.getMessageType().equals(MessageType.SEARCH_USER)){
+
+				// Friends
+			} else if (request.getMessageType().equals(MessageType.SEARCH_USER)) {
 				setSearchUserObj(request, obj);
-			} else if (request.getMessageType().equals(MessageType.SHOW_IMAGE)){
-				setShowImageObj(request, obj);
-			} else if (request.getMessageType().equals(MessageType.POST_PICTURE)){
+			} else if (request.getMessageType().equals(
+					MessageType.ACCEPT_FRIENDSHIP)) {
+				setAcceptFriendshipObj(request, obj);
+			} else if (request.getMessageType().equals(
+					MessageType.REFUSE_FRIENDSHIP)) {
+				setRefuseFriendshipObj(request, obj);
+			} else if (request.getMessageType().equals(
+					MessageType.ASK_FRIENDSHIP)) {
+				setAskFriendshipObj(request, obj);
+			} else if (request.getMessageType().equals(MessageType.BROADCAST)) {
+				setBroadCastObj(request, obj);
+
+				// Post new messages
+			} else if (request.getMessageType()
+					.equals(MessageType.POST_PICTURE)) {
 				setPostPictureObj(request, obj);
-			} else if (request.getMessageType().equals(MessageType.POST_TEXT)){
+			} else if (request.getMessageType().equals(MessageType.POST_TEXT)) {
 				setPostTextObj(request, obj);
+			} else if (request.getMessageType().equals(MessageType.ACK_POST)) {
+				setAckPostObj(request, obj);
+
+				// Retrieve data
+			} else if (request.getMessageType().equals(MessageType.GET_POSTS)) {
+				setGetWallObj(request, obj);
+
+			} else if (request.getMessageType().equals(MessageType.SHOW_IMAGE)) {
+				setShowImageObj(request, obj);
+			} else if (request.getMessageType()
+					.equals(MessageType.SEND_PICTURE)) {
+				setSendPictureObj(request, obj);
+			} else if (request.getMessageType().equals(MessageType.SEND_TEXT)) {
+				setSendTextObj(request, obj);
+			} else if (request.getMessageType().equals(MessageType.SEND_STATE)) {
+				setSendStateObj(request, obj, numberofmessages);
+			} else if (request.getMessageType().equals(MessageType.GET_STATE)) {
+				setGetStateObj(request, obj);
+
+				// In case of Unknown message
 			} else {
 				try {
 					throw new UnknowRequestType(request.getMessageType());
@@ -66,42 +104,137 @@ public class JSONObjectFactory {
 					e.printStackTrace();
 				}
 			}
-		} catch (JSONException e){
+		} catch (JSONException e) {
 			e.printStackTrace();
 		}
 		return obj;
 	}
-	
-	private static void setConnectObj(Message request, JSONObject obj) throws JSONException{
+
+	// /
+	// Server Message Setters
+	// /
+
+	private static void setConnectObj(Message request, JSONObject obj)
+			throws JSONException {
 		obj.put(Cmds.CMD.getStr(), Args.CONNECT.getStr());
 	}
-	
-	private static void setDisconnectObj(Message request, JSONObject obj) throws JSONException{
+
+	private static void setDisconnectObj(Message request, JSONObject obj)
+			throws JSONException {
 		obj.put(Cmds.CMD.getStr(), Args.DISCONNECT.getStr());
 	}
-	
-	private static void setGetWallObj(Message request, JSONObject obj) throws JSONException{
-		obj.put(Cmds.CMD.getStr(), Args.GET_POSTS.getStr());
-	}
-	
-	private static void setSearchUserObj(Message request, JSONObject obj) throws JSONException{
+
+	// /
+	// Friends Message Setters
+	// /
+
+	private static void setSearchUserObj(Message request, JSONObject obj)
+			throws JSONException {
+		obj.put(Cmds.CMD.getStr(), Args.SEARCH.getStr());
 		obj.put(Cmds.USER.getStr(), request.getUsernameSender());
 	}
-	
-	private static void setShowImageObj(Message request, JSONObject obj){
-		//not a JSON request, thus the object associated to this request is empty
+
+	private static void setAcceptFriendshipObj(Message request, JSONObject obj)
+			throws JSONException {
+		obj.put(Cmds.CMD.getStr(), Args.REP_FRIEND.getStr());
+		obj.put(Cmds.RESPONSE.getStr(), Args.ACCEPT.getStr());
+
 	}
-	
-	private static void setPostPictureObj(Message request, JSONObject obj) throws JSONException{
+
+	private static void setRefuseFriendshipObj(Message request, JSONObject obj)
+			throws JSONException {
+		obj.put(Cmds.CMD.getStr(), Args.REP_FRIEND.getStr());
+		obj.put(Cmds.RESPONSE.getStr(), Args.REJECT.getStr());
+
+	}
+
+	private static void setAskFriendshipObj(Message request, JSONObject obj)
+			throws JSONException {
+		obj.put(Cmds.CMD.getStr(), Args.ASK_FRIEND.getStr());
+		obj.put(Cmds.USER.getStr(), request.getUsernameSender());
+
+	}
+
+	private static void setBroadCastObj(Message request, JSONObject obj)
+			throws JSONException {
+		obj.put(Cmds.CMD.getStr(), Args.BROADCAST.getStr());
+		obj.put(Cmds.USER.getStr(), request.getUsernameSender());
+
+	}
+
+	// /
+	// Post Message Setters
+	// /
+	// TODO: Difference between Send and Post?
+
+	private static void setPostPictureObj(Message request, JSONObject obj)
+			throws JSONException {
 		obj.put(Cmds.CMD.getStr(), Args.POST_PIC.getStr());
 		obj.put(Cmds.ID.getStr(), request.getPostId());
 		obj.put(Cmds.TEXT.getStr(), request.getMessage());
 		obj.put(Cmds.PIC.getStr(), request.getHttpLink());
 	}
-	
-	private static void setPostTextObj(Message request, JSONObject obj) throws JSONException{
+
+	private static void setPostTextObj(Message request, JSONObject obj)
+			throws JSONException {
 		obj.put(Cmds.CMD.getStr(), Args.POST_TXT.getStr());
 		obj.put(Cmds.ID.getStr(), request.getPostId());
 		obj.put(Cmds.TEXT.getStr(), request.getMessage());
+
 	}
+
+	private static void setAckPostObj(Message request, JSONObject obj)
+			throws JSONException {
+		obj.put(Cmds.CMD.getStr(), Args.ACK.getStr());
+	//	obj.put(Cmds.ACK.getStr(), Args.POST.getStr());
+		obj.put(Cmds.ID.getStr(), request.getPostId());
+	}
+	
+	///
+	// Retrieve Data Message Setters
+	///
+	
+	private static void setSendTextObj(Message request, JSONObject obj)
+			throws JSONException {
+
+		obj.put(Cmds.CMD.getStr(), Args.SEND_TXT);
+		obj.put(Cmds.ID.getStr(), String.valueOf(request.getPostId()));
+		obj.put(Cmds.TEXT.getStr(), request.getMessage());
+
+	}
+
+	private static void setSendPictureObj(Message request, JSONObject obj)
+			throws JSONException {
+		obj.put(Cmds.CMD.getStr(), Args.POST_PIC.getStr());
+		obj.put(Cmds.ID.getStr(), request.getPostId());
+		obj.put(Cmds.TEXT.getStr(), request.getMessage());
+		obj.put(Cmds.PIC.getStr(), request.getHttpLink());
+
+	}
+	
+	private static void setGetStateObj(Message request, JSONObject obj)
+			throws JSONException {
+		obj.put(Cmds.CMD.getStr(), Args.GET_STATE.toString());
+
+	}
+
+	private static void setSendStateObj(Message request ,JSONObject obj,  int numberofmessages)
+			throws JSONException {
+		obj.put(Cmds.CMD.toString(), Args.SEND_STATE.toString());
+		obj.put(Cmds.ID.getStr(), String.valueOf(request.getPostId()));
+		// TODO: Recheck
+		obj.put(Cmds.NUM_M.getStr(), String.valueOf(numberofmessages));
+
+	}
+
+	private static void setGetWallObj(Message request, JSONObject obj)
+			throws JSONException {
+		obj.put(Cmds.CMD.getStr(), Args.GET_POSTS.getStr());
+	}
+
+	private static void setShowImageObj(Message request, JSONObject obj) {
+		// not a JSON request, thus the object associated to this request is
+		// empty
+	}
+
 }

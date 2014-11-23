@@ -23,6 +23,36 @@ public class Message {
 	//content
 	protected String message;
 	protected String httpLink;
+	protected String response;
+	
+	//setters
+	public void setMessageType(MessageType requestType){
+		this.requestType = requestType;
+	}
+
+	public void setUsernameSender(String usernameSender) {
+		this.usernameSender = usernameSender;
+	}
+
+	public void setUsernameReceiver(String usernameReceiver) {
+		this.usernameReceiver = usernameSender;
+	}
+
+	public void setPostId(int postId) {
+		this.postId = postId;
+	}
+
+	public void setHttpLink(String httpLink) {
+		this.httpLink = httpLink;
+	}
+	
+	public void setMessage(String message) {
+		this.message = message;
+	}
+	public void setFriendshipResponse(String response){
+		this.response= response;
+	}
+	
 	
 	//getters
 	public MessageType getMessageType(){
@@ -47,6 +77,9 @@ public class Message {
 	
 	public String getMessage() {
 		return message;
+	}
+	public String getFriendshipResponse(){
+		return response;
 	}
 	
 	/**

@@ -1,0 +1,22 @@
+Schedule (Security)
+
+Week 0:
+-Protocol Definitions (done)
+-Algorithm Specifications (done)
+
+Week 1: (due 23.11)
+-Contact Exchange over NFC (done)
+-Symmetric Key Exchange over NFC
+-Key Generation
+-Key storage 
+-Interfaces 
+
+Week 2: (due 30.11)
+-Provide Null Cypher
+-Implement symmetric post encryption/decryption and authentication
+
+Week 3: (due 7.12)
+-Implement asymmetric message encryption/decryption and signing
+
+Week 4: (due 14.12)
+-Remote key exchange
