@@ -14,8 +14,8 @@ public class User {
 	private String username;
 	private Wall wall;
 	private List<User> friends;
-	// What is it used for? Just as placeholder :)
-	private Pair<String, String> key;
+	
+	private UserCredentials credentials;
 	// Number of posts (partial order)
 	private int postsCount;
 	// Max post id
@@ -37,8 +37,17 @@ public class User {
 		this.username = username;
 		this.wall = wall;
 		this.friends = friends;
-
+		this.credentials = null;
 	}
+	
+	public User(UserId id, String username, Wall wall, List<User> friends, UserCredentials credentials) {
+		this.id = id;
+		this.username = username;
+		this.wall = wall;
+		this.friends = friends;
+		this.credentials = credentials;
+	}
+	
 	
 	// Getters.
 	public UserId getId() {
@@ -56,6 +65,10 @@ public class User {
 	
 	public List<User> getFriends() {
 		return friends;
+	}
+
+	public UserCredentials getCredentials() {
+		return credentials;
 	}
 	
 	// Setters.

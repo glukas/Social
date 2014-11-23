@@ -3,6 +3,7 @@ package ch.ethz.inf.vs.android.glukas.project4;
 import ch.ethz.inf.vs.android.glukas.project4.networking.FriendshipRequest;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.Protocol;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.ProtocolDelegate;
+import ch.ethz.inf.vs.android.glukas.project4.security.ZeroCredentialStorage;
 import android.app.Activity;
 import android.content.Intent;
 import android.nfc.NdefMessage;
@@ -42,7 +43,8 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 	
 	private void createNextRequest() {
 		//TODO (Vincent?/Young?/Samuel?) replace with this device's user
-		nextRequest = new FriendshipRequest(new User(new UserId("1"), "Alice", null, null));
+		UserId dummyId = new UserId("1");
+		nextRequest = new FriendshipRequest(new User(dummyId, "Alice", null, null, ZeroCredentialStorage.constantCredentials.getUserCredentials(dummyId)));
 		nfcAdapter.setNdefPushMessageCallback(nextRequest, this);
 		nfcAdapter.setOnNdefPushCompleteCallback(this, this);
 	}

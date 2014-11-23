@@ -5,6 +5,7 @@ import java.util.List;
 
 import ch.ethz.inf.vs.android.glukas.project4.Post;
 import ch.ethz.inf.vs.android.glukas.project4.User;
+import ch.ethz.inf.vs.android.glukas.project4.UserCredentials;
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
 import ch.ethz.inf.vs.android.glukas.project4.Wall;
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseContract.FriendsEntry;
@@ -139,6 +140,15 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseDelegat
 		 return Users.getUserMaxPostsId(this.getReadableDatabase());
 	}
 	
+	/**
+	 * Credentials (Keys)
+	 */
+
+	@Override
+	public UserCredentials getUserCredentials(UserId user) {
+		// TODO (Alessio) implement
+		return null;
+	}
 	
 	/**
 	 * FRIENDS MANAGEMENT
@@ -264,4 +274,5 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseDelegat
 	public void deleteFriendWall(UserId friendid) {
 		Walls.deleteFriendWall(friendid, this.getWritableDatabase());
 	}
+
 }

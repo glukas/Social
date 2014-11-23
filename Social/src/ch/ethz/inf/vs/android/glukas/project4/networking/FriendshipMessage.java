@@ -5,6 +5,7 @@ import java.math.BigInteger;
 import javax.crypto.SecretKey;
 
 import ch.ethz.inf.vs.android.glukas.project4.User;
+import ch.ethz.inf.vs.android.glukas.project4.UserCredentials;
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
 import ch.ethz.inf.vs.android.glukas.project4.security.CredentialStorage;
 import ch.ethz.inf.vs.android.glukas.project4.security.KeyGeneration;
@@ -26,7 +27,6 @@ public abstract class FriendshipMessage implements CreateNdefMessageCallback {
 	 * @return the sender of this message
 	 */
 	public User getSender() {
-		//TODO (Vincent) 
 		return sender;
 	}
 	
@@ -90,13 +90,10 @@ public abstract class FriendshipMessage implements CreateNdefMessageCallback {
 	protected void parseMessage(NdefMessage message) {
 		NdefRecord[] records = message.getRecords();
 		String username = new String(records[0].getPayload());
-		this.communicationHandle = records[1].getPayload();
-		byte[] userId = records[2].getPayload();
-		SecretKey encKey = KeyGeneration.getInstance().decodeEncryptionKey(records[3].getPayload());
-		//Log.d(this.getClass().toString(), "enc key ("+ username + ")" + new BigInteger(encKey.getEncoded()));
-		SecretKey authKey = KeyGeneration.getInstance().decodeAuthenticationKey(records[4].getPayload());
-		//TODO store the keys
- 		this.sender = new User(new UserId(userId), username, null, null);
+		communicationHandle = records[1].getPayload();
+		UserId senderId = new UserId(records[2].getPayload());
+		UserCredentials credentials = new UserCredentials(senderId, records[3].getPayload(), records[4].getPayload());
+ 		sender = new User(senderId, username, null, null, credentials);
 	}
 	
 	@Override
@@ -113,11 +110,11 @@ public abstract class FriendshipMessage implements CreateNdefMessageCallback {
 	}
 
 	private NdefRecord createAuthKeyRecord() {
-		return NdefRecord.createExternal(APPLICATION_NAME, ExternalType.AuthKey.typeName, CredentialStorage.getDefaultStore().getBroadcastAuthenticationKey(sender.getId()).getEncoded());
+		return NdefRecord.createExternal(APPLICATION_NAME, ExternalType.AuthKey.typeName, sender.getCredentials().broadcastAuthenticationKey);
 	}
 
 	private NdefRecord createEncKeyRecord() {
 		//Log.d(this.getClass().toString(), "enc key ("+ sender.getUsername() + ")" + new BigInteger(CredentialStorage.getDefaultStore().getBroadcastEncryptionKey(sender.getId()).getEncoded()));
-		return NdefRecord.createExternal(APPLICATION_NAME, ExternalType.EncKey.typeName, CredentialStorage.getDefaultStore().getBroadcastEncryptionKey(sender.getId()).getEncoded());
+		return NdefRecord.createExternal(APPLICATION_NAME, ExternalType.EncKey.typeName, sender.getCredentials().broadcastEncryptionKey);
 	}
 }

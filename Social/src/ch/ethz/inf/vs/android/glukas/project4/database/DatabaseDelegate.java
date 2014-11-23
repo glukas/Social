@@ -3,6 +3,7 @@ package ch.ethz.inf.vs.android.glukas.project4.database;
 import java.util.List;
 import ch.ethz.inf.vs.android.glukas.project4.Post;
 import ch.ethz.inf.vs.android.glukas.project4.User;
+import ch.ethz.inf.vs.android.glukas.project4.UserCredentials;
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
 import ch.ethz.inf.vs.android.glukas.project4.Wall;
 
@@ -36,6 +37,11 @@ public interface DatabaseDelegate {
 	 */
 	public int getUserMaxPostsId();
 	
+	////
+	// Credentials (Keys)
+	////
+	
+	public UserCredentials getUserCredentials(UserId user);
 	
 	////
 	// Friends management

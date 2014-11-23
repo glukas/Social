@@ -2,15 +2,18 @@ package ch.ethz.inf.vs.android.glukas.project4.security;
 
 import javax.crypto.SecretKey;
 
+import ch.ethz.inf.vs.android.glukas.project4.UserCredentials;
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
 
 /**
  * Dummy storage class that returns the same constant key for all users
  */
-public class ZeroCredentialStorage extends CredentialStorage {
+public class ZeroCredentialStorage implements CredentialStorage {
 
-	SecretKey enc = KeyGeneration.getInstance().generateEncryptionKey();
-	SecretKey auth = KeyGeneration.getInstance().generateMACKey();
+	public static final ZeroCredentialStorage constantCredentials = new ZeroCredentialStorage();
+	
+	private SecretKey enc = KeyGeneration.getInstance().generateEncryptionKey();
+	private SecretKey auth = KeyGeneration.getInstance().generateMACKey();
 	
 	@Override
 	public SecretKey getBroadcastEncryptionKey(UserId user) {
@@ -23,11 +26,8 @@ public class ZeroCredentialStorage extends CredentialStorage {
 	}
 
 	@Override
-	public void setBroadcastEncryptionKey(UserId user, SecretKey key) {
-	}
-
-	@Override
-	public void setBroadcastAuthenticationKey(UserId user, SecretKey key) {
+	public UserCredentials getUserCredentials(UserId user) {
+		return new UserCredentials(user, enc.getEncoded(), auth.getEncoded());
 	}
 
 }

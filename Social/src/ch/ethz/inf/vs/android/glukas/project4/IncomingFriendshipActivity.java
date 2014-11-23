@@ -2,6 +2,7 @@ package ch.ethz.inf.vs.android.glukas.project4;
 
 import ch.ethz.inf.vs.android.glukas.project4.networking.FriendshipRequest;
 import ch.ethz.inf.vs.android.glukas.project4.networking.FriendshipResponse;
+import ch.ethz.inf.vs.android.glukas.project4.security.ZeroCredentialStorage;
 import android.app.Activity;
 import android.content.Intent;
 import android.nfc.NdefMessage;
@@ -73,7 +74,8 @@ public class IncomingFriendshipActivity extends Activity implements OnNdefPushCo
         NdefMessage msg = (NdefMessage) rawMsgs[0];
         request = new FriendshipRequest(msg);
         //TODO (Vincent?/Young?/Samuel?) replace with this device's user
-        response = request.createAcceptingResponse(new User(new UserId("0"), "Bob", null, null));
+        UserId dummyId = new UserId("0");
+        response = request.createAcceptingResponse(new User(dummyId, "Bob", null, null,  ZeroCredentialStorage.constantCredentials.getUserCredentials(dummyId)));
  
 		nfcAdapter = NfcAdapter.getDefaultAdapter(this);
 		//TODO better error handling
