@@ -1,5 +1,7 @@
 package ch.ethz.inf.vs.android.glukas.project4.database;
 
+import java.math.BigInteger;
+
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 import ch.ethz.inf.vs.android.glukas.project4.User;
@@ -35,7 +37,7 @@ class Friends {
 		String selection = FriendsEntry.USER_ID + " == ? AND " + FriendsEntry.FRIEND_ID + " == ?";
 
 		// Arguments for selection.
-		String[] selectionArgs1 = {Integer.toString(Utility.userID), Integer.toString(id)};
+		String[] selectionArgs1 = {Utility.userID.toString(), Integer.toString(id)};
 		
 		// Delete friendship
 		db.delete(FriendsEntry.TABLE_NAME, selection, selectionArgs1);

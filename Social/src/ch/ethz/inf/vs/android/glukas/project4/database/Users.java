@@ -19,7 +19,7 @@ class Users {
 		
 		// Create content to insert.
 		ContentValues values = new ContentValues();
-		values.put(UsersEntry.NAME, username);
+		values.put(UsersEntry.USERNAME, username);
 		
 		// Insert content.
 		db.insert(UsersEntry.TABLE_NAME, null, values);

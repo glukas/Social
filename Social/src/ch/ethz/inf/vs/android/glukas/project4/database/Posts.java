@@ -20,7 +20,7 @@ import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseContract.UsersEnt
  */
 class Posts {
 
-	/**
+	/** FIXME
 	 * Update the wall of the user with the given post.
 	 * SQL code: 
 	 * @param post the post to insert
@@ -28,10 +28,10 @@ class Posts {
 	 */
 	public static void putUserPost(Post post, SQLiteDatabase db) {
 		// Avoid code duplication by calling this function.
-		putFriendPost(post, Utility.userID, db);
+//		putFriendPost(post, Utility.userID, db);
 	}
 	
-	/**
+	/** FIXME
 	 * Get a certain post from the user's wall.
 	 * SQL query: SELECT p_id, p.text, p.image, p.date_time, p.id FROM users u, posts p WHERE u._id == Utility.userID AND u._id == p.wall_id AND p._id == id
 	 * @param postid the id of the post to retrieve
@@ -40,23 +40,24 @@ class Posts {
 	 */
 	public static Post getUserPost(int postid, SQLiteDatabase db) {
 		// Avoid code duplication by calling this function.
-		return getFriendPost(postid, Utility.userID, db);
+//		return getFriendPost(postid, Utility.userID, db);
+		return null;
 	}
 	
-	/**
+	/** FIXME
 	 * Delete a certain post from the user's wall.
 	 * @param id the id of the post to delete
 	 * @param db SQLliteDatabase to query
 	 */
 	public static void deleteUserPost(int postid, SQLiteDatabase db) {
-		deleteFriendPost(postid, Utility.userID, db);
+//		deleteFriendPost(postid, Utility.userID, db);
 	}
 
 	// TODO: Get all the Posts in a Wall starting from timestamp
 	public static List<Post> getAllUserPostsFrom(int timestamp, SQLiteDatabase db) {
 		String[] projection = {PostsEntry._ID, PostsEntry.TEXT, PostsEntry.IMAGE, PostsEntry.DATE_TIME};
 		String selection = PostsEntry.WALL_ID + " == ? AND " + PostsEntry.DATE_TIME + " > ?";
-		String[] selectionArgs = {Integer.toString(Utility.userID), Integer.toString(timestamp)};
+		String[] selectionArgs = {Utility.userID.toString(), Integer.toString(timestamp)};
 		
 		Cursor cursor = db.query(PostsEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, null);
 		

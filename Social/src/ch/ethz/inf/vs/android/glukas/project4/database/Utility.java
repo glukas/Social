@@ -2,6 +2,7 @@ package ch.ethz.inf.vs.android.glukas.project4.database;
 
 import java.util.Date;
 
+import ch.ethz.inf.vs.android.glukas.project4.UserId;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
@@ -17,6 +18,7 @@ class Utility {
 	public static final String CREATE_TABLE = "CREATE TABLE";
 	public static final String DROP_TABLE = "DROP TABLE";
 	public static final String IF_EXISTS = "IF EXISTS";
+	public static final String PRIMARY_KEY = "primary_key";
 	public static final String FOREIGN_KEY = "FOREIGN_KEY";
 	public static final String REFERENCES = "REFERENCES";
 	
@@ -24,7 +26,7 @@ class Utility {
 	public static final int MAX_BLOB_SIZE = 0;	// TODO: define # of bytes needed for a blob (images + keys + big text?)
 	public static final int MAX_DATABASE_SIZE = 0;	// TODO: define # of bytes needed for the DB
 	
-	public static int userID = 0;
+	public static UserId userID = new UserId("0");
 	
 	/**
 	 * Transforms a byte[] representing an image into a bitmap.

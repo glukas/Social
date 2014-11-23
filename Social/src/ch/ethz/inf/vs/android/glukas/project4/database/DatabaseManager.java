@@ -26,6 +26,7 @@ import android.util.Log;
 public abstract class DatabaseManager extends SQLiteOpenHelper implements DatabaseDelegate{
 
 	private static final String TAG = "----DATABASE----";
+	
 	// DB Metadata
 	private static final String DATABASE_NAME = "SocialDB";
 	private static final int DATABASE_VERSION = 1;
@@ -38,11 +39,12 @@ public abstract class DatabaseManager extends SQLiteOpenHelper implements Databa
 	private static final String SQL_CREATE_FRIENDS = Utility.CREATE_TABLE + " " + FriendsEntry.TABLE_NAME + " (" 
 			+ FriendsEntry._ID + " " + Utility.INTEGER_TYPE + " PRIMARY KEY AUTOINCREMENT, "
 			// Index 0: user_id 
-			+ FriendsEntry.USER_ID + " " + Utility.INTEGER_TYPE + ", "
+			+ FriendsEntry.USER_ID + " " + Utility.BLOB_TYPE + ", "
 			// Index 1: friend_id
-			+ FriendsEntry.FRIEND_ID + " " + Utility.INTEGER_TYPE 
-			+ Utility.FOREIGN_KEY + "(" + FriendsEntry.USER_ID + ")" + " " + Utility.REFERENCES + " " + UsersEntry.TABLE_NAME + "(" + UsersEntry._ID + ")" 
-			+ Utility.FOREIGN_KEY + "(" + FriendsEntry.FRIEND_ID + ")" + " " + Utility.REFERENCES + " " + UsersEntry.TABLE_NAME + "(" + UsersEntry._ID + ")" 
+			+ FriendsEntry.FRIEND_ID + " " + Utility.BLOB_TYPE
+			// Foreign keys references
+			+ Utility.FOREIGN_KEY + "(" + FriendsEntry.USER_ID + ")" + " " + Utility.REFERENCES + " " + UsersEntry.TABLE_NAME + "(" + UsersEntry.USER_ID + ")" 
+			+ Utility.FOREIGN_KEY + "(" + FriendsEntry.FRIEND_ID + ")" + " " + Utility.REFERENCES + " " + UsersEntry.TABLE_NAME + "(" + UsersEntry.USER_ID + ")" 
 			+ ");";
 	
 	/**
@@ -51,9 +53,15 @@ public abstract class DatabaseManager extends SQLiteOpenHelper implements Databa
 	 */
 	private static final String SQL_CREATE_USERS = Utility.CREATE_TABLE + " " + UsersEntry.TABLE_NAME + " (" 
 			// Index 0: _id
-			+ UsersEntry._ID + " " + Utility.INTEGER_TYPE + " PRIMARY KEY, "
-			// Index 1: name
-			+ UsersEntry.NAME + " " + Utility.TEXT_TYPE + ");"; //", "
+			+ UsersEntry._ID + " " + Utility.INTEGER_TYPE + " PRIMARY KEY AUTOINCREMENT, "
+			// Index 1: user_id
+			+ UsersEntry.USER_ID + " " + Utility.BLOB_TYPE + ", "
+			// Index 2: username
+			+ UsersEntry.USERNAME + " " + Utility.TEXT_TYPE + ");" + ", "
+			// Integer 3: count
+			+ UsersEntry.COUNT + " " + Utility.INTEGER_TYPE + ", "
+			// Integer 4: max
+			+ UsersEntry.MAX + " " + Utility.INTEGER_TYPE + ")";
 //			+ UsersEntry.PRIVATE_KEY + " " + Utility.BLOB_TYPE + ", "
 //			+ UsersEntry.PUBLIC_KEY + " " + Utility.BLOB_TYPE + ")";
 	
@@ -63,16 +71,22 @@ public abstract class DatabaseManager extends SQLiteOpenHelper implements Databa
 	 */
 	private static final String SQL_CREATE_POSTS = Utility.CREATE_TABLE + " " + PostsEntry.TABLE_NAME + " (" 
 			// Index 0: _id
-			+ PostsEntry._ID + " " + Utility.INTEGER_TYPE + " PRIMARY KEY, "
-			// INdex 1: wall_id
-			+ PostsEntry.WALL_ID + " " + Utility.INTEGER_TYPE + ", "
-			// Index 2: text
+			+ PostsEntry._ID + " " + Utility.INTEGER_TYPE
+			// Index 1: poster_id
+			+ PostsEntry.POSTER_ID + " " + Utility.BLOB_TYPE + ", "
+			// INdex 2: wall_id
+			+ PostsEntry.WALL_ID + " " + Utility.BLOB_TYPE + ", "
+			// Index 3: datetime
+			+ PostsEntry.DATE_TIME + " " + Utility.TEXT_TYPE + ", "
+			// Index 4: text
 			+ PostsEntry.TEXT + " " + Utility.TEXT_TYPE + ", "
-			// Index 3: image
+			// Index 5: image
 			+ PostsEntry.IMAGE + " " + Utility.BLOB_TYPE + ", "
-			// Index 4: datetime
-			+ PostsEntry.DATE_TIME + " " + Utility.TEXT_TYPE 
-			+ Utility.FOREIGN_KEY + "(" + PostsEntry.WALL_ID + ")" + " " + Utility.REFERENCES + " " + UsersEntry.TABLE_NAME + "(" + UsersEntry._ID + ")" 
+			// Primary key
+			+ Utility.PRIMARY_KEY + " (" + PostsEntry._ID + ", " + PostsEntry.WALL_ID + "),"
+			// Foreign key references
+			+ Utility.FOREIGN_KEY + "(" + PostsEntry.POSTER_ID + ")" + " " + Utility.REFERENCES + " " + UsersEntry.TABLE_NAME + "(" + UsersEntry.USER_ID + "), " 
+			+ Utility.FOREIGN_KEY + "(" + PostsEntry.WALL_ID + ")" + " " + Utility.REFERENCES + " " + UsersEntry.TABLE_NAME + "(" + UsersEntry.USER_ID + ")" 
 			+ ");";
 
 	// CREATION

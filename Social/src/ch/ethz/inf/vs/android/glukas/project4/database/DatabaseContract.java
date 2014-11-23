@@ -25,7 +25,10 @@ public final class DatabaseContract {
 	// Structure of table users.
 	public static abstract class UsersEntry implements BaseColumns {
 		public static final String TABLE_NAME = "users";
-		public static final String NAME = "name";
+		public static final String USER_ID = "user_id";
+		public static final String USERNAME = "username";
+		public static final String COUNT = "count";
+		public static final String MAX = "max";
 //		public static final String AGE = "age";
 		public static final String PRIVATE_KEY = "private_key";
 		public static final String PUBLIC_KEY = "public_key";
@@ -40,6 +43,7 @@ public final class DatabaseContract {
 		public static final String TEXT = "text";
 		public static final String IMAGE = "image";
 		public static final String DATE_TIME = "date_time";
+		public static final String POSTER_ID = "poster_id";
 	}
 
 }

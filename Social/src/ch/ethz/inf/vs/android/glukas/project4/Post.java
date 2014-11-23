@@ -19,9 +19,6 @@ public class Post {
 	private Date datetime;
 	// Id of the user that posted the message
 	private UserId poster;
-	// 
-	private int postsCount;
-	private int maxId;
 
 	/**
 	 * Create new Image Post

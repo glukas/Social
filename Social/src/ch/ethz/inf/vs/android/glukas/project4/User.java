@@ -14,8 +14,12 @@ public class User {
 	private String username;
 	private Wall wall;
 	private List<User> friends;
-	// What is it used for?
+	// What is it used for? Just as placeholder :)
 	private Pair<String, String> key;
+	// Number of posts (partial order)
+	private int postsCount;
+	// Max post id
+	private int maxId;
 	
 	// Extra stuff. For the moment, I propose that we just ignore extra stuff.
 	// It will be easy to add specialties on the top of everything.
