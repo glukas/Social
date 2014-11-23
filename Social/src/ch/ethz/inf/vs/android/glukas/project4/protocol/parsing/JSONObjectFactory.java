@@ -10,34 +10,14 @@ import ch.ethz.inf.vs.android.glukas.project4.protocol.Message.MessageType;
 /**
  * Factory to create JSONObject
  */
-public class JSONObjectFactory {
-
+public class JSONObjectFactory {	
 	
-	/* TODO: Probably not needed anymore
-	// //
-	// Friendship
-	// //
-
-	public static JSONObject getFriendshipBroadcastMessage() {
-		JSONObject obj = new JSONObject();
-		try {
-			obj.put(Cmds.CMD.getStr(), Args.BROADCAST.getStr());
-			obj.put(Cmds.USER.getStr(), "USER-STATIC");
-		} catch (JSONException ex) {
-			obj = null;
-			ex.printStackTrace();
-		}
-		return obj;
-	}
-	 */
-	
-	
-	// //
+	////
 	// UserRequest
 	//
 	// the package-info gives more informations about how JSONObjects should be
 	// defined
-	// //
+	////
 
 	/**
 	 * Create a JSONObject from an UserRequest to be used to send messages over
@@ -46,11 +26,9 @@ public class JSONObjectFactory {
 	public static JSONObject createJSONObject(Message request , int numberofmessages) {
 
 		JSONObject obj = new JSONObject();
-
-		// TODO: Check if anything is missing
-
+		
 		try {
-			// Server
+				// Server
 			if (request.getMessageType().equals(MessageType.CONNECT)) {
 				setConnectObj(request, obj);
 			} else if (request.getMessageType().equals(MessageType.DISCONNECT)) {
@@ -59,14 +37,11 @@ public class JSONObjectFactory {
 				// Friends
 			} else if (request.getMessageType().equals(MessageType.SEARCH_USER)) {
 				setSearchUserObj(request, obj);
-			} else if (request.getMessageType().equals(
-					MessageType.ACCEPT_FRIENDSHIP)) {
+			} else if (request.getMessageType().equals(MessageType.ACCEPT_FRIENDSHIP)) {
 				setAcceptFriendshipObj(request, obj);
-			} else if (request.getMessageType().equals(
-					MessageType.REFUSE_FRIENDSHIP)) {
+			} else if (request.getMessageType().equals(MessageType.REFUSE_FRIENDSHIP)) {
 				setRefuseFriendshipObj(request, obj);
-			} else if (request.getMessageType().equals(
-					MessageType.ASK_FRIENDSHIP)) {
+			} else if (request.getMessageType().equals(MessageType.ASK_FRIENDSHIP)) {
 				setAskFriendshipObj(request, obj);
 			} else if (request.getMessageType().equals(MessageType.BROADCAST)) {
 				setBroadCastObj(request, obj);
@@ -83,11 +58,9 @@ public class JSONObjectFactory {
 				// Retrieve data
 			} else if (request.getMessageType().equals(MessageType.GET_POSTS)) {
 				setGetWallObj(request, obj);
-
 			} else if (request.getMessageType().equals(MessageType.SHOW_IMAGE)) {
 				setShowImageObj(request, obj);
-			} else if (request.getMessageType()
-					.equals(MessageType.SEND_PICTURE)) {
+			} else if (request.getMessageType().equals(MessageType.SEND_PICTURE)) {
 				setSendPictureObj(request, obj);
 			} else if (request.getMessageType().equals(MessageType.SEND_TEXT)) {
 				setSendTextObj(request, obj);
@@ -110,9 +83,9 @@ public class JSONObjectFactory {
 		return obj;
 	}
 
-	// /
+	////
 	// Server Message Setters
-	// /
+	////
 
 	private static void setConnectObj(Message request, JSONObject obj)
 			throws JSONException {
@@ -124,9 +97,9 @@ public class JSONObjectFactory {
 		obj.put(Cmds.CMD.getStr(), Args.DISCONNECT.getStr());
 	}
 
-	// /
+	////
 	// Friends Message Setters
-	// /
+	////
 
 	private static void setSearchUserObj(Message request, JSONObject obj)
 			throws JSONException {
@@ -162,10 +135,11 @@ public class JSONObjectFactory {
 
 	}
 
-	// /
+	////
 	// Post Message Setters
-	// /
-	// TODO: Difference between Send and Post?
+	////
+	// Difference between Send and Post?
+	// Post posts a new message on someone's wall. Send is used to send an existing message from a wall.
 
 	private static void setPostPictureObj(Message request, JSONObject obj)
 			throws JSONException {
@@ -185,22 +159,19 @@ public class JSONObjectFactory {
 
 	private static void setAckPostObj(Message request, JSONObject obj)
 			throws JSONException {
-		obj.put(Cmds.CMD.getStr(), Args.ACK.getStr());
-	//	obj.put(Cmds.ACK.getStr(), Args.POST.getStr());
+		obj.put(Cmds.ACK.getStr(), Args.POST.getStr());
 		obj.put(Cmds.ID.getStr(), request.getPostId());
 	}
 	
-	///
+	////
 	// Retrieve Data Message Setters
-	///
+	////
 	
 	private static void setSendTextObj(Message request, JSONObject obj)
 			throws JSONException {
-
 		obj.put(Cmds.CMD.getStr(), Args.SEND_TXT);
 		obj.put(Cmds.ID.getStr(), String.valueOf(request.getPostId()));
 		obj.put(Cmds.TEXT.getStr(), request.getMessage());
-
 	}
 
 	private static void setSendPictureObj(Message request, JSONObject obj)
@@ -209,22 +180,18 @@ public class JSONObjectFactory {
 		obj.put(Cmds.ID.getStr(), request.getPostId());
 		obj.put(Cmds.TEXT.getStr(), request.getMessage());
 		obj.put(Cmds.PIC.getStr(), request.getHttpLink());
-
 	}
 	
 	private static void setGetStateObj(Message request, JSONObject obj)
 			throws JSONException {
 		obj.put(Cmds.CMD.getStr(), Args.GET_STATE.toString());
-
 	}
 
-	private static void setSendStateObj(Message request ,JSONObject obj,  int numberofmessages)
+	private static void setSendStateObj(Message request, JSONObject obj, int numberofmessages)
 			throws JSONException {
 		obj.put(Cmds.CMD.toString(), Args.SEND_STATE.toString());
 		obj.put(Cmds.ID.getStr(), String.valueOf(request.getPostId()));
-		// TODO: Recheck
-		obj.put(Cmds.NUM_M.getStr(), String.valueOf(numberofmessages));
-
+		obj.put(Cmds.NUM_M.getStr(), numberofmessages);
 	}
 
 	private static void setGetWallObj(Message request, JSONObject obj)
@@ -233,8 +200,6 @@ public class JSONObjectFactory {
 	}
 
 	private static void setShowImageObj(Message request, JSONObject obj) {
-		// not a JSON request, thus the object associated to this request is
-		// empty
+		// not a JSON request, thus the object associated to this request is empty
 	}
-
 }

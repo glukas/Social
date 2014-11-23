@@ -14,6 +14,8 @@ public class MessageParser {
 
 	public static Message parseMessage(String message, PublicHeader header) {
 
+		// TODO : retrieve data
+		
 		JSONObject obj = null;
 		Message msg = null;
 		try {
@@ -31,10 +33,8 @@ public class MessageParser {
 	}
 
 	private static MessageType parseMessageType(String type, String response) {
-
-		// TODO : Check if its complete
-
-		// Server
+		
+			// Server
 		if (type.equals(Args.CONNECT.getStr())) {
 			return MessageType.CONNECT;
 		} else if (type.equals(Args.DISCONNECT.getStr())) {
@@ -52,11 +52,7 @@ public class MessageParser {
 			else
 				return MessageType.REFUSE_FRIENDSHIP;
 
-		/*} else if (type.equals(Args.SEARCH.getStr())) {
-			return MessageType.SEARCH_USER;
-		*/
 			// Post new message
-
 		} else if (type.equals(Args.POST_PIC.getStr())) {
 			return MessageType.POST_PICTURE;
 		} else if (type.equals(Args.POST_TXT.getStr())) {
@@ -84,7 +80,6 @@ public class MessageParser {
 		msg.setUsernameSender(header.getSender().getId().toString());
 		msg.setUsernameReceiver(header.getReceiver().getId().toString());
 		msg.setPostId(header.getMessageId());
-
 	}
 
 	private static void fillMessage(Message msg, JSONObject obj) {
@@ -93,24 +88,18 @@ public class MessageParser {
 			try {
 				msg.setMessage(obj.getString(Cmds.TEXT.getStr()));
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		} else if (type.equals(MessageType.POST_PICTURE)) {
 			try {
 				msg.setHttpLink(obj.getString(Cmds.PIC.getStr()));
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		} else if (type.equals(MessageType.ACCEPT_FRIENDSHIP)) {
-
 			msg.setFriendshipResponse(Args.ACCEPT.getStr());
-
 		} else if (type.equals(MessageType.REFUSE_FRIENDSHIP)) {
-
 			msg.setFriendshipResponse(Args.REJECT.getStr());
 		}
-
 	}
 }

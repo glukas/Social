@@ -13,7 +13,7 @@ public class Post {
 	// It would be nice if we can manage to have multiple images per post. But maybe it make things to 
 	// complicate
 	private Bitmap image;
-	//the id is crucial for sorting, it needs to be DB-consistent. Thus, on the TODO . =)
+	//the id is crucial for sorting.
 	private int id;
 	//date will not be used for sorting, but can provide friendly user content
 	private Date datetime;
@@ -27,6 +27,7 @@ public class Post {
 	 * @param datetime
 	 */
 	public Post(String text, Bitmap image, Date datetime, Wall wall) {
+		// TODO : ask Alessio if he can writes static methods for getMaxId and getNumPosts
 		this.id = -1;
 		this.text = text;
 		this.image = image;
@@ -39,6 +40,7 @@ public class Post {
 	 * @param datetime
 	 */
 	public Post(String text, Date datetime, Wall wall) {
+		// TODO : ask Alessio if he can writes static methods for getMaxId and getNumPosts
 		this.id = -1;
 		this.text = text;
 		this.image = null;
