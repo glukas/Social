@@ -159,7 +159,7 @@ public class JSONObjectFactory {
 
 	private static void setAckPostObj(Message request, JSONObject obj)
 			throws JSONException {
-		obj.put(Cmds.ACK.getStr(), Args.POST.getStr());
+		obj.put(Cmds.CMD.getStr(), Args.ACK.getStr());
 		obj.put(Cmds.ID.getStr(), request.getPostId());
 	}
 	
