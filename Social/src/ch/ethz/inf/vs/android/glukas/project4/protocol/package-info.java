@@ -101,7 +101,7 @@
  *  	user :: USERNAME
  *  
  *  acknowledge a post:
- *  	ack :: post
+ *  	cmd :: ack
  *  	id :: INT
  *  
  */

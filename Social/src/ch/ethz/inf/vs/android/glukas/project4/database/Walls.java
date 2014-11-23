@@ -1,9 +1,13 @@
 package ch.ethz.inf.vs.android.glukas.project4.database;
 
+import java.util.Date;
 import java.util.List;
 
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
 import ch.ethz.inf.vs.android.glukas.project4.Post;
+import ch.ethz.inf.vs.android.glukas.project4.UserId;
 import ch.ethz.inf.vs.android.glukas.project4.Wall;
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseContract.PostsEntry;
 
@@ -15,19 +19,51 @@ import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseContract.PostsEnt
 
 class Walls {
 
-	// TODO: Get the whole wall of the user.
+	// Get the whole wall of the user.
 	public static Wall getUserWall(SQLiteDatabase db) {
-		return null;
+		return getFriendWall(Utility.userID, db);
 	}
 	
-	// TODO: Get all the Posts in a Wall starting from id -> id or time?
-	public static List<Post> getAllPostsUserFrom(int timestamp, SQLiteDatabase db) {
-		return null;
+	// Delete user's wall.
+	public static void deleteUserWall(SQLiteDatabase db) {
+		deleteFriendWall(Utility.userID, db);
 	}
 	
-	// TODO: Get the whole Wall of a certain friend.
-	public static Wall getFriendWall(int friendid, SQLiteDatabase db) {
-		return null;
+	// Get the whole Wall of a certain friend.
+	public static Wall getFriendWall(UserId friendid, SQLiteDatabase db) {
+		// SQL SELECT clause
+		String[] projection = {PostsEntry._ID, PostsEntry.POSTER_ID, PostsEntry.TEXT, PostsEntry.IMAGE, PostsEntry.DATE_TIME};
+		// SQL WHERE clause
+		String selection = PostsEntry.WALL_ID + " == ?";
+		
+		// Arguments for selection.
+		String[] selectionArgs = {Utility.toSQLiteId(friendid).toString()};
+		
+		// SQL ORDER BY clause.
+		String order = PostsEntry._ID + " DESC";
+		
+		// Execute query.
+		Cursor cursor = db.query(PostsEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, order);
+		
+		// Instantiate Wall object
+		Wall wall = new Wall();
+		
+		// Add posts to wall
+		if(cursor.moveToFirst()) {
+			do {
+				// Add post to wall.
+				wall.posts.add(Utility.buildPost(cursor));
+			} while(cursor.moveToNext());
+			// Close cursor
+			cursor.close();
+			
+			// Return wall
+			return wall;
+		} else {
+			// Close cursor
+			cursor.close();
+			return null;
+		}
 	}
 	
 	/**
@@ -36,11 +72,15 @@ class Walls {
 	 * @param friendid
 	 * @param db the database
 	 */
-	public static void deleteFriendWall(int friendid, SQLiteDatabase db) {
+	public static void deleteFriendWall(UserId friendid, SQLiteDatabase db) {
 		// SQL WHERE clause.
 		String selection = PostsEntry.WALL_ID + " == ?";
-		// 
-		String[] selectionArgs = {Integer.toString(friendid)};
+		
+		// Arguments for selection. They must be the string representation
+		// of the byte array corresponding to the id.
+		String[] selectionArgs = {Utility.toSQLiteId(friendid).toString()};
+		
+		// Execute delete.
 		db.delete(PostsEntry.TABLE_NAME, selection, selectionArgs);
 	}
 }
