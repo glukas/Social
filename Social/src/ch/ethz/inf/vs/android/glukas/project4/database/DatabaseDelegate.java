@@ -1,8 +1,6 @@
 package ch.ethz.inf.vs.android.glukas.project4.database;
 
-import java.util.Date;
 import java.util.List;
-
 import ch.ethz.inf.vs.android.glukas.project4.Post;
 import ch.ethz.inf.vs.android.glukas.project4.User;
 import ch.ethz.inf.vs.android.glukas.project4.UserId;

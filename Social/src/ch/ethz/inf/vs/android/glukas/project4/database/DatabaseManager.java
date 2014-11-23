@@ -23,7 +23,7 @@ import android.util.Log;
  * @comment these will be the basic functionalities, more will be added.
  */
 
-public abstract class DatabaseManager extends SQLiteOpenHelper implements DatabaseDelegate{
+public class DatabaseManager extends SQLiteOpenHelper implements DatabaseDelegate{
 
 	private static final String TAG = "----DATABASE----";
 	
