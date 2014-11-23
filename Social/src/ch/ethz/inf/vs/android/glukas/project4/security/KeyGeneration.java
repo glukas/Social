@@ -35,6 +35,7 @@ public class KeyGeneration {
 		}
 	}
 	
+	//This can be used to generate user Ids.
 	public byte[] getPseudorandom(int numberOfBytes) {
 		byte[] bytes = new byte[numberOfBytes];
 		secureRandom.nextBytes(bytes);
