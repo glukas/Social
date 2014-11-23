@@ -25,4 +25,14 @@ class Users {
 		db.insert(UsersEntry.TABLE_NAME, null, values);
 	}
 	
+	// TODO: Get the upper bound of the number of posts in the user's wall.
+	public static int getUserPostsCount(SQLiteDatabase db) {
+		return 0;
+	}
+	
+	// TODO: Get the upper bound of the number of posts in the user's wall.
+	public static int getUserMaxPostsId(SQLiteDatabase db) {
+		return 0;
+	}
+	
 }

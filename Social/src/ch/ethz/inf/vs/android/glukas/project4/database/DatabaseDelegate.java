@@ -127,7 +127,7 @@ public interface DatabaseDelegate {
 	 * @param post the post to add
 	 * @param id the id of the friend
 	 */
-	public void putFriendPost(Post post, int id);
+	public void putFriendPost(Post post, UserId id);
 
 	/**
 	 * Get a post of a friend
@@ -135,7 +135,7 @@ public interface DatabaseDelegate {
 	 * @param friendid the friend who owns the post
 	 * @return
 	 */
-	public Post getFriendPost(int postid, int friendid);
+	public Post getFriendPost(int postid, UserId friendid);
 	
 	/**
 	 * Get all post of a friend with at least 'from' as post's number
@@ -143,14 +143,14 @@ public interface DatabaseDelegate {
 	 * @param from the least post id to consider
 	 * @return a list of all matching posts (not sorted)
 	 */
-	public List<Post> getAllFriendPostsFrom(int id, int from);
+	public List<Post> getAllFriendPostsFrom(UserId id, int from);
 	
 	/**
 	 * Delete a friend's post.
 	 * @param postid the id of the post to delete
 	 * @param friendid the id of the friend
 	 */
-	public void deleteFriendPost(int postid, int friendid);
+	public void deleteFriendPost(int postid, UserId friendid);
 	
 	
 	////
@@ -173,12 +173,12 @@ public interface DatabaseDelegate {
 	 * @param id the friend's id
 	 * @return the friend's wall object
 	 */
-	public Wall getFriendWall(int id);
+	public Wall getFriendWall(UserId id);
 	
 	/**
 	 * Delete the wall of a friend.
 	 * @param id the id of the friend whose wall is to delete
 	 */
-	public void deleteFriendWall(int id);
+	public void deleteFriendWall(UserId id);
 
 }

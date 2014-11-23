@@ -53,7 +53,7 @@ public class Post {
 	 * @param image
 	 * @param datetime
 	 */
-	public Post(int id, String text, Bitmap image, Date datetime) {
+	public Post(int id, UserId Poster, String text, Bitmap image, Date datetime) {
 		this.id = id;
 		this.text = text;
 		this.image = image;

@@ -43,8 +43,10 @@ public abstract class DatabaseManager extends SQLiteOpenHelper implements Databa
 			// Index 1: friend_id
 			+ FriendsEntry.FRIEND_ID + " " + Utility.BLOB_TYPE
 			// Foreign keys references
-			+ Utility.FOREIGN_KEY + "(" + FriendsEntry.USER_ID + ")" + " " + Utility.REFERENCES + " " + UsersEntry.TABLE_NAME + "(" + UsersEntry.USER_ID + ")" 
-			+ Utility.FOREIGN_KEY + "(" + FriendsEntry.FRIEND_ID + ")" + " " + Utility.REFERENCES + " " + UsersEntry.TABLE_NAME + "(" + UsersEntry.USER_ID + ")" 
+			+ Utility.FOREIGN_KEY + "(" + FriendsEntry.USER_ID + ")" + " " + Utility.REFERENCES + " " + UsersEntry.TABLE_NAME + "(" + UsersEntry.USER_ID + ")"
+//				TODO + " " + Utility.ON_DELETE + " " + Utility.
+			+ Utility.FOREIGN_KEY + "(" + FriendsEntry.FRIEND_ID + ")" + " " + Utility.REFERENCES + " " + UsersEntry.TABLE_NAME + "(" + UsersEntry.USER_ID + ")"
+				+ " " + Utility.ON_DELETE + " " + Utility.CASCADE
 			+ ");";
 	
 	/**
@@ -53,9 +55,9 @@ public abstract class DatabaseManager extends SQLiteOpenHelper implements Databa
 	 */
 	private static final String SQL_CREATE_USERS = Utility.CREATE_TABLE + " " + UsersEntry.TABLE_NAME + " (" 
 			// Index 0: _id
-			+ UsersEntry._ID + " " + Utility.INTEGER_TYPE + " PRIMARY KEY AUTOINCREMENT, "
+			+ UsersEntry._ID + " " + Utility.INTEGER_TYPE + " AUTOINCREMENT, "
 			// Index 1: user_id
-			+ UsersEntry.USER_ID + " " + Utility.BLOB_TYPE + ", "
+			+ UsersEntry.USER_ID + " " + Utility.BLOB_TYPE + " " + Utility.PRIMARY_KEY + ", "
 			// Index 2: username
 			+ UsersEntry.USERNAME + " " + Utility.TEXT_TYPE + ");" + ", "
 			// Integer 3: count
@@ -74,7 +76,7 @@ public abstract class DatabaseManager extends SQLiteOpenHelper implements Databa
 			+ PostsEntry._ID + " " + Utility.INTEGER_TYPE
 			// Index 1: poster_id
 			+ PostsEntry.POSTER_ID + " " + Utility.BLOB_TYPE + ", "
-			// INdex 2: wall_id
+			// Index 2: wall_id
 			+ PostsEntry.WALL_ID + " " + Utility.BLOB_TYPE + ", "
 			// Index 3: datetime
 			+ PostsEntry.DATE_TIME + " " + Utility.TEXT_TYPE + ", "
@@ -85,8 +87,10 @@ public abstract class DatabaseManager extends SQLiteOpenHelper implements Databa
 			// Primary key
 			+ Utility.PRIMARY_KEY + " (" + PostsEntry._ID + ", " + PostsEntry.WALL_ID + "),"
 			// Foreign key references
-			+ Utility.FOREIGN_KEY + "(" + PostsEntry.POSTER_ID + ")" + " " + Utility.REFERENCES + " " + UsersEntry.TABLE_NAME + "(" + UsersEntry.USER_ID + "), " 
-			+ Utility.FOREIGN_KEY + "(" + PostsEntry.WALL_ID + ")" + " " + Utility.REFERENCES + " " + UsersEntry.TABLE_NAME + "(" + UsersEntry.USER_ID + ")" 
+			+ Utility.FOREIGN_KEY + "(" + PostsEntry.POSTER_ID + ")" + " " + Utility.REFERENCES + " " + UsersEntry.TABLE_NAME + "(" + UsersEntry.USER_ID + ") " 
+				 + Utility.ON_DELETE + " " + Utility.SET_NULL + ", "
+			+ Utility.FOREIGN_KEY + "(" + PostsEntry.WALL_ID + ")" + " " + Utility.REFERENCES + " " + UsersEntry.TABLE_NAME + "(" + UsersEntry.USER_ID + ") "
+				+ Utility.ON_DELETE + " " + Utility.CASCADE
 			+ ");";
 
 	// CREATION
@@ -123,50 +127,50 @@ public abstract class DatabaseManager extends SQLiteOpenHelper implements Databa
 		Users.putUser(user, this.getWritableDatabase());
 	}
 
-	// TODO: Get the upper bound of the number of posts in the user's wall.
+	// Get the upper bound of the number of posts in the user's wall.
 	@Override
 	public int getUserPostsCount() {
-//		return Users
-		return 0;
+		return Users.getUserPostsCount(this.getReadableDatabase());
 	}
 	
-	// TODO: Get the upper bound of the number of posts in the user's wall.
+	// Get the upper bound of the number of posts in the user's wall.
 	@Override
 	public int getUserMaxPostsId() {
-		// return Users
-		return 0;
+		 return Users.getUserMaxPostsId(this.getReadableDatabase());
 	}
 	
 	
 	/**
 	 * FRIENDS MANAGEMENT
 	 */
-	// TODO: Get the upper bound of the number of posts in the friend's wall.
+	// Get the upper bound of the number of posts in the friend's wall.
 	@Override
 	public int getFriendPostsCount(UserId id) {
-		return 0;
+		return Friends.getFriendPostsCount(id, this.getReadableDatabase());
 	}
 	
-	// TODO: Get the upper bound over the partial order of actual posts for the friend.
+	// Get the upper bound over the partial order of actual posts for the friend.
 	@Override
 	public int getFriendMaxId(UserId id) {
-		return 0;
+		return Friends.getFriendMaxId(id, this.getReadableDatabase());
 	}
 	
-	// TODO: Create a friendship relation between the user and a new friend.
+	// Create a friendship relation between the user and a new friend.
+	@Override
 	public void putFriendship(UserId id, String username) {
-		
+		Friends.putFriendship(id, username, this.getWritableDatabase());
 	}
 	
-	// TODO: Get an user name from an user id
+	// Get an user name from an user id
 	@Override
 	public String getFriendUsername(UserId id) {
-		return null;
+		return Friends.getFriendUsername(id, this.getReadableDatabase());
 	}
 	
-	// TODO: Get an user id from an user name (cannot ensures uniqueness)
+	// Get an user id from an user name (cannot ensures uniqueness)
+	@Override
 	public List<UserId> getFriendId(String username) {
-		return null;
+		return Friends.getFriendId(username, this.getReadableDatabase());
 	}
 	
 	// Add a friend in the List of Friends of the user
@@ -175,10 +179,10 @@ public abstract class DatabaseManager extends SQLiteOpenHelper implements Databa
 		Friends.putFriend(friend, this.getWritableDatabase());
 	}
 	
-	// TODO: Remove friend from the List of friends & everything associated with him/her
+	// Remove friend from the List of friends & everything associated with him/her
 	@Override
 	public void deleteFriend(UserId id) {
-//		Friends.deleteFriend(id, this.getWritableDatabase());
+		Friends.deleteFriend(id, this.getWritableDatabase());
 	}
 	
 	
@@ -191,11 +195,10 @@ public abstract class DatabaseManager extends SQLiteOpenHelper implements Databa
 		Posts.putUserPost(post, this.getWritableDatabase());
 	}
 	
-	// TODO: Get all the Posts in a Wall starting from id -> id or time?
+	// Get all the Posts in a Wall starting from id -> id or time?
 	@Override
 	public List<Post> getAllUserPostsFrom(int from) {
-//	return Posts.getAllUserPostsFrom(timestamp, this.getReadableDatabase());
-		return null;
+		return Posts.getAllUserPostsFrom(from, this.getReadableDatabase());
 	}
 
 	// Delete a certain post from the user's wall.
@@ -212,26 +215,25 @@ public abstract class DatabaseManager extends SQLiteOpenHelper implements Databa
 
 	// Update the wall of a friend whose wall is saved on our phone
 	@Override
-	public void putFriendPost(Post post, int friendid) {
+	public void putFriendPost(Post post, UserId friendid) {
 		Posts.putFriendPost(post, friendid, this.getWritableDatabase());
 	}
 
 	// Get a certain Post from a certain friend
 	@Override
-	public Post getFriendPost(int postid, int friendid) {
+	public Post getFriendPost(int postid, UserId friendid) {
 		return Posts.getFriendPost(postid, friendid, this.getReadableDatabase());
 	}
 
 	// Get all Posts of a certain friend starting at a certain time/timestamp
 	@Override
-	public List<Post> getAllFriendPostsFrom(int friendid, int postid) {
-//		return Posts.getAllFriendPostsfrom(timestamp, friendid, this.getReadableDatabase());
-		return null;
+	public List<Post> getAllFriendPostsFrom(UserId friendid, int from) {
+		return Posts.getAllFriendPostsFrom(friendid, from, this.getReadableDatabase());
 	}
 
 	// delete a certain Post of a certain friend
 	@Override
-	public void deleteFriendPost(int postid, int friendid) {
+	public void deleteFriendPost(int postid, UserId friendid) {
 		Posts.deleteFriendPost(postid, friendid, this.getWritableDatabase());
 	}
 	
@@ -253,13 +255,13 @@ public abstract class DatabaseManager extends SQLiteOpenHelper implements Databa
 	
 	// Get the whole Wall of a certain friend
 	@Override
-	public Wall getFriendWall(int friendid) {
+	public Wall getFriendWall(UserId friendid) {
 		return Walls.getFriendWall(friendid, this.getReadableDatabase());
 	}
 	
 	// Delete the whole saved Wall of a certain friend
 	@Override
-	public void deleteFriendWall(int friendid) {
+	public void deleteFriendWall(UserId friendid) {
 		Walls.deleteFriendWall(friendid, this.getWritableDatabase());
 	}
 }

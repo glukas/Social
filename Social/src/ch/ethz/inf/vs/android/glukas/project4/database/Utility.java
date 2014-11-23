@@ -1,8 +1,11 @@
 package ch.ethz.inf.vs.android.glukas.project4.database;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Date;
 
+import ch.ethz.inf.vs.android.glukas.project4.Post;
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
@@ -17,12 +20,18 @@ class Utility {
 	
 	public static final String CREATE_TABLE = "CREATE TABLE";
 	public static final String DROP_TABLE = "DROP TABLE";
+	public static final String NOT_NULL = "NOT NULL";
 	public static final String IF_EXISTS = "IF EXISTS";
-	public static final String PRIMARY_KEY = "primary_key";
-	public static final String FOREIGN_KEY = "FOREIGN_KEY";
+	public static final String PRIMARY_KEY = "PRIMARY KEY";
+	public static final String FOREIGN_KEY = "FOREIGN KEY";
 	public static final String REFERENCES = "REFERENCES";
+	public static final String ON_DELETE = "ON DELETE";
+	public static final String CASCADE = "CASCADE";
+	public static final String SET_NULL = "SET NULL";
+	public static final String NO_ACTION = "NO ACTION";
 	
 	// Implementation constants.
+	// TODO: think about making them dynamic
 	public static final int MAX_BLOB_SIZE = 0;	// TODO: define # of bytes needed for a blob (images + keys + big text?)
 	public static final int MAX_DATABASE_SIZE = 0;	// TODO: define # of bytes needed for the DB
 	
@@ -37,6 +46,22 @@ class Utility {
 		return BitmapFactory.decodeByteArray(blobImage, 0, blobImage.length);
 	}
 	
+	public static final byte[] toByteArray(Bitmap bitmapImage) {
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		bitmapImage.compress(Bitmap.CompressFormat.PNG, 100, bos);	// TODO: adapt quality (second parameter)
+		return bos.toByteArray();
+	}
+	
+	/**
+	 * Transforms a UserId into a byte[].
+	 * This is needed because ids need to be stored in blobs.
+	 * @param userid the UserId object to be transformed
+	 * @return byte[] representation of the input
+	 */
+	public static final byte[] toSQLiteId(UserId userid) {
+		return userid.getId().toByteArray();
+	}
+	
 	/** TODO
 	 * 
 	 * @param sqlDate Date in SQLite String format
@@ -46,9 +71,28 @@ class Utility {
 		return null;
 	}
 	
-	public static final Date toSQLiteDate(String javaDate) {
+	public static final String toSQLiteDate(Date javaDate) {
 		return null;
 	}
 	
-	
+	/**
+	 * Retrieves data from the current cursor position in order to build
+	 * a Post object.
+	 * @param cursor
+	 * @return Post object
+	 */
+	public static final Post buildPost(Cursor cursor) {
+		// Get id.
+		int id = cursor.getInt(0);
+		// Get poster id.
+		UserId poster_id = new UserId(cursor.getBlob(1));
+		// Get text.
+		String text = cursor.getString(4);
+		// Get image.
+		Bitmap image = Utility.toBitmap(cursor.getBlob(5));
+		// Get datetime.
+		Date datetime = Utility.toJavaDate(cursor.getString(3));
+		// Build adn return post.
+		return new Post(id, poster_id, text, image, datetime);
+	}
 }
