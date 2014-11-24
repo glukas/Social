@@ -121,7 +121,7 @@ class Posts {
 		}	
 	}
 	
-	/** FIXME
+	/**
 	 * Get all Posts of a certain friend with id at least from.
 	 * @param timestamp
 	 * @param friendid

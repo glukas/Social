@@ -46,6 +46,11 @@ class Utility {
 		return BitmapFactory.decodeByteArray(blobImage, 0, blobImage.length);
 	}
 	
+	/**
+	 * Transforms a Bitmap into a byte[].
+	 * @param bitmapImage
+	 * @return
+	 */
 	public static final byte[] toByteArray(Bitmap bitmapImage) {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		bitmapImage.compress(Bitmap.CompressFormat.PNG, 100, bos);	// TODO: adapt quality (second parameter)
@@ -63,7 +68,7 @@ class Utility {
 	}
 	
 	/** TODO
-	 * 
+	 * Java date format:
 	 * @param sqlDate Date in SQLite String format
 	 * @return Java Date object
 	 */
@@ -71,6 +76,11 @@ class Utility {
 		return null;
 	}
 	
+	/** TODO
+	 * SQL date format: 
+	 * @param javaDate
+	 * @return
+	 */
 	public static final String toSQLiteDate(Date javaDate) {
 		return null;
 	}
