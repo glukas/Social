@@ -30,8 +30,8 @@ public final class DatabaseContract {
 		public static final String COUNT = "count";
 		public static final String MAX = "max";
 //		public static final String AGE = "age";
-		public static final String PRIVATE_KEY = "private_key";
-		public static final String PUBLIC_KEY = "public_key";
+		public static final String BROADCAST_ENC_KEY = "broadcast_enc_key";
+		public static final String BROADCAST_AUTH_KEY = "broadcast_auth_key";
 		// ...
 		
 	}

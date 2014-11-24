@@ -78,14 +78,18 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate, Messag
 	@Override
 	public void connect() throws NetworkException {
 		String msg = JSONObjectFactory.createJSONObject(new Message(MessageType.CONNECT), -1).toString();
-		PublicHeader header = new PublicHeader(null , ConsistencyByte.CONNECTION.getState(),  0 ,localUserId, null);
+
+		PublicHeader header = new PublicHeader(null ,StatusByte.CONNECT.getByte(),  0 ,localUserId, null);
+
 		messageRelay.connect(msg, header);
 	}
 
 	@Override
 	public void disconnect() throws NetworkException {
 		String msg = JSONObjectFactory.createJSONObject(new Message(MessageType.DISCONNECT), -1).toString();
-		PublicHeader header = new PublicHeader(null , ConsistencyByte.CONNECTION.getState(), 0 , localUserId, null);
+
+		PublicHeader header = new PublicHeader(null , StatusByte.DISCONNECT.getByte(), 0 , localUserId, null);
+
 		messageRelay.disconnect(msg, header);
 	}
 	
@@ -108,7 +112,9 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate, Messag
 			new DatabaseException().printStackTrace();
 		}
 		Message msg = new Message(MessageType.GET_STATE);
-		PublicHeader header = new PublicHeader(null , ConsistencyByte.DATA_SEARCH.getState(), 0 ,localUserId, listUserId.get(0));
+
+		PublicHeader header = new PublicHeader(null ,  StatusByte.DATA.getByte(), 0 ,localUserId, listUserId.get(0));
+
 		secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg, 0).toString(), header));
 	}
 

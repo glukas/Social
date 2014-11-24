@@ -9,22 +9,55 @@
  *  
  *  Packets Header :
  *  
- *  -----------------------------------------------
- *  | Sender  |  Receiver  |  Consistency  |  id  |
- *  -----------------------------------------------
- *  | /    /    /    /    /    /    /    /    /   |
- *  | /    /    /  CONTENT     /    /    /    /   |
- *  | /    /    /    /    /    /    /    /    /   |
- *  -----------------------------------------------  
+ *  ------------------------------------------------------------------
+ *  | Length  |  Reserved  |  Status  |  id  |  Sender  |  Receiver  |
+ *  ------------------------------------------------------------------
+ *  | /    /    /    /    /    /    /    /    /    /    /    /    /  |
+ *  | /    /    /    /    /     CONTENT  /    /    /    /    /    /  |
+ *  | /    /    /    /    /    /    /    /    /    /    /    /    /  |
+ *  ------------------------------------------------------------------  
  *  
  *  Where:
  *  
+ *  Length, length of the message including the header (32 bits)
+ *  Reserved, are three bytes reserved for futurw use (24 bits)
+ *  Status, is a byte describing the status of the message (8 bits)
+ *  id, not unique id of the message (32 bits)
  *  Sender, id of the sender (128 bits)
  *  Receiver, id of the receiver (128 bits)
- *  Consistency, byte used for consistency (8 bits)
- *  id, not unique id of the message (32 bits)
  *  
  *  i.e. Server has identity 0
+ *  
+ *  Status Byte :
+ *  
+ *  The status byte is used by the server to identify the action it has to provide to the message. There are
+ *  five different kind of messages :
+ *  
+ *  Connect :
+ *  
+ *  The user wants to connect to the server. Sender is the id of the user to connect, receiver should be the
+ *  id of the server (0). id is also 0.
+ *  
+ *  Disconnect :
+ *  
+ *  The user wants to disconnect from the server. Sender is the id of the user to disconnect, receiver
+ *  should be the id of the server (0). id is also 0.
+ *  
+ *  Post :
+ *  
+ *  User wants to post a new message on someone's else wall. Server has to check if the user targeted by receiver
+ *  field is connected. If it's the case, server has to forward the post to the targeted user. (It has to be sure
+ *  that message was correctly delivered.) If the targeted user is not connected, then server has to cache the post.
+ *  
+ *  Send :
+ *  
+ *  User wants to send a message to someone. Server forward message to targeted user.
+ *  
+ *  Data :
+ *  
+ *  The user wants to retrieve some data. If the Sender = Receiver, then the user wants to get all posts that
+ *  server has previously cached. Server has to send to the user all cached messages. (And, when ack, it can drop
+ *  them.)
  *  
  *  
  *  JSON Protocol :

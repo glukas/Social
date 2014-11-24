@@ -71,7 +71,22 @@ public class User {
 		return credentials;
 	}
 	
+	public int getPostsCount() {
+		return postsCount;
+	}
+	
+	public int getMaxId() {
+		return maxId;
+	}
+	
 	// Setters.
 	// TODO: add, but only for fields that can be modified!
-
+	
+	public void setPostsCount(int newCount) {
+		this.postsCount = newCount;
+	}
+	
+	public void setMaxId(int newMax) {
+		this.maxId = newMax;
+	}
 }
