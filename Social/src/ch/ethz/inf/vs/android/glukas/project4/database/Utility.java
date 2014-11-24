@@ -4,7 +4,10 @@ import java.io.ByteArrayOutputStream;
 import java.util.Date;
 
 import ch.ethz.inf.vs.android.glukas.project4.Post;
+import ch.ethz.inf.vs.android.glukas.project4.User;
+import ch.ethz.inf.vs.android.glukas.project4.UserCredentials;
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
+import ch.ethz.inf.vs.android.glukas.project4.Wall;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -105,4 +108,5 @@ class Utility {
 		// Build adn return post.
 		return new Post(id, poster_id, text, image, datetime);
 	}
+	
 }

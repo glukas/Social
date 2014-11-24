@@ -130,10 +130,10 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseDelegat
 		Users.putUser(user, this.getWritableDatabase());
 	}
 	
-	@Override 
+	@Override
+	// Get the user object from the database.
 	public User getUser(){
-		// TODO : Get the user object from database
-		return null;
+		return Users.getUser(this.getReadableDatabase());
 	}
 
 	// Get the upper bound of the number of posts in the user's wall.
@@ -152,10 +152,11 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseDelegat
 	 * Credentials (Keys)
 	 */
 
+	// Get the credentials of the given user.
+	// ATTENTION: this method will be modified in the future!!
 	@Override
-	public UserCredentials getUserCredentials(UserId user) {
-		// TODO (Alessio) implement
-		return null;
+	public UserCredentials getUserCredentials(UserId id) {
+		return Users.getUserCredentials(id, this.getReadableDatabase());
 	}
 	
 	/**
@@ -265,10 +266,10 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseDelegat
 		return Walls.getUserWall(this.getReadableDatabase());
 	}
 	
-	// TODO: Delete user's wall.
+	// Delete user's wall.
 	@Override
 	public void deleteUserWall() {
-		
+		Walls.deleteUserWall(this.getWritableDatabase());
 	}
 	
 	// Get the whole Wall of a certain friend

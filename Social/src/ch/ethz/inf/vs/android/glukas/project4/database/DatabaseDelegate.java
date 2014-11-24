@@ -9,7 +9,7 @@ import ch.ethz.inf.vs.android.glukas.project4.Wall;
 
 /**
  * Abstract list of all functionalities offered by the database.
- * Please refer to this and add here new functions you need.
+ * Please refer to this and add new functions you need.
  * Please consider all methods with a TODO as still having a non 
  * (complete) meaningful declaration.
  */
@@ -27,6 +27,7 @@ public interface DatabaseDelegate {
 	
 	/**
 	 * Get User of device from Database.
+	 * @return the User object, whose friend's list contains only the ids!!
 	 */
 	public User getUser();
 	
