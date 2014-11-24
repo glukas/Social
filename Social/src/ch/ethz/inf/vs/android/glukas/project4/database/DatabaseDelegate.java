@@ -26,9 +26,18 @@ public interface DatabaseDelegate {
 	public void putUser(User user);
 	
 	/**
+	 * Get User of device from Database.
+	 */
+	public User getUser();
+	
+	
+	
+	
+	/**
 	 * Get the upper bound of the number of posts in the user's wall.
 	 * @return the upper bound.
 	 */
+	
 	public int getUserPostsCount();
 	
 	/**

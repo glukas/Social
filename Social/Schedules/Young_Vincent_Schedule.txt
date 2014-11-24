@@ -30,6 +30,9 @@ Week 24 - 30 November :
 		-Posts creation
 		-Check (write tests for) parser and creater of JSON messages
 		-onMessageReceived implementation
+		-Define ConsistencyByte
+		-Talk with Mathias for application on server
+		-ByteBuffer constructor / write into ByteBuffer
 
 Week 1 - 7 December
 
