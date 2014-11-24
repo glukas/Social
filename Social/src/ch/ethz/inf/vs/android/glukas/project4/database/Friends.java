@@ -23,7 +23,7 @@ class Friends {
 	}
 	
 	// TODO: Get the upper bound over the partial order of actual posts for the friend.
-	public static int getFriendMaxId(UserId id, SQLiteDatabase db) {
+	public static int getFriendMaxPostsId(UserId id, SQLiteDatabase db) {
 		return 0;
 	}
 	
