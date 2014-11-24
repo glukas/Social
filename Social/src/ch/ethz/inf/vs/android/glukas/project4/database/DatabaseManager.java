@@ -127,6 +127,12 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseDelegat
 	public void putUser(User user) {
 		Users.putUser(user, this.getWritableDatabase());
 	}
+	
+	@Override 
+	public User getUser(){
+		// TODO : Get the user object from database
+		return null;
+	}
 
 	// Get the upper bound of the number of posts in the user's wall.
 	@Override
