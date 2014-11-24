@@ -61,12 +61,14 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseDelegat
 			+ UsersEntry.USER_ID + " " + Utility.BLOB_TYPE + " " + Utility.PRIMARY_KEY + ", "
 			// Index 2: username
 			+ UsersEntry.USERNAME + " " + Utility.TEXT_TYPE + ");" + ", "
-			// Integer 3: count
+			// Index 3: count
 			+ UsersEntry.COUNT + " " + Utility.INTEGER_TYPE + ", "
-			// Integer 4: max
-			+ UsersEntry.MAX + " " + Utility.INTEGER_TYPE + ")";
-//			+ UsersEntry.PRIVATE_KEY + " " + Utility.BLOB_TYPE + ", "
-//			+ UsersEntry.PUBLIC_KEY + " " + Utility.BLOB_TYPE + ")";
+			// Index 4: max
+			+ UsersEntry.MAX + " " + Utility.INTEGER_TYPE + ", "
+			// Index 5: broadcast_enc_key
+			+ UsersEntry.BROADCAST_ENC_KEY + " " + Utility.BLOB_TYPE + ", "
+			// Index 6: broadcast_auth_key
+			+ UsersEntry.BROADCAST_AUTH_KEY + " " + Utility.BLOB_TYPE + ")";
 	
 	/**
 	 * String containing SQL code to create table posts.
@@ -161,11 +163,11 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseDelegat
 	
 	// Get the upper bound over the partial order of actual posts for the friend.
 	@Override
-	public int getFriendMaxId(UserId id) {
-		return Friends.getFriendMaxId(id, this.getReadableDatabase());
+	public int getFriendMaxPostsId(UserId id) {
+		return Friends.getFriendMaxPostsId(id, this.getReadableDatabase());
 	}
 	
-	// Create a friendship relation between the user and a new friend.
+	// FIXME: Create a friendship relation between the user and a new friend.
 	@Override
 	public void putFriendship(UserId id, String username) {
 		Friends.putFriendship(id, username, this.getWritableDatabase());

@@ -41,6 +41,11 @@ public interface DatabaseDelegate {
 	// Credentials (Keys)
 	////
 	
+	/** TODO
+	 * 
+	 * @param user
+	 * @return
+	 */
 	public UserCredentials getUserCredentials(UserId user);
 	
 	////
@@ -59,7 +64,7 @@ public interface DatabaseDelegate {
 	 * @param id the id of the friend
 	 * @return the upper bound.
 	 */
-	public int getFriendMaxId(UserId id);
+	public int getFriendMaxPostsId(UserId id);
 	
 	/** TODO: check with @Lukas for use in Security Layer (friends of friends)
 	 * Create a friendship relation between the user and a new friend.
