@@ -2,6 +2,8 @@ package ch.ethz.inf.vs.android.glukas.project4.protocol;
 
 import java.nio.ByteBuffer;
 
+import android.util.Log;
+
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
 
 /**
@@ -19,14 +21,10 @@ public class PublicHeader {
 	/**
 	 * Construct a new PublicHeader from explicit arguments
 	 * 
-	 * @param sender
-	 *            , UserId of sender
-	 * @param receiver
-	 *            , UserId of receiver
-	 * @param consistency
-	 *            , byte describing kind of message
-	 * @param messageId
-	 *            , if it's a post, the id of the post
+	 * @param sender, UserId of sender
+	 * @param receiver, UserId of receiver
+	 * @param consistency, byte describing kind of message
+	 * @param messageId, if it's a post, the id of the post
 	 */
 	public PublicHeader(int length, byte[] future, byte consistency,
 			int messageId, UserId sender, UserId receiver) {
@@ -46,9 +44,7 @@ public class PublicHeader {
 
 	/**
 	 * Construct new PublicHeader from a byte array
-	 * 
-	 * @param bytesHeader
-	 *            , byte array received from network
+	 * @param bytesHeader, byte array received from network
 	 */
 	public PublicHeader(ByteBuffer buf) {
 
@@ -111,15 +107,27 @@ public class PublicHeader {
 	///
 	//Setters
 	///
-	public void setLength() {
+	public void setLength(int length) {
 		this.length = length;
 	}
+	
 	/**
 	 * Returns the header as byte array
 	 */
 	public byte[] getbytes() {
+		
+		ByteBuffer buf = ByteBuffer.allocate(44);
+		
+		buf.putInt(length);
+		buf.put(future);
+		buf.put(consistency);
+		buf.putInt(messageId);
+		buf.put(sender.getId().toByteArray());
+		buf.put(receiver.getId().toByteArray());
+		return buf.array();
+		
+		/*
 		byte[] data = new byte[40];
-
 		// future bytes
 		byte[] future = this.getFuture();
 
@@ -169,6 +177,6 @@ public class PublicHeader {
 			data[i] = receiverId[i];
 		}
 
-		return data;
+		return data;*/
 	}
 }
