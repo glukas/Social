@@ -22,22 +22,25 @@ import ch.ethz.inf.vs.android.glukas.project4.security.SecureChannelDelegate;
 import ch.ethz.inf.vs.android.glukas.project4.security.NetworkMessage;
 
 /**
- * This is the main part of the package, where most of the protocol is implemented.
+ * This is the main part of the package, where most of the protocol is
+ * implemented.
  * 
- * It linked together request from the user, through implementing the UserDelegate. On an other hand,
- * it handles calls back from the network, through implementing SecureChannelDelegate.
+ * It linked together request from the user, through implementing the
+ * UserDelegate. On an other hand, it handles calls back from the network,
+ * through implementing SecureChannelDelegate.
  */
-public class Protocol implements ProtocolDelegate, SecureChannelDelegate, MessageRelayDelegate {
-	
-	////
-	//Life cycle
-	////
-	
+public class Protocol implements ProtocolDelegate, SecureChannelDelegate,
+		MessageRelayDelegate {
+
+	// //
+	// Life cycle
+	// //
+
 	private static Protocol instance;
-	
+
 	/**
-	 * Get a instance of Protocol. If it's the first time, it can take some time. (Has to retrieve data
-	 * from the database.)
+	 * Get a instance of Protocol. If it's the first time, it can take some
+	 * time. (Has to retrieve data from the database.)
 	 */
 	public static Protocol getInstance(Context context) {
 		if (instance == null) {
@@ -46,49 +49,56 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate, Messag
 			return instance;
 		}
 	}
-	
-	private Protocol(Context context){
-		//TODO : instantiate delegates (user, security layers)
-		
+
+	private Protocol(Context context) {
+		// TODO : instantiate delegates (user, security layers)
+
 		database = new DatabaseManager(context);
 		secureChannel.setDelegate(this);
 		messageRelay.setDelegate(this);
 		userHandler.setDelegate(this);
-		//TODO : method for that
-		//localUserId = database.getUserId();
+		// TODO : method for that
+		// localUserId = database.getUserId();
 	}
-	
-	////
-	//Members
-	////
-	
-	//Communications with other components
+
+	// //
+	// Members
+	// //
+
+	// Communications with other components
 	private SecureChannel secureChannel;
 	private MessageRelay messageRelay;
 	private UserDelegate userHandler;
 	private DatabaseDelegate database;
-	
-	
+
 	private UserId localUserId;
-	
-	////
-	//ProtocolDelegate
-	////
-	
+
+	// //
+	// ProtocolDelegate
+	// //
+
 	@Override
 	public void connect() throws NetworkException {
-		String msg = JSONObjectFactory.createJSONObject(new Message(MessageType.CONNECT), -1).toString();
-		PublicHeader header = new PublicHeader(localUserId, null, StatusByte.CONNECT.getByte(), 0);
+		String msg = JSONObjectFactory.createJSONObject(
+				new Message(MessageType.CONNECT), -1).toString();
+
+		PublicHeader header = new PublicHeader(0, null,
+				StatusByte.CONNECT.getByte(), 0, localUserId, null);
+
 		messageRelay.connect(msg, header);
 	}
 
 	@Override
 	public void disconnect() throws NetworkException {
-		String msg = JSONObjectFactory.createJSONObject(new Message(MessageType.DISCONNECT), -1).toString();
-		PublicHeader header = new PublicHeader(localUserId, null, StatusByte.DISCONNECT.getByte(), 0);
+		String msg = JSONObjectFactory.createJSONObject(
+				new Message(MessageType.DISCONNECT), -1).toString();
+
+		PublicHeader header = new PublicHeader(0, null,
+				StatusByte.DISCONNECT.getByte(), 0, localUserId, null);
+
 		messageRelay.disconnect(msg, header);
 	}
-	
+
 	@Override
 	public void postPost(Post post) throws DatabaseException {
 		// The order matters !
@@ -103,13 +113,18 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate, Messag
 	@Override
 	public void getUserWall(String distUsername) throws NetworkException {
 		List<UserId> listUserId = database.getFriendId(distUsername);
-		// if the list is bigger than one, then the user has two friends with common user name
+		// if the list is bigger than one, then the user has two friends with
+		// common user name
 		if (listUserId.size() > 1) {
 			new DatabaseException().printStackTrace();
 		}
 		Message msg = new Message(MessageType.GET_STATE);
-		PublicHeader header = new PublicHeader(localUserId, listUserId.get(0), StatusByte.DATA.getByte(), 0);
-		secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg, 0).toString(), header));
+
+		PublicHeader header = new PublicHeader(0, null,
+				StatusByte.DATA.getByte(), 0, localUserId, listUserId.get(0));
+
+		secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory
+				.createJSONObject(msg, 0).toString(), header));
 	}
 
 	@Override
@@ -121,56 +136,57 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate, Messag
 	public void discoverFriends() throws NetworkException {
 		// TODO : sketch whole process (linked with security)
 	}
-	
+
 	@Override
 	public void setDelegate(UserDelegate delegate) {
 		userHandler = delegate;
 	}
 
-	////
-	//SecureChannelDelegate
-	////
+	// //
+	// SecureChannelDelegate
+	// //
 
 	@Override
 	public void onMessageReceived(NetworkMessage message) {
 		Message msg = MessageParser.parseMessage(message.text, message.header);
-		
+
 		// TODO : main part, a lot of cases split depending on MessageType
-		
-			// Friendship
+
+		// Friendship
 		if (msg.getMessageType().equals(MessageType.ACCEPT_FRIENDSHIP)) {
 			userHandler.onFriendshipAccepted();
 		} else if (msg.getMessageType().equals(MessageType.REFUSE_FRIENDSHIP)) {
 			userHandler.onFriendshipDeclined();
 		}
-		
-			// Retrieve data
-		else if(msg.getMessageType().equals(MessageType.ACK_POST)) {
-			
+
+		// Retrieve data
+		else if (msg.getMessageType().equals(MessageType.ACK_POST)) {
+
 		}
-		
-			// Post data
-		else if(msg.getMessageType().equals(MessageType.POST_PICTURE)) {
-			
+
+		// Post data
+		else if (msg.getMessageType().equals(MessageType.POST_PICTURE)) {
+
 		}
-		
-			// Unknown
+
+		// Unknown
 		else {
-			
+
 		}
 	}
 
-	////
-	//MessageRelayDelegate
-	////
-	
+	// //
+	// MessageRelayDelegate
+	// //
+
 	@Override
 	public void onRegistrationSucceeded(UserId self, UserId other) {
 		userHandler.onConnectionSucceeded();
 	}
 
 	@Override
-	public void onRegistrationFailed(UserId self, UserId other, FailureReason reason) {
+	public void onRegistrationFailed(UserId self, UserId other,
+			FailureReason reason) {
 		userHandler.onConnectionFailed(reason);
 	}
 
@@ -183,5 +199,5 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate, Messag
 	public void onDeregistrationFailed(FailureReason reason) {
 		userHandler.onDisconnectionFailed(reason);
 	}
-	
+
 }
