@@ -25,6 +25,9 @@ public class User {
 	// It will be easy to add specialties on the top of everything.
 	// int age;
 
+	public User(UserId id) {
+		this.id = id;
+	}
 	/**
 	 * Construct a new User
 	 * @param id

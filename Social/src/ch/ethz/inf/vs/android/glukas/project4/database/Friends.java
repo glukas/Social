@@ -1,9 +1,11 @@
 package ch.ethz.inf.vs.android.glukas.project4.database;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import ch.ethz.inf.vs.android.glukas.project4.User;
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
@@ -17,14 +19,42 @@ import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseContract.UsersEnt
  */
 class Friends {
 
-	// TODO: Get the upper bound of the number of posts in the friend's wall.
+	// Get the upper bound of the number of posts in the friend's wall.
 	public static int getFriendPostsCount(UserId id, SQLiteDatabase db) {
-		return 0;
+		// SQL SELECT clause
+		String[] projection = {UsersEntry.COUNT};
+		// SQL WHERE clause
+		String selection = UsersEntry.USER_ID + " == ?";
+		// Arguments for selection
+		String[] selectionArgs = {Utility.toSQLiteId(id).toString()};
+		
+		// Execute query
+		Cursor cursor = db.query(UsersEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, null);
+		
+		// Get and return result.
+		if(cursor.moveToFirst()) {
+			return cursor.getInt(3);
+		} else
+			return -1;
 	}
 	
-	// TODO: Get the upper bound over the partial order of actual posts for the friend.
-	public static int getFriendMaxId(UserId id, SQLiteDatabase db) {
-		return 0;
+	// Get the upper bound over the partial order of actual posts for the friend.
+	public static int getFriendMaxPostsId(UserId id, SQLiteDatabase db) {
+		// SQL SELECT clause
+		String[] projection = {UsersEntry.MAX};
+		// SQL WHERE clause
+		String selection = UsersEntry.USER_ID + " == ?";
+		// Arguments for selection
+		String[] selectionArgs = {Utility.toSQLiteId(id).toString()};
+		
+		// Execute query
+		Cursor cursor = db.query(UsersEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, null);
+		
+		// Get and return result.
+		if(cursor.moveToFirst()) {
+			return cursor.getInt(3);
+		} else
+			return -1;
 	}
 	
 	// TODO: Create a friendship relation between the user and a new friend.
@@ -32,17 +62,52 @@ class Friends {
 		
 	}
 	
-	// TODO: Get an user name from an user id
+	// Get an user name from an user id
 	public static String getFriendUsername(UserId id, SQLiteDatabase db) {
-		return null;
+		// SQL SELECT clause
+		String[] projection = {UsersEntry.USERNAME};
+		// SQL WHERE clause
+		String selection = UsersEntry.USER_ID + " == ?";
+		// Arguments for selection
+		String[] selectionArgs = {Utility.toSQLiteId(id).toString()};
+		
+		// Execute query
+		Cursor cursor = db.query(UsersEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, null);
+		
+		// Get and return result.
+		if(cursor.moveToFirst()) {
+			return cursor.getString(2);
+		} else
+			return null;
 	}
 	
-	// TODO: Get an user id from an user name (cannot ensures uniqueness)
+	// Get an user id from an user name (cannot ensures uniqueness)
 	public static List<UserId> getFriendId(String username, SQLiteDatabase db) {
-		return null;
+		// SQL SELECT clause
+		String[] projection = {UsersEntry.USER_ID};
+		// SQL WHERE clause
+		String selection = UsersEntry.USERNAME + " == ?";
+		// Arguments for selection
+		String[] selectionArgs = {username};
+		
+		// Execute query
+		Cursor cursor = db.query(UsersEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, null);
+		
+		// Instantiate id list.
+		List<UserId> idsList = new ArrayList<UserId>();
+		
+		// Get and return result.
+		if(cursor.moveToFirst()) {
+			while(!cursor.isAfterLast()) {
+				idsList.add(new UserId(cursor.getBlob(0).toString()));
+				cursor.moveToNext();
+			}
+			return idsList;
+		} else
+			return null;
 	}
 		
-	/** FIXME: duplicate code of putUser
+	/**
 	 * Add a friend in the List of Friends of the user
 	 * @param user
 	 * @param db
@@ -57,23 +122,23 @@ class Friends {
 	 * @param db
 	 */
 	public static void deleteFriend(UserId id, SQLiteDatabase db) {
-//		// Delete posts
-//		Walls.deleteFriendWall(id, db);
-//		
-//		// SQL WHERE clause.
-//		String selection = FriendsEntry.USER_ID + " == ? AND " + FriendsEntry.FRIEND_ID + " == ?";
-//
-//		// Arguments for selection.
-//		String[] selectionArgs1 = {Utility.userID.toString(), Integer.toString(id)};
-//		
-//		// Delete friendship
-//		db.delete(FriendsEntry.TABLE_NAME, selection, selectionArgs1);
-//		
-//
-//		selection = UsersEntry._ID + " == ?";
-//		String[] selectionArgs2 = {Integer.toString(id)};
-//
-//		// Delete friend data
-//		db.delete(UsersEntry.TABLE_NAME, selection, selectionArgs2);
+		// Delete posts
+		Walls.deleteFriendWall(id, db);
+		
+		// SQL WHERE clause.
+		String selection = FriendsEntry.USER_ID + " == ? AND " + FriendsEntry.FRIEND_ID + " == ?";
+
+		// Arguments for selection.
+		String[] selectionArgs1 = {Utility.toSQLiteId(Utility.userID).toString(), Utility.toSQLiteId(id).toString()};
+		
+		// Delete friendship
+		db.delete(FriendsEntry.TABLE_NAME, selection, selectionArgs1);
+		
+
+		selection = UsersEntry.USER_ID + " == ?";
+		String[] selectionArgs2 = {Utility.toSQLiteId(id).toString()};
+
+		// Delete friend data
+		db.delete(UsersEntry.TABLE_NAME, selection, selectionArgs2);
 	}
 }
