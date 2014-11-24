@@ -6,21 +6,31 @@ Abstract Schedule of Young and Vincent (Protocol Layer)
 
 Week 17 - 23 November :
 
-	Implementation of the model 'the server doesn't drop any messages'. 
+	Settings, connections with other components
 
-	-Young :
-		-React to user requests
-		-Stores post of the user into DB
-		
-
-	-Vincent :
-		-Create JSONObjects from user's requests and pass them to Security Layer
-		-Receive messages from Security Layer and pass them, as a Post object, to UI
+	Young :
+		+Database Interface, discussion of schema with Alessio
+		+Parser and creater of JSON messages 
+	Vincent :
+		+Interface with upper (UI) and lower (Security) level
+		+Settings of the model
 
 Week 24 - 30 November :
 
-	Implementation of the model 'the server can drop any message at any time'
+	Implementation of the model 'everyone is always connected'
+
+	Young :
+		-Friendship with NFC mechanism
+		-Check (write tests for) PublicHeader 'bytisation' and 'unbytisation'
+		-postPost implementation
+	
+	Vincent :
+		-Add to Database interface some methods
+		-Protocol instantiation
+		-Posts creation
+		-Check (write tests for) parser and creater of JSON messages
+		-onMessageReceived implementation
 
 Week 1 - 7 December
 
-	Testing, add functionalities. It's highly probable that there will be delay of the previous week.
+	
