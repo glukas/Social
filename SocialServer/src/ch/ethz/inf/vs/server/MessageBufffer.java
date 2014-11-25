@@ -1,21 +1,22 @@
 package ch.ethz.inf.vs.server;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import ch.ethz.inf.vs.android.glukas.project4.UserId;
+
 public class MessageBufffer {
 	
 	//<Receipient, Messages>
-	HashMap<BigInteger, UserMessageQueue> buffer = new HashMap<BigInteger, UserMessageQueue>();
+	HashMap<UserId, UserMessageQueue> buffer = new HashMap<UserId, UserMessageQueue>();
 	
 	public void addMessage(Message m){
-		if(buffer.containsKey(m.getRecipient())){
-			buffer.get(m.getRecipient()).addMessage(m);
+		if(buffer.containsKey(m.getHeader().getReceiver())){
+			buffer.get(m.getHeader().getReceiver()).addMessage(m);
 		} else {
 			UserMessageQueue queue = new UserMessageQueue(m);
-			buffer.put(m.getRecipient(), queue);
+			buffer.put(m.getHeader().getReceiver(), queue);
 		}
 	}
 	
@@ -24,7 +25,7 @@ public class MessageBufffer {
 		this.addMessage(m);
 	}
 	
-	public List<Message> getMessagesSince(BigInteger recipient, int clock){
+	public List<Message> getMessagesSince(UserId recipient, int clock){
 		ArrayList<Message> list = new ArrayList<Message>();
 		if(buffer.containsKey(recipient)){
 			return buffer.get(recipient).getMessagesSince(clock);

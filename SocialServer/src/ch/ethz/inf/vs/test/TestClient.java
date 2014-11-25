@@ -11,11 +11,11 @@ import java.util.concurrent.TimeUnit;
 public class TestClient {
 	
 	public static void main(String[] args) {
-		int clients = 1;
+		int clients = 5;
 		ExecutorService threadPool = Executors.newCachedThreadPool();
 		//Start some dummy clients
 		System.out.println("How many clients?");
-		clients = Integer.parseInt(System.console().readLine());
+		//clients = Integer.parseInt(System.console().readLine());
 		
 		for(int i = 0; i < clients; i++){
 			threadPool.execute(

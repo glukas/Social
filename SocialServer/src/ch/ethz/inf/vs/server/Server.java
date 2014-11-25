@@ -29,7 +29,7 @@ public class Server implements Runnable {
 	private Selector selector;
 
 	// The buffer into which we'll read data when it's available
-	private ByteBuffer readBuffer = ByteBuffer.allocate(16384);
+	private ByteBuffer readBuffer = ByteBuffer.allocate(50);
 	
 	//The worker to handle connections
 	private ConnectionWorker worker;
@@ -136,6 +136,7 @@ public class Server implements Runnable {
 		int numRead;
 		try {
 			numRead = socketChannel.read(this.readBuffer);
+			System.out.println(numRead + "bytes read!");
 		} catch (IOException e) {
 			// Connection got closed
 			System.out.println("One remote connection got closed!");
@@ -238,17 +239,6 @@ public class Server implements Runnable {
 			this.type = type;
 			this.ops = ops;
 		}
-	}
-	
-	/**
-	 * @author mathiasbirrer
-	 * Define here all possible status of messages
-	 */
-	public class Status{
-		
-		public final static byte INTERNAL 	= 0x00;
-		public final static byte MESSAGE 	= 0x01;
-		public final static byte PING		= 0x02;
 	}
 
 }

@@ -5,7 +5,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
 
-import ch.ethz.inf.vs.server.Server.Status;
+import ch.ethz.inf.vs.android.glukas.project4.protocol.StatusByte;
 
 public class ConnectionWorker implements Runnable {
 	  private List<ServerEvent> queue = new LinkedList<ServerEvent>();
@@ -15,7 +15,7 @@ public class ConnectionWorker implements Runnable {
 		  Message received = new Message(data);
 		  byte[] dataCopy = new byte[count];
 		  System.arraycopy(data, 0, dataCopy, 0, count);
-
+		  System.out.println("Status: " + Integer.toHexString(received.getHeader().getConsistency()));
 		  String s = new String(dataCopy, StandardCharsets.UTF_8);
 
 		  System.out.println("Server read: " + s);
@@ -43,14 +43,21 @@ public class ConnectionWorker implements Runnable {
 	      
 	      //Choose what to do, based on the status of the message
 	      // TODO Add all possible status
-	      byte s = dataEvent.message.getStatus();
-	      switch(s){
-	      	case Status.INTERNAL:
+	      System.out.println("Handle message");
+	      //StatusByte s = StatusByte.constructStatusByte(dataEvent.message.getHeader().getConsistency());
+	      byte b = dataEvent.message.getHeader().getConsistency();
+	      System.out.println("Server handles status: " + Integer.toHexString(b));
+	      switch(b){
+	      	case 0x00:
 	      		break;
-	      	case Status.MESSAGE:
+	      	case 0x01:
 	      		break;
-	      	case Status.PING:
+	      	case 0x02:
+	      		break;
+	      	case 0x03:
 	      		dataEvent.server.send(dataEvent.socket, dataEvent.message);
+	      		break;
+	      	case 0x04:
 	      		break;
 	      	default:
 	      		break;
