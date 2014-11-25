@@ -12,6 +12,7 @@ import ch.ethz.inf.vs.android.glukas.project4.Wall;
  * Please refer to this and add new functions you need.
  * Please consider all methods with a TODO as still having a non 
  * (complete) meaningful declaration.
+ * All methods are performed atomically. (TODO : is this true?)
  */
 public interface DatabaseAccess {
 
@@ -56,19 +57,12 @@ public interface DatabaseAccess {
 	 */
 	public void setUserMaxPostsId(int newMaxPostsId);
 	
-	/** TODO
+	/**
 	 * Get a list of all user's friends.
 	 * @return List of User objects that have only the id field set, while all others are null; null if no friend is found.
 	 */
 	public List<User> getUserFriendsList();
-	
-	/** TODO
-	 * Create a friendship relation between the user and the friend with id and username.
-	 * @param id
-	 * @param username
-	 */
-	public void putUserFriendship(UserId id, String username);
-	
+
 	////
 	// Credentials (Keys)
 	////
@@ -112,24 +106,22 @@ public interface DatabaseAccess {
 	 */
 	public void setFriendMaxPostsId(int newMaxPostsId, UserId id);
 	
-	/** TODO: check with @Lukas for use in Security Layer (friends of friends):
-	 * which informations are needed about the friends?
-	 * Create a friendship relation between two friends.
+	/**
+	 * Establish that user has the friends with id's in friends
+	 * Not that friends is an exhaustive list of all friends of the user, 
+	 * so it replaces the old set of friends.
 	 * @param id1 the id of the friend (128 bits)
-	 * @param username1
 	 * @param id2
-	 * @param username2
-	 * @param username the user name of the added friend
 	 */
-	public void putFriendFriendship(UserId id1, String username1, UserId id2, String username2);
+	public void setFriends(UserId user, List<UserId> friends);
 	
-	/** TODO
+	/**
 	 * Get a list of all friends of the friend with id.
 	 * @param id the id of the friend to retrieve the friends
-	 * @return List of User objects that have only the id field set, while all others are null; null if no friend is found.
+	 * @return List of UserIds of a the friends of the user with id 'id'
+	 * 	       These friends need not necessarily be common friends.
 	 */
-	
-	public List<User> getFriendFriendsList(UserId id);
+	public List<UserId> getFriends(UserId id);
 	
 	/**
 	 * Get an user name from an user id
@@ -143,6 +135,7 @@ public interface DatabaseAccess {
 	 * @param username the username of the friend to retrieve the id
 	 * @return A list of different users matched by provided user name
 	 */
+	//Remark (Lukas) : Why do we need this?
 	public List<UserId> getFriendId(String username);
 	
 	/**

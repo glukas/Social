@@ -195,12 +195,6 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 		return Friends.getFriendMaxPostsId(id, this.getReadableDatabase());
 	}
 	
-	// FIXME: Create a friendship relation between the user and a new friend.
-	@Override
-	public void putFriendFriendship(UserId id1, String username1, UserId id2, String username2) {
-//		Friends.putFriendship(id, username, this.getWritableDatabase());
-	}
-	
 	// Get an user name from an user id
 	@Override
 	public String getFriendUsername(UserId id) {
@@ -240,6 +234,18 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 	// TODO: 
 	@Override
 	public User getFriend(UserId id) {
+		return null;
+	}
+	
+	@Override
+	public void setFriends(UserId user, List<UserId> friends) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public List<UserId> getFriends(UserId id) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 	
