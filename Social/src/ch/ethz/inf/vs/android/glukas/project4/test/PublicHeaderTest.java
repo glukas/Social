@@ -1,14 +1,11 @@
 package ch.ethz.inf.vs.android.glukas.project4.test;
 
 import java.nio.ByteBuffer;
-
 import org.junit.Test;
-
 import android.test.AndroidTestCase;
 import android.util.Log;
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.PublicHeader;
-import ch.ethz.inf.vs.android.glukas.project4.protocol.StatusByte;
 
 
 public class PublicHeaderTest extends AndroidTestCase {
@@ -20,8 +17,8 @@ public class PublicHeaderTest extends AndroidTestCase {
 		int testmessageId1= 16;
 		byte[] testfuture1 = new byte[]{1,2,3};
 		byte testconsistency1 = 1;
-		UserId testsenderId1 = new UserId("255");
-		UserId testreceiverId1 = new UserId("6633");
+		UserId testsenderId1 = new UserId("25534563456");
+		UserId testreceiverId1 = new UserId("-2352332");
 		
 		PublicHeader testheader1= new PublicHeader (testlength1, testfuture1,testconsistency1 , testmessageId1, testsenderId1, testreceiverId1);
 		Log.d("Length: ", "###"+String.valueOf(testheader1.getLength()));

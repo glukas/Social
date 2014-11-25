@@ -39,9 +39,9 @@ public class MessageParser {
 		
 		// Server
 		if (command.equals(Args.CONNECT.getStr())){
-			
+			//empty message, only header is important
 		} else if (command.equals(Args.DISCONNECT.getStr())){
-			
+			//empty message, only header is important
 		}
 		
 		// Friendship

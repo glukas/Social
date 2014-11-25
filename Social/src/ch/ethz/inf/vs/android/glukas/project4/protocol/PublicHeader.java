@@ -18,7 +18,7 @@ public class PublicHeader {
 	/**
 	 * Length, in bytes, of a header
 	 */
-	public static final int BYTES_LENGTH_HEADER = 46;
+	public static final int BYTES_LENGTH_HEADER = 44;
 	
 
 	/**
@@ -55,8 +55,6 @@ public class PublicHeader {
 		byte[] future = new byte[3];
 		byte consistency;
 		int messageId;
-		int lengthSender;
-		int lengthReceiver;
 
 		//retrieve length of message, status byte and message id from ByteBuffer
 		length = buf.getInt();
@@ -65,25 +63,20 @@ public class PublicHeader {
 		messageId = buf.getInt();
 		
 		//retrieve id of sender
-		lengthSender = buf.get();
-		byte[] senderId = new byte[lengthSender];
-		buf.get(senderId, 0, lengthSender);
-		buf.position(buf.position()+(16-lengthSender));
+		byte[] senderId = new byte[UserId.LENGTH];
+		buf.get(senderId, 0, UserId.LENGTH);
 		
 		//retrieve id of receiver
-		lengthReceiver = buf.get();
-		byte[] receiverId = new byte[lengthReceiver];
-		buf.get(receiverId, 0, lengthReceiver);
-		buf.position(buf.position()+(16-lengthReceiver));
+		byte[] receiverId = new byte[UserId.LENGTH];
+		buf.get(receiverId, 0, UserId.LENGTH);
 
-		// instantiate members
+		//instantiate members
 		this.length = length;
 		this.future = future;
 		this.consistency = consistency;
 		this.messageId = messageId;
 		this.sender = new UserId(senderId);
 		this.receiver = new UserId(receiverId);
-
 	}
 
 	///
@@ -132,17 +125,8 @@ public class PublicHeader {
 		buf.put(future);
 		buf.put(consistency);
 		buf.putInt(messageId);
-		byte[] senderBytes = sender.getId().toByteArray();
-		byte[] receiverBytes = receiver.getId().toByteArray();
-
-		byte lengthSender = (byte)senderBytes.length;
-		byte lengthReceiver = (byte)receiverBytes.length;
-		
-		buf.put(lengthSender);
-		buf.put(senderBytes);
-		buf.position(buf.position()+(16-lengthSender));
-		buf.put(lengthReceiver);
-		buf.put(receiverBytes);
+		buf.put(sender.getBytes());
+		buf.put(receiver.getBytes());
 		return buf.array();
 	}
 }
