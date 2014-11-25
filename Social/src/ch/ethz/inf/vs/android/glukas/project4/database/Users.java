@@ -67,9 +67,12 @@ class Users {
 			UserCredentials credentials = new UserCredentials(id, enc_key, auth_key);
 			Wall wall = Walls.getUserWall(db);
 			List<User> friends = Users.getUserFriends(db);
+			cursor.close();
 			return new User(id, username, wall, friends, credentials);
-		} else
+		} else {
+			cursor.close();
 			return null;
+		}
 	}
 	
 	// Get the upper bound of the number of posts in the user's wall.
@@ -98,9 +101,13 @@ class Users {
 		if(cursor.moveToFirst()) {
 			byte[] enc_key = cursor.getBlob(0);
 			byte[] auth_key = cursor.getBlob(1);
+			// Close cursor
+			cursor.close();
 			return new UserCredentials(id, enc_key, auth_key);
-		} else
+		} else {
+			cursor.close();
 			return null;
+		}	
 	}
 	
 	// FIXME: Get the user's list of friends (with only ids)

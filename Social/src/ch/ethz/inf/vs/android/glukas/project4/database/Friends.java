@@ -33,9 +33,12 @@ class Friends {
 		
 		// Get and return result.
 		if(cursor.moveToFirst()) {
-			return cursor.getInt(3);
-		} else
+			cursor.close();
+			return cursor.getInt(0);
+		} else {
+			cursor.close();
 			return -1;
+		}
 	}
 	
 	// Get the upper bound over the partial order of actual posts for the friend.
@@ -52,9 +55,12 @@ class Friends {
 		
 		// Get and return result.
 		if(cursor.moveToFirst()) {
-			return cursor.getInt(3);
-		} else
+			cursor.close();
+			return cursor.getInt(0);
+		} else {
+			cursor.close();
 			return -1;
+		}
 	}
 	
 	// TODO: Create a friendship relation between the user and a new friend.
@@ -76,9 +82,12 @@ class Friends {
 		
 		// Get and return result.
 		if(cursor.moveToFirst()) {
-			return cursor.getString(2);
-		} else
+			cursor.close();
+			return cursor.getString(0);
+		} else {
+			cursor.close();
 			return null;
+		}
 	}
 	
 	// Get an user id from an user name (cannot ensures uniqueness)
@@ -102,9 +111,12 @@ class Friends {
 				idsList.add(new UserId(cursor.getBlob(0).toString()));
 				cursor.moveToNext();
 			}
+			cursor.close();
 			return idsList;
-		} else
+		} else {
+			cursor.close();
 			return null;
+		}
 	}
 		
 	/**

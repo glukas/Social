@@ -91,7 +91,7 @@ class Utility {
 	/**
 	 * Retrieves data from the current cursor position in order to build
 	 * a Post object.
-	 * @param cursor
+	 * @param cursor with following projection: id, poster_id, text, image, datetime 
 	 * @return Post object
 	 */
 	public static final Post buildPost(Cursor cursor) {
@@ -100,12 +100,12 @@ class Utility {
 		// Get poster id.
 		UserId poster_id = new UserId(cursor.getBlob(1));
 		// Get text.
-		String text = cursor.getString(4);
+		String text = cursor.getString(2);
 		// Get image.
-		Bitmap image = Utility.toBitmap(cursor.getBlob(5));
+		Bitmap image = Utility.toBitmap(cursor.getBlob(3));
 		// Get datetime.
-		Date datetime = Utility.toJavaDate(cursor.getString(3));
-		// Build adn return post.
+		Date datetime = Utility.toJavaDate(cursor.getString(4));
+		// Build and return post.
 		return new Post(id, poster_id, text, image, datetime);
 	}
 	

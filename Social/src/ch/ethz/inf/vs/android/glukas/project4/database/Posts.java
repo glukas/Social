@@ -149,9 +149,10 @@ class Posts {
 		
 		// Create Post objects and add them to the list.
 		if(cursor.moveToFirst()) {
-			do {
+			while(!cursor.isAfterLast()) {
 				posts.add(Utility.buildPost(cursor));
-			} while(cursor.moveToNext());
+				cursor.moveToNext();
+			}
 			
 			// Close cursor
 			cursor.close();

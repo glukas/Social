@@ -50,10 +50,11 @@ class Walls {
 		
 		// Add posts to wall
 		if(cursor.moveToFirst()) {
-			do {
+			while(!cursor.isAfterLast()) {
 				// Add post to wall.
 				wall.posts.add(Utility.buildPost(cursor));
-			} while(cursor.moveToNext());
+				cursor.moveToNext();
+			}
 			// Close cursor
 			cursor.close();
 			
