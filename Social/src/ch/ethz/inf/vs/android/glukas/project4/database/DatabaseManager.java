@@ -35,7 +35,7 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseDelegat
 	// DDL
 	/**
 	 * String containing SQL code to create table friends.
-	 * TODO: add update/delete options and integrity checks
+	 * TODO: add and integrity checks
 	 */
 	private static final String SQL_CREATE_FRIENDS = Utility.CREATE_TABLE + " " + FriendsEntry.TABLE_NAME + " (" 
 			+ FriendsEntry._ID + " " + Utility.INTEGER_TYPE + " PRIMARY KEY AUTOINCREMENT, "
@@ -45,20 +45,20 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseDelegat
 			+ FriendsEntry.FRIEND_ID + " " + Utility.BLOB_TYPE
 			// Foreign keys references
 			+ Utility.FOREIGN_KEY + "(" + FriendsEntry.USER_ID + ")" + " " + Utility.REFERENCES + " " + UsersEntry.TABLE_NAME + "(" + UsersEntry.USER_ID + ")"
-//				TODO + " " + Utility.ON_DELETE + " " + Utility.
+				+ " " + Utility.ON_DELETE + " " + Utility.CASCADE
 			+ Utility.FOREIGN_KEY + "(" + FriendsEntry.FRIEND_ID + ")" + " " + Utility.REFERENCES + " " + UsersEntry.TABLE_NAME + "(" + UsersEntry.USER_ID + ")"
 				+ " " + Utility.ON_DELETE + " " + Utility.CASCADE
 			+ ");";
 	
 	/**
 	 * String containing SQL code to create table users.
-	 * TODO: add update/delete options, integrity checks and remaining columns
+	 * TODO: add integrity checks and remaining columns
 	 */
 	private static final String SQL_CREATE_USERS = Utility.CREATE_TABLE + " " + UsersEntry.TABLE_NAME + " (" 
 			// Index 0: _id
 			+ UsersEntry._ID + " " + Utility.INTEGER_TYPE + " AUTOINCREMENT, "
 			// Index 1: user_id
-			+ UsersEntry.USER_ID + " " + Utility.BLOB_TYPE + " " + Utility.PRIMARY_KEY + ", "
+			+ UsersEntry.USER_ID + " " + Utility.BLOB_TYPE + " " + Utility.PRIMARY_KEY + " " + Utility.NOT_NULL + ", "
 			// Index 2: username
 			+ UsersEntry.USERNAME + " " + Utility.TEXT_TYPE + ");" + ", "
 			// Index 3: count
@@ -68,11 +68,14 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseDelegat
 			// Index 5: broadcast_enc_key
 			+ UsersEntry.BROADCAST_ENC_KEY + " " + Utility.BLOB_TYPE + ", "
 			// Index 6: broadcast_auth_key
-			+ UsersEntry.BROADCAST_AUTH_KEY + " " + Utility.BLOB_TYPE + ")";
+			+ UsersEntry.BROADCAST_AUTH_KEY + " " + Utility.BLOB_TYPE + ", "
+			// Primary key
+			+ Utility.PRIMARY_KEY + " (" + UsersEntry.USER_ID + ")"
+			+ ");";
 	
 	/**
 	 * String containing SQL code to create table posts.
-	 * TODO: add update/delete options and integrity checks
+	 * TODO: add integrity checks
 	 */
 	private static final String SQL_CREATE_POSTS = Utility.CREATE_TABLE + " " + PostsEntry.TABLE_NAME + " (" 
 			// Index 0: _id
