@@ -31,14 +31,10 @@ public interface DatabaseDelegate {
 	 */
 	public User getUser();
 	
-	
-	
-	
 	/**
 	 * Get the upper bound of the number of posts in the user's wall.
 	 * @return the upper bound.
 	 */
-	
 	public int getUserPostsCount();
 	
 	/**
@@ -46,6 +42,20 @@ public interface DatabaseDelegate {
 	 * @return the upper bound.
 	 */
 	public int getUserMaxPostsId();
+	
+	//TODO
+	/**
+	 * Set the upper bound of the number of posts in the user's wall.
+	 * @param newCount
+	 */
+	public void setUserPostsCount(int newCount);
+	
+	//TODO
+	/**
+	 * Set the upper bound over the partial order of actual posts for the user.
+	 * @param newMaxPostsId
+	 */
+	public void setUserMaxPostsId(int newMaxPostsId);
 	
 	////
 	// Credentials (Keys)
@@ -75,6 +85,22 @@ public interface DatabaseDelegate {
 	 * @return the upper bound.
 	 */
 	public int getFriendMaxPostsId(UserId id);
+	
+	//TODO
+	/**
+	 * Set the upper bound of the number of posts in a friend's wall
+	 * @param newCount
+	 * @param id
+	 */
+	public void setFriendPostsCount(int newCount, UserId id);
+	
+	//TODO
+	/**
+	 * Set the upper bound over the partial order of actual posts for a friend
+	 * @param newMaxPostsId
+	 * @param id
+	 */
+	public void setFriendPostsId(int newMaxPostsId, UserId id);
 	
 	/** TODO: check with @Lukas for use in Security Layer (friends of friends)
 	 * Create a friendship relation between the user and a new friend.

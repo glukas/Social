@@ -284,4 +284,28 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseDelegat
 		Walls.deleteFriendWall(friendid, this.getWritableDatabase());
 	}
 
+	@Override
+	public void setUserPostsCount(int newCount) {
+		// TODO Auto-generated method stub, added (by Vincent, if search someone to blame ^^) in DatabaseDelegate
+		
+	}
+
+	@Override
+	public void setUserMaxPostsId(int newMaxPostsId) {
+		// TODO Auto-generated method stub, added (by Vincent, if search someone to blame ^^) in DatabaseDelegate
+		
+	}
+
+	@Override
+	public void setFriendPostsCount(int newCount, UserId id) {
+		// TODO Auto-generated method stub, added (by Vincent, if search someone to blame ^^) in DatabaseDelegate
+		
+	}
+
+	@Override
+	public void setFriendPostsId(int newMaxPostsId, UserId id) {
+		// TODO Auto-generated method stub, added (by Vincent, if search someone to blame ^^) in DatabaseDelegate
+		
+	}
+
 }
