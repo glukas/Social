@@ -51,6 +51,16 @@ public class User {
 		this.credentials = credentials;
 	}
 	
+	public User(UserId id, String username, Wall wall, List<User> friends, UserCredentials credentials, int postsCount, int maxId) {
+		this.id = id;
+		this.username = username;
+		this.wall = wall;
+		this.friends = friends;
+		this.credentials = credentials;
+		this.postsCount = postsCount;
+		this.maxId = maxId;
+	}
+	
 	
 	// Getters.
 	public UserId getId() {

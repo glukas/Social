@@ -8,7 +8,9 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import ch.ethz.inf.vs.android.glukas.project4.User;
+import ch.ethz.inf.vs.android.glukas.project4.UserCredentials;
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
+import ch.ethz.inf.vs.android.glukas.project4.Wall;
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseContract.FriendsEntry;
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseContract.UsersEntry;
 
@@ -61,15 +63,11 @@ class Friends {
 		} else {
 			cursor.close();
 			return -1;
-<<<<<<< HEAD
 		}
-=======
-
->>>>>>> branch 'master' of https://github.com/glukas/Social
 	}
 	
-	// TODO: Create a friendship relation between the user and a new friend.
-	public static void putFriendship(UserId id, String username, SQLiteDatabase db) {
+	// TODO: Create a friendship relation between two users.
+	public static void putFriendFriendship(UserId id, String username, SQLiteDatabase db) {
 		
 	}
 	
@@ -133,29 +131,87 @@ class Friends {
 		Users.putUser(user, db);
 	}
 	
-	/** TODO
+	/**
 	 * Remove friend from the List of friends & everything associated with him/her
 	 * @param id
 	 * @param db
 	 */
 	public static void deleteFriend(UserId id, SQLiteDatabase db) {
-		// Delete posts
-		Walls.deleteFriendWall(id, db);
+		// Not needed anymore because of ON DELETE CASCADE in users table !?
+//		// Delete posts
+//		Walls.deleteFriendWall(id, db);
+//		
+//		// SQL WHERE clause.
+//		String selection = FriendsEntry.USER_ID + " == ? AND " + FriendsEntry.FRIEND_ID + " == ?";
+//
+//		// Arguments for selection.
+//		String[] selectionArgs1 = {Utility.toSQLiteId(Utility.userID).toString(), Utility.toSQLiteId(id).toString()};
+//		
+//		// Delete friendship
+//		db.delete(FriendsEntry.TABLE_NAME, selection, selectionArgs1);
 		
-		// SQL WHERE clause.
-		String selection = FriendsEntry.USER_ID + " == ? AND " + FriendsEntry.FRIEND_ID + " == ?";
 
-		// Arguments for selection.
-		String[] selectionArgs1 = {Utility.toSQLiteId(Utility.userID).toString(), Utility.toSQLiteId(id).toString()};
-		
-		// Delete friendship
-		db.delete(FriendsEntry.TABLE_NAME, selection, selectionArgs1);
-		
-
-		selection = UsersEntry.USER_ID + " == ?";
-		String[] selectionArgs2 = {Utility.toSQLiteId(id).toString()};
+		String selection = UsersEntry.USER_ID + " == ?";
+		String[] selectionArgs = {Utility.toSQLiteId(id).toString()};
 
 		// Delete friend data
-		db.delete(UsersEntry.TABLE_NAME, selection, selectionArgs2);
+		db.delete(UsersEntry.TABLE_NAME, selection, selectionArgs);
+	}
+	
+	// Get a friend object with no wall nor friends list
+	public static User getFriend(UserId friendid, SQLiteDatabase db) {
+		// SQL SELECT clause
+		String[] projection = null;
+		// SQL WHERE clause
+		String selection = UsersEntry.USER_ID + " == ?";
+		// Arguments for selection.
+		String[] selectionArgs = {Utility.toSQLiteId(friendid).toString()};
+		
+		// Execute query.
+		Cursor cursor = db.query(UsersEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, null);
+		
+		// Retrieve and return the result.
+		if(cursor.moveToFirst()) {
+			UserId id = new UserId(cursor.getBlob(1));
+			String username = cursor.getString(2);
+			int count = cursor.getInt(3);
+			int max = cursor.getInt(4);
+			byte[] enc_key = cursor.getBlob(5);
+			byte[] auth_key = cursor.getBlob(6);
+			UserCredentials credentials = new UserCredentials(id, enc_key, auth_key);
+			cursor.close();
+			return new User(id, username, null, null, credentials, count, max);
+		} else {
+			cursor.close();
+			return null;
+		}
+	}
+	
+	// Update the posts count for the user with this id.
+	public static void updateFriendPostsCount(int newCount, UserId id, SQLiteDatabase db) {
+		// Create updated content.
+		ContentValues values = new ContentValues();
+		values.put(UsersEntry.COUNT, newCount);
+		
+		// SQL WHERE clause
+		String selection = UsersEntry.USER_ID + " == ?";
+		// Arguments for selection.
+		String[] selectionArgs = {Utility.toSQLiteId(id).toString()};
+		
+		db.update(UsersEntry.TABLE_NAME, values, selection, selectionArgs);
+	}
+	
+	// Update the max posts id for the user with this id.
+	public static void updateFriendMaxPostsId(int newMax, UserId id, SQLiteDatabase db) {
+		// Create updated content.
+		ContentValues values = new ContentValues();
+		values.put(UsersEntry.MAX, newMax);
+		
+		// SQL WHERE clause
+		String selection = UsersEntry.USER_ID + " == ?";
+		// Arguments for selection.
+		String[] selectionArgs = {Utility.toSQLiteId(id).toString()};
+		
+		db.update(UsersEntry.TABLE_NAME, values, selection, selectionArgs);
 	}
 }

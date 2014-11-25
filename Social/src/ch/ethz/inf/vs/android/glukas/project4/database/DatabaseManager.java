@@ -35,7 +35,7 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 	// DDL
 	/**
 	 * String containing SQL code to create table friends.
-	 * TODO: add and integrity checks
+	 * TODO: add integrity checks
 	 */
 	private static final String SQL_CREATE_FRIENDS = Utility.CREATE_TABLE + " " + FriendsEntry.TABLE_NAME + " (" 
 			+ FriendsEntry._ID + " " + Utility.INTEGER_TYPE + " PRIMARY KEY AUTOINCREMENT, "
@@ -151,6 +151,24 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 		 return Users.getUserMaxPostsId(this.getReadableDatabase());
 	}
 	
+	// Change the user's posts count.
+	@Override
+	public void setUserPostsCount(int newCount) {
+		Users.updateUserPostCount(newCount, this.getWritableDatabase());
+	}
+
+	// Change the user's max posts id.
+	@Override
+	public void setUserMaxPostsId(int newMaxPostsId) {
+		Users.updateUserMaxPostsId(newMaxPostsId, this.getWritableDatabase());
+	}
+	
+	// Get the user's list of friends.
+	@Override
+	public List<User> getUserFriendsList() {
+		return Users.getUserFriends(this.getReadableDatabase());
+	}
+	
 	/**
 	 * Credentials (Keys)
 	 */
@@ -179,8 +197,8 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 	
 	// FIXME: Create a friendship relation between the user and a new friend.
 	@Override
-	public void putFriendship(UserId id, String username) {
-		Friends.putFriendship(id, username, this.getWritableDatabase());
+	public void putFriendFriendship(UserId id1, String username1, UserId id2, String username2) {
+//		Friends.putFriendship(id, username, this.getWritableDatabase());
 	}
 	
 	// Get an user name from an user id
@@ -205,6 +223,24 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 	@Override
 	public void deleteFriend(UserId id) {
 		Friends.deleteFriend(id, this.getWritableDatabase());
+	}
+
+	// Update the posts count for the user with this id.
+	@Override
+	public void setFriendPostsCount(int newCount, UserId id) {
+		Friends.updateFriendPostsCount(newCount, id, this.getWritableDatabase());
+	}
+
+	//  Update the max posts id for the user with this id.
+	@Override
+	public void setFriendMaxPostsId(int newMaxPostsId, UserId id) {
+		Friends.updateFriendMaxPostsId(newMaxPostsId, id, this.getWritableDatabase());
+	}
+
+	// TODO: 
+	@Override
+	public User getFriend(UserId id) {
+		return null;
 	}
 	
 	
@@ -287,34 +323,5 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 		Walls.deleteFriendWall(friendid, this.getWritableDatabase());
 	}
 
-	@Override
-	public void setUserPostsCount(int newCount) {
-		// TODO Auto-generated method stub, added (by Vincent, if search someone to blame ^^) in DatabaseDelegate
-		
-	}
-
-	@Override
-	public void setUserMaxPostsId(int newMaxPostsId) {
-		// TODO Auto-generated method stub, added (by Vincent, if search someone to blame ^^) in DatabaseDelegate
-		
-	}
-
-	@Override
-	public void setFriendPostsCount(int newCount, UserId id) {
-		// TODO Auto-generated method stub, added (by Vincent, if search someone to blame ^^) in DatabaseDelegate
-		
-	}
-
-	@Override
-	public void setFriendPostsId(int newMaxPostsId, UserId id) {
-		// TODO Auto-generated method stub, added (by Vincent, if search someone to blame ^^) in DatabaseDelegate
-		
-	}
-
-	@Override
-	public User getFriend(UserId id) {
-		// TODO Auto-generated method stub, added (by Vincent, if search someone to blame ^^) in DatabaseDelegate
-		return null;
-	}
 
 }

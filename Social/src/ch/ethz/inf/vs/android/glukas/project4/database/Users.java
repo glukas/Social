@@ -43,36 +43,10 @@ class Users {
 		db.insert(UsersEntry.TABLE_NAME, null, values);
 	}
 	
-	// FIXME: Get the user object from the database.
+	// Get the user object from the database.
 	// Friends only have id!!
 	public static User getUser(SQLiteDatabase db) {
-		// SQL SELECT clause
-		String[] projection = null;
-		// SQL WHERE clause
-		String selection = UsersEntry.USER_ID + " == ?";
-		// Arguments for selection.
-		String[] selectionArgs = {Utility.toSQLiteId(Utility.userID).toString()};
-		
-		// Execute query.
-		Cursor cursor = db.query(UsersEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, null);
-		
-		// Retrieve and return the result.
-		if(cursor.moveToFirst()) {
-			UserId id = new UserId(cursor.getBlob(1));
-			String username = cursor.getString(2);
-			int count = cursor.getInt(3);
-			int max = cursor.getInt(4);
-			byte[] enc_key = cursor.getBlob(5);
-			byte[] auth_key = cursor.getBlob(6);
-			UserCredentials credentials = new UserCredentials(id, enc_key, auth_key);
-			Wall wall = Walls.getUserWall(db);
-			List<User> friends = Users.getUserFriends(db);
-			cursor.close();
-			return new User(id, username, wall, friends, credentials);
-		} else {
-			cursor.close();
-			return null;
-		}
+		return Friends.getFriend(Utility.userID, db);
 	}
 	
 	// Get the upper bound of the number of posts in the user's wall.
@@ -110,7 +84,15 @@ class Users {
 		}	
 	}
 	
-	// FIXME: Get the user's list of friends (with only ids)
+	public static void updateUserPostCount(int newCount, SQLiteDatabase db) {
+		Friends.updateFriendPostsCount(newCount, Utility.userID, db);
+	}
+	
+	public static void updateUserMaxPostsId(int newMax, SQLiteDatabase db) {
+		Friends.updateFriendMaxPostsId(newMax, Utility.userID, db);
+	}
+	
+	// Get the user's list of friends (with only ids)
 	public static List<User> getUserFriends(SQLiteDatabase db) {
 		//
 		String[] projection = {FriendsEntry.FRIEND_ID};
@@ -122,7 +104,7 @@ class Users {
 		// Execute query.
 		Cursor cursor = db.query(FriendsEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, null);
 		
-		List<User> friends = new ArrayList();
+		List<User> friends = new ArrayList<User>();
 		
 		if(cursor.moveToFirst()) {
 			while(!cursor.isAfterLast()) {

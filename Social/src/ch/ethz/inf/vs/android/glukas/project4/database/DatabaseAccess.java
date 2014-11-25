@@ -27,7 +27,8 @@ public interface DatabaseAccess {
 	
 	/**
 	 * Get User of device from Database.
-	 * @return the User object, whose friend's list contains only the ids!!
+	 * @return the User object (wall and friends list are null!)
+	 * if the user exists, else null
 	 */
 	public User getUser();
 	
@@ -43,28 +44,32 @@ public interface DatabaseAccess {
 	 */
 	public int getUserMaxPostsId();
 	
-	//TODO
 	/**
 	 * Set the upper bound of the number of posts in the user's wall.
 	 * @param newCount
 	 */
 	public void setUserPostsCount(int newCount);
 	
-	//TODO
 	/**
 	 * Set the upper bound over the partial order of actual posts for the user.
 	 * @param newMaxPostsId
 	 */
 	public void setUserMaxPostsId(int newMaxPostsId);
 	
+	/**
+	 * Get a list of all user's friends.
+	 * @return List of User objects that have only the id field set, while all others are null; null if no friend is found.
+	 */
+	public List<User> getUserFriendsList();
+	
 	////
 	// Credentials (Keys)
 	////
 	
-	/** TODO
-	 * 
-	 * @param user
-	 * @return
+	/**
+	 * Get the credentials of the given user.
+	 * @param user the id of the user to retrieve the credentials
+	 * @return the corresponding UserCredentials object if the user was found, else null
 	 */
 	public UserCredentials getUserCredentials(UserId user);
 	
@@ -86,7 +91,6 @@ public interface DatabaseAccess {
 	 */
 	public int getFriendMaxPostsId(UserId id);
 	
-	//TODO
 	/**
 	 * Set the upper bound of the number of posts in a friend's wall
 	 * @param newCount
@@ -94,20 +98,23 @@ public interface DatabaseAccess {
 	 */
 	public void setFriendPostsCount(int newCount, UserId id);
 	
-	//TODO
 	/**
 	 * Set the upper bound over the partial order of actual posts for a friend
 	 * @param newMaxPostsId
 	 * @param id
 	 */
-	public void setFriendPostsId(int newMaxPostsId, UserId id);
+	public void setFriendMaxPostsId(int newMaxPostsId, UserId id);
 	
-	/** TODO: check with @Lukas for use in Security Layer (friends of friends)
-	 * Create a friendship relation between the user and a new friend.
-	 * @param id the id of the friend (128 bits)
+	/** TODO: check with @Lukas for use in Security Layer (friends of friends):
+	 * which informations are needed about the friends?
+	 * Create a friendship relation between two friends.
+	 * @param id1 the id of the friend (128 bits)
+	 * @param username1
+	 * @param id2
+	 * @param username2
 	 * @param username the user name of the added friend
 	 */
-	public void putFriendship(UserId id, String username);
+	public void putFriendFriendship(UserId id1, String username1, UserId id2, String username2);
 	
 	/**
 	 * Get an user name from an user id
@@ -136,11 +143,11 @@ public interface DatabaseAccess {
 	 */
 	public void deleteFriend(UserId id);
 	
-	//TODO
 	/**
 	 * Get a friend targeted by his / her id
 	 * @param id
-	 * @return a friend if exists an entry in database, null otherwise
+	 * @return a friend object (both wall and friends list fields are null!) 
+	 * 			if exists an entry in database, null otherwise
 	 */
 	public User getFriend(UserId id);
 	
