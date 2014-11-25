@@ -1,8 +1,13 @@
 package ch.ethz.inf.vs.android.glukas.project4.security;
 
+import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.SecureRandom;
+import java.util.Arrays;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -10,6 +15,7 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.ShortBufferException;
+import javax.crypto.spec.IvParameterSpec;
 
 import ch.ethz.inf.vs.android.glukas.project4.protocol.PublicHeader;
 
@@ -19,6 +25,8 @@ public class MessageCryptography {
 	private final Mac mac;
 	private final Cipher cipher;
 	private final SecureRandom random;
+	
+	private final Charset charset = Charset.availableCharsets().get("UTF-8");
 	
 	MessageCryptography(CredentialStorage keyStorage, Mac mac, Cipher cipher, SecureRandom random) {
 		this.keyStore = keyStorage;
@@ -31,25 +39,29 @@ public class MessageCryptography {
 		
 		ByteBuffer result = null;
 		try {
+			//IV
+			byte[] ivBytes = random.generateSeed(CryptographyParameters.ENC_IV_BYTE_LENGTH);
+			IvParameterSpec ivSpec = new IvParameterSpec(ivBytes);
 			//Encrypt
 			SecretKey encryptionKey = keyStore.getBroadcastEncryptionKey(message.header.getReceiver());
-			cipher.init(Cipher.ENCRYPT_MODE, encryptionKey, random);
-			byte[] messageBytes = message.text.getBytes();
+			cipher.init(Cipher.ENCRYPT_MODE, encryptionKey, ivSpec);
 			
-			cipher.update(messageBytes);
-			byte [] cryptedBytes = cipher.doFinal();
-			//TODO Authenticate
-			SecretKey authenticationKey = keyStore.getBroadcastAuthenticationKey(message.header.getReceiver());
+			byte[] messageBytes = message.text.getBytes(charset);
+			byte [] cryptedBytes = cipher.doFinal(messageBytes);
 			
-			//prepend header
-			int messageLength = cryptedBytes.length + PublicHeader.BYTES_LENGTH_HEADER;
+			//public header
+			int messageLength = cipher.getOutputSize(messageBytes.length) + ivBytes.length + PublicHeader.BYTES_LENGTH_HEADER;
 			result = ByteBuffer.allocate(messageLength);
-			
-			//prepend public header
 			message.header.setLength(messageLength);
 			byte[] headerBytes = message.header.getbytes();
+			
+			//assemble message
 			result.put(headerBytes);
+			result.put(ivBytes);
 			result.put(cryptedBytes);
+			
+			//TODO Authenticate
+			//SecretKey authenticationKey = keyStore.getBroadcastAuthenticationKey(message.header.getReceiver());
 			
 		} catch (InvalidKeyException e) {
 			e.printStackTrace();
@@ -58,6 +70,9 @@ public class MessageCryptography {
 			e.printStackTrace();
 			return null;
 		} catch (BadPaddingException e) {
+			e.printStackTrace();
+			return null;
+		} catch (InvalidAlgorithmParameterException e) {
 			e.printStackTrace();
 			return null;
 		}
@@ -71,8 +86,9 @@ public class MessageCryptography {
 		//extract public header to get sender & recipient
 		PublicHeader header = new PublicHeader(messageBytes);
 		SecretKey encryptionKey = keyStore.getBroadcastEncryptionKey(header.getReceiver());
+		messageBytes.position(PublicHeader.BYTES_LENGTH_HEADER);
+		
 		try {
-			
 			//Decrypt
 			cipher.init(Cipher.DECRYPT_MODE, encryptionKey);
 			messageBytes.position(PublicHeader.BYTES_LENGTH_HEADER);
@@ -95,8 +111,9 @@ public class MessageCryptography {
 			e.printStackTrace();
 			return null;
 		}
-		
-		String text = new String(textBytes.array());
+		byte[] textByteClean = Arrays.copyOfRange(textBytes.array(), CryptographyParameters.ENC_IV_BYTE_LENGTH, textBytes.array().length);
+		String text = new String(textByteClean);
+
 		return new NetworkMessage(text, header);
 	}
 	
