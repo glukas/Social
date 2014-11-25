@@ -41,6 +41,7 @@ class Friends {
 		}
 	}
 	
+
 	// Get the upper bound over the partial order of actual posts for the friend.
 	public static int getFriendMaxPostsId(UserId id, SQLiteDatabase db) {
 		// SQL SELECT clause
@@ -60,7 +61,11 @@ class Friends {
 		} else {
 			cursor.close();
 			return -1;
+<<<<<<< HEAD
 		}
+=======
+
+>>>>>>> branch 'master' of https://github.com/glukas/Social
 	}
 	
 	// TODO: Create a friendship relation between the user and a new friend.

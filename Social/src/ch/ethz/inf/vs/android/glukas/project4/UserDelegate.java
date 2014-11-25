@@ -3,18 +3,11 @@ package ch.ethz.inf.vs.android.glukas.project4;
 import java.util.List;
 
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.FailureReason;
-import ch.ethz.inf.vs.android.glukas.project4.protocol.ProtocolDelegate;
 
 /**
  * Interface to the network for calls back from the network
  */
 public interface UserDelegate {
-	
-	/**
-	 * Set the delegate for call backs
-	 * @param protocol
-	 */
-	public void setDelegate(ProtocolDelegate protocol);
 	
 	/**
 	 * The network received a post

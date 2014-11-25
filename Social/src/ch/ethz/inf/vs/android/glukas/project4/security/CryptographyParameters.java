@@ -3,28 +3,32 @@ package ch.ethz.inf.vs.android.glukas.project4.security;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
+import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
-public class KeyGeneration {
+public class CryptographyParameters {
 
-	private static final KeyGeneration keyGen = new KeyGeneration();
+	private static final CryptographyParameters keyGen = new CryptographyParameters();
 	private static final String encryptionAlgorithm = "AES";
 	private static final String authenticationAlgorithm = "HmacSHA256";
+	private static final String encryptionMode = "CBC";
+	private static final String encryptionPadding = "PKCS5Padding";
 	
-	public static final KeyGeneration getInstance() {
+	public static final CryptographyParameters getInstance() {
 		return keyGen;
 	}
 	
 	//Note: not so "secure" on android 4.3 and lower.
-	private SecureRandom secureRandom = new SecureRandom();
+	private static SecureRandom secureRandom = new SecureRandom();
 	
 	private KeyGenerator encryptionKeyGenerator;
 	
 	private KeyGenerator macKeyGenerator;
 	
-	private KeyGeneration() {
+	private CryptographyParameters() {
 		try {
 			encryptionKeyGenerator = KeyGenerator.getInstance(encryptionAlgorithm);
 			encryptionKeyGenerator.init(128, secureRandom);
@@ -62,5 +66,21 @@ public class KeyGeneration {
 	
 	public SecretKey generateMACKey() {
 		return macKeyGenerator.generateKey();
+	}
+	
+	public static SecureRandom getRandom() {
+		return secureRandom;
+	}
+	
+	public static Cipher getCipher() {
+		Cipher c = null;
+		try {
+			c = Cipher.getInstance(encryptionAlgorithm+"/"+encryptionMode+"/"+encryptionPadding);
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		} catch (NoSuchPaddingException e) {
+			e.printStackTrace();
+		}
+		return c;
 	}
 }

@@ -3,12 +3,13 @@ package ch.ethz.inf.vs.android.glukas.project4.protocol.parsing;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import ch.ethz.inf.vs.android.glukas.project4.exceptions.UnhandledFunctionnality;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.UnknowRequestType;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.Message;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.Message.MessageType;
 
 /**
- * Factory to create JSONObject
+ * Factory to create JSONObject. See package-info for more informations about definitions of messages
  */
 public class JSONObjectFactory {	
 	
@@ -47,8 +48,7 @@ public class JSONObjectFactory {
 				setBroadCastObj(request, obj);
 
 				// Post new messages
-			} else if (request.getMessageType()
-					.equals(MessageType.POST_PICTURE)) {
+			} else if (request.getMessageType().equals(MessageType.POST_PICTURE)) {
 				setPostPictureObj(request, obj);
 			} else if (request.getMessageType().equals(MessageType.POST_TEXT)) {
 				setPostTextObj(request, obj);
@@ -57,7 +57,7 @@ public class JSONObjectFactory {
 
 				// Retrieve data
 			} else if (request.getMessageType().equals(MessageType.GET_POSTS)) {
-				setGetWallObj(request, obj);
+				setGetPostsObj(request, obj);
 			} else if (request.getMessageType().equals(MessageType.SHOW_IMAGE)) {
 				setShowImageObj(request, obj);
 			} else if (request.getMessageType().equals(MessageType.SEND_PICTURE)) {
@@ -87,13 +87,11 @@ public class JSONObjectFactory {
 	// Server Message Setters
 	////
 
-	private static void setConnectObj(Message request, JSONObject obj)
-			throws JSONException {
+	private static void setConnectObj(Message request, JSONObject obj) throws JSONException {
 		obj.put(Cmds.CMD.getStr(), Args.CONNECT.getStr());
 	}
 
-	private static void setDisconnectObj(Message request, JSONObject obj)
-			throws JSONException {
+	private static void setDisconnectObj(Message request, JSONObject obj) throws JSONException {
 		obj.put(Cmds.CMD.getStr(), Args.DISCONNECT.getStr());
 	}
 
@@ -101,64 +99,52 @@ public class JSONObjectFactory {
 	// Friends Message Setters
 	////
 
-	private static void setSearchUserObj(Message request, JSONObject obj)
-			throws JSONException {
-		obj.put(Cmds.CMD.getStr(), Args.SEARCH.getStr());
-		obj.put(Cmds.USER.getStr(), request.getUsernameSender());
+	private static void setSearchUserObj(Message request, JSONObject obj) throws JSONException {
+		try {
+			throw new UnhandledFunctionnality();
+		} catch (UnhandledFunctionnality e) {
+			e.printStackTrace();
+		}
 	}
 
-	private static void setAcceptFriendshipObj(Message request, JSONObject obj)
-			throws JSONException {
+	private static void setAcceptFriendshipObj(Message request, JSONObject obj) throws JSONException {
 		obj.put(Cmds.CMD.getStr(), Args.REP_FRIEND.getStr());
 		obj.put(Cmds.RESPONSE.getStr(), Args.ACCEPT.getStr());
-
 	}
 
-	private static void setRefuseFriendshipObj(Message request, JSONObject obj)
-			throws JSONException {
+	private static void setRefuseFriendshipObj(Message request, JSONObject obj) throws JSONException {
 		obj.put(Cmds.CMD.getStr(), Args.REP_FRIEND.getStr());
 		obj.put(Cmds.RESPONSE.getStr(), Args.REJECT.getStr());
-
 	}
 
-	private static void setAskFriendshipObj(Message request, JSONObject obj)
-			throws JSONException {
+	private static void setAskFriendshipObj(Message request, JSONObject obj) throws JSONException {
 		obj.put(Cmds.CMD.getStr(), Args.ASK_FRIEND.getStr());
-		obj.put(Cmds.USER.getStr(), request.getUsernameSender());
-
+		obj.put(Cmds.FROM.getStr(), request.getSender().getUsername());
 	}
 
-	private static void setBroadCastObj(Message request, JSONObject obj)
-			throws JSONException {
+	private static void setBroadCastObj(Message request, JSONObject obj) throws JSONException {
 		obj.put(Cmds.CMD.getStr(), Args.BROADCAST.getStr());
-		obj.put(Cmds.USER.getStr(), request.getUsernameSender());
-
+		obj.put(Cmds.USER.getStr(), request.getSender().getUsername());
 	}
 
 	////
 	// Post Message Setters
 	////
-	// Difference between Send and Post?
-	// Post posts a new message on someone's wall. Send is used to send an existing message from a wall.
 
-	private static void setPostPictureObj(Message request, JSONObject obj)
-			throws JSONException {
+	private static void setPostPictureObj(Message request, JSONObject obj) throws JSONException {
 		obj.put(Cmds.CMD.getStr(), Args.POST_PIC.getStr());
 		obj.put(Cmds.ID.getStr(), request.getPostId());
 		obj.put(Cmds.TEXT.getStr(), request.getMessage());
 		obj.put(Cmds.PIC.getStr(), request.getHttpLink());
 	}
 
-	private static void setPostTextObj(Message request, JSONObject obj)
-			throws JSONException {
+	private static void setPostTextObj(Message request, JSONObject obj) throws JSONException {
 		obj.put(Cmds.CMD.getStr(), Args.POST_TXT.getStr());
 		obj.put(Cmds.ID.getStr(), request.getPostId());
 		obj.put(Cmds.TEXT.getStr(), request.getMessage());
-
 	}
 
-	private static void setAckPostObj(Message request, JSONObject obj)
-			throws JSONException {
+	private static void setAckPostObj(Message request, JSONObject obj) throws JSONException {
 		obj.put(Cmds.CMD.getStr(), Args.ACK.getStr());
 		obj.put(Cmds.ID.getStr(), request.getPostId());
 	}
@@ -167,35 +153,30 @@ public class JSONObjectFactory {
 	// Retrieve Data Message Setters
 	////
 	
-	private static void setSendTextObj(Message request, JSONObject obj)
-			throws JSONException {
+	private static void setSendTextObj(Message request, JSONObject obj) throws JSONException {
 		obj.put(Cmds.CMD.getStr(), Args.SEND_TXT);
 		obj.put(Cmds.ID.getStr(), String.valueOf(request.getPostId()));
 		obj.put(Cmds.TEXT.getStr(), request.getMessage());
 	}
 
-	private static void setSendPictureObj(Message request, JSONObject obj)
-			throws JSONException {
+	private static void setSendPictureObj(Message request, JSONObject obj) throws JSONException {
 		obj.put(Cmds.CMD.getStr(), Args.POST_PIC.getStr());
 		obj.put(Cmds.ID.getStr(), request.getPostId());
 		obj.put(Cmds.TEXT.getStr(), request.getMessage());
 		obj.put(Cmds.PIC.getStr(), request.getHttpLink());
 	}
 	
-	private static void setGetStateObj(Message request, JSONObject obj)
-			throws JSONException {
+	private static void setGetStateObj(Message request, JSONObject obj) throws JSONException {
 		obj.put(Cmds.CMD.getStr(), Args.GET_STATE.toString());
 	}
 
-	private static void setSendStateObj(Message request, JSONObject obj, int numberofmessages)
-			throws JSONException {
+	private static void setSendStateObj(Message request, JSONObject obj, int numberofmessages) throws JSONException {
 		obj.put(Cmds.CMD.toString(), Args.SEND_STATE.toString());
 		obj.put(Cmds.ID.getStr(), String.valueOf(request.getPostId()));
 		obj.put(Cmds.NUM_M.getStr(), numberofmessages);
 	}
 
-	private static void setGetWallObj(Message request, JSONObject obj)
-			throws JSONException {
+	private static void setGetPostsObj(Message request, JSONObject obj) throws JSONException {
 		obj.put(Cmds.CMD.getStr(), Args.GET_POSTS.getStr());
 	}
 

@@ -19,12 +19,14 @@
  *  
  *  Where:
  *  
+ *  Total length, 368 bits. (Fixed)
+ *  
  *  Length, length of the message including the header (32 bits)
- *  Reserved, are three bytes reserved for futurw use (24 bits)
+ *  Reserved, are three bytes reserved for future use (24 bits)
  *  Status, is a byte describing the status of the message (8 bits)
  *  id, not unique id of the message (32 bits)
- *  Sender, id of the sender (128 bits)
- *  Receiver, id of the receiver (128 bits)
+ *  Sender, id of the sender (128 bits + 8 bits of length)
+ *  Receiver, id of the receiver (128 bits + 8 bits of length)
  *  
  *  i.e. Server has identity 0
  *  
