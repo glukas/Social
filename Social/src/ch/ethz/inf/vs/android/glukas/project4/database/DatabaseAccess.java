@@ -56,11 +56,18 @@ public interface DatabaseAccess {
 	 */
 	public void setUserMaxPostsId(int newMaxPostsId);
 	
-	/**
+	/** TODO
 	 * Get a list of all user's friends.
 	 * @return List of User objects that have only the id field set, while all others are null; null if no friend is found.
 	 */
 	public List<User> getUserFriendsList();
+	
+	/** TODO
+	 * Create a friendship relation between the user and the friend with id and username.
+	 * @param id
+	 * @param username
+	 */
+	public void putUserFriendship(UserId id, String username);
 	
 	////
 	// Credentials (Keys)
@@ -115,6 +122,14 @@ public interface DatabaseAccess {
 	 * @param username the user name of the added friend
 	 */
 	public void putFriendFriendship(UserId id1, String username1, UserId id2, String username2);
+	
+	/** TODO
+	 * Get a list of all friends of the friend with id.
+	 * @param id the id of the friend to retrieve the friends
+	 * @return List of User objects that have only the id field set, while all others are null; null if no friend is found.
+	 */
+	
+	public List<User> getFriendFriendsList(UserId id);
 	
 	/**
 	 * Get an user name from an user id
