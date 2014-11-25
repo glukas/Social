@@ -26,8 +26,8 @@
  * -for future use [3 bytes]
  * -status byte [1 byte]
  * -message id / "virtual clock" [4 bytes]
- * -sender [16 bytes]
- * -recipient [16 bytes]
+ * -sender [16 bytes + 1 byte length]
+ * -recipient [16 bytes + 1 byte length]
  * 
  * The sender is a unique id of the sender.
  * The recipient is the unique id of the recipient, or 0 the message is is a broadcast.

@@ -19,6 +19,8 @@
  *  
  *  Where:
  *  
+ *  Total length, 368 bits. (Fixed)
+ *  
  *  Length, length of the message including the header (32 bits)
  *  Reserved, are three bytes reserved for future use (24 bits)
  *  Status, is a byte describing the status of the message (8 bits)
