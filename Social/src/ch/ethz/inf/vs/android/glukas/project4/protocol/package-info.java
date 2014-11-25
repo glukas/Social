@@ -72,10 +72,11 @@
  *  
  *  Where:
  *  
- *  TEXT is a text (String format)
- *  LINK is a http link usable to download pictures in a future time (String format)
- *  INT is an integer
- *  USERNAME is an user name (String format)
+ *  ID is an integer
+ *  USERNAME is a string
+ *  NUM_M is an integer
+ *  LINK is a string
+ *  MESSAGE is a string
  *  
  *  and where names and values in lower case are strings
  *  
@@ -99,36 +100,36 @@
  *  
  *  get someone's posts
  *  	cmd :: getPosts
- *  	id :: INT
+ *  	id :: ID
  *  
  *  get someone's current state
  *  	cmd :: getState
  *  
  *  send current state
  *  	cmd :: sendState
- *  	id :: INT
- *  	numMessages :: INT
+ *  	id :: ID
+ *  	numMessages :: NUM_M
  *  
  *  post text message on someone's wall:
  *  	cmd :: postText
- *  	id :: INT
- *  	text :: TEXT
+ *  	id :: ID
+ *  	text :: MESSAGE
  *  
  *  post picture message on someone's wall:
  *  	cmd :: postPicture
- *  	id :: INT
- *  	text :: TEXT
+ *  	id :: ID
+ *  	text :: MESSAGE
  *  	picture :: LINK
  *  
  *  send a text message to someone:
  *  	cmd :: sendText
- *  	id :: INT
- *  	text :: TEXT
+ *  	id :: ID
+ *  	text :: MESSAGE
  *  
  *  send a picture message to someone:
  *  	cmd :: sendPicture
- *  	id :: INT
- *  	text :: TEXT
+ *  	id :: ID
+ *  	text :: MESSAGE
  *  	picture :: LINK
  *  
  *  broadcast user's name:
@@ -137,7 +138,7 @@
  *  
  *  acknowledge a post:
  *  	cmd :: ack
- *  	id :: INT
+ *  	id :: ID
  *  
  */
 

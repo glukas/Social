@@ -30,49 +30,49 @@ public class JSONObjectFactory {
 		
 		try {
 				// Server
-			if (request.getMessageType().equals(MessageType.CONNECT)) {
+			if (request.getRequestType().equals(MessageType.CONNECT)) {
 				setConnectObj(request, obj);
-			} else if (request.getMessageType().equals(MessageType.DISCONNECT)) {
+			} else if (request.getRequestType().equals(MessageType.DISCONNECT)) {
 				setDisconnectObj(request, obj);
 
 				// Friends
-			} else if (request.getMessageType().equals(MessageType.SEARCH_USER)) {
+			} else if (request.getRequestType().equals(MessageType.SEARCH_USER)) {
 				setSearchUserObj(request, obj);
-			} else if (request.getMessageType().equals(MessageType.ACCEPT_FRIENDSHIP)) {
+			} else if (request.getRequestType().equals(MessageType.ACCEPT_FRIENDSHIP)) {
 				setAcceptFriendshipObj(request, obj);
-			} else if (request.getMessageType().equals(MessageType.REFUSE_FRIENDSHIP)) {
+			} else if (request.getRequestType().equals(MessageType.REFUSE_FRIENDSHIP)) {
 				setRefuseFriendshipObj(request, obj);
-			} else if (request.getMessageType().equals(MessageType.ASK_FRIENDSHIP)) {
+			} else if (request.getRequestType().equals(MessageType.ASK_FRIENDSHIP)) {
 				setAskFriendshipObj(request, obj);
-			} else if (request.getMessageType().equals(MessageType.BROADCAST)) {
+			} else if (request.getRequestType().equals(MessageType.BROADCAST)) {
 				setBroadCastObj(request, obj);
 
 				// Post new messages
-			} else if (request.getMessageType().equals(MessageType.POST_PICTURE)) {
+			} else if (request.getRequestType().equals(MessageType.POST_PICTURE)) {
 				setPostPictureObj(request, obj);
-			} else if (request.getMessageType().equals(MessageType.POST_TEXT)) {
+			} else if (request.getRequestType().equals(MessageType.POST_TEXT)) {
 				setPostTextObj(request, obj);
-			} else if (request.getMessageType().equals(MessageType.ACK_POST)) {
+			} else if (request.getRequestType().equals(MessageType.ACK_POST)) {
 				setAckPostObj(request, obj);
 
 				// Retrieve data
-			} else if (request.getMessageType().equals(MessageType.GET_POSTS)) {
+			} else if (request.getRequestType().equals(MessageType.GET_POSTS)) {
 				setGetPostsObj(request, obj);
-			} else if (request.getMessageType().equals(MessageType.SHOW_IMAGE)) {
+			} else if (request.getRequestType().equals(MessageType.SHOW_IMAGE)) {
 				setShowImageObj(request, obj);
-			} else if (request.getMessageType().equals(MessageType.SEND_PICTURE)) {
+			} else if (request.getRequestType().equals(MessageType.SEND_PICTURE)) {
 				setSendPictureObj(request, obj);
-			} else if (request.getMessageType().equals(MessageType.SEND_TEXT)) {
+			} else if (request.getRequestType().equals(MessageType.SEND_TEXT)) {
 				setSendTextObj(request, obj);
-			} else if (request.getMessageType().equals(MessageType.SEND_STATE)) {
+			} else if (request.getRequestType().equals(MessageType.SEND_STATE)) {
 				setSendStateObj(request, obj, numberofmessages);
-			} else if (request.getMessageType().equals(MessageType.GET_STATE)) {
+			} else if (request.getRequestType().equals(MessageType.GET_STATE)) {
 				setGetStateObj(request, obj);
 
 				// In case of Unknown message
 			} else {
 				try {
-					throw new UnknowRequestType(request.getMessageType());
+					throw new UnknowRequestType(request.getRequestType());
 				} catch (UnknowRequestType e) {
 					e.printStackTrace();
 				}

@@ -30,67 +30,88 @@ public class Message {
 	protected MessageType requestType;
 	
 	//content
-	protected String message;
 	protected String httpLink;
-	protected String response;
+	protected String message;
+	protected String username;
+	protected int id;
+	protected int numM;
 	
-	//setters
-	public void setMessageType(MessageType requestType){
-		this.requestType = requestType;
-	}
-
-	public void setSender(User newSender) {
-		this.sender = newSender;
-	}
-
-	public void setReceiver(User newReceiver) {
-		this.receiver = newReceiver;
-	}
-
-	public void setPostId(int postId) {
-		this.postId = postId;
-	}
-
-	public void setHttpLink(String httpLink) {
-		this.httpLink = httpLink;
-	}
+	////
+	//Getters and Setters
+	////
 	
-	public void setMessage(String message) {
-		this.message = message;
-	}
-	public void setFriendshipResponse(String response){
-		this.response= response;
-	}
-	
-	
-	//getters
-	public MessageType getMessageType(){
-		return requestType;
-	}
-
 	public User getSender() {
 		return sender;
+	}
+
+	public void setSender(User sender) {
+		this.sender = sender;
 	}
 
 	public User getReceiver() {
 		return receiver;
 	}
 
+	public void setReceiver(User receiver) {
+		this.receiver = receiver;
+	}
+
 	public int getPostId() {
 		return postId;
+	}
+
+	public void setPostId(int postId) {
+		this.postId = postId;
+	}
+
+	public MessageType getRequestType() {
+		return requestType;
+	}
+
+	public void setRequestType(MessageType requestType) {
+		this.requestType = requestType;
 	}
 
 	public String getHttpLink() {
 		return httpLink;
 	}
-	
+
+	public void setHttpLink(String httpLink) {
+		this.httpLink = httpLink;
+	}
+
 	public String getMessage() {
 		return message;
 	}
-	public String getFriendshipResponse(){
-		return response;
+
+	public void setMessage(String message) {
+		this.message = message;
 	}
-	
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public int getNumM() {
+		return numM;
+	}
+
+	public void setNumM(int numM) {
+		this.numM = numM;
+	}
+
 	/**
 	 * Different types of messages
 	 */

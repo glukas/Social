@@ -17,7 +17,6 @@ import ch.ethz.inf.vs.android.glukas.project4.networking.MessageRelayDelegate;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.Message.MessageType;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.Message;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.parsing.JSONObjectFactory;
-import ch.ethz.inf.vs.android.glukas.project4.protocol.parsing.MessageParser;
 import ch.ethz.inf.vs.android.glukas.project4.security.SecureChannel;
 import ch.ethz.inf.vs.android.glukas.project4.security.SecureChannelDelegate;
 import ch.ethz.inf.vs.android.glukas.project4.security.NetworkMessage;
@@ -156,31 +155,8 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate,
 
 	@Override
 	public void onMessageReceived(NetworkMessage message) {
-		Message msg = MessageParser.parseMessage(message.text, message.header, database);
 
 		// TODO : main part, a lot of cases split depending on MessageType
-
-		// Friendship
-		if (msg.getMessageType().equals(MessageType.ACCEPT_FRIENDSHIP)) {
-			userHandler.onFriendshipAccepted();
-		} else if (msg.getMessageType().equals(MessageType.REFUSE_FRIENDSHIP)) {
-			userHandler.onFriendshipDeclined();
-		}
-
-		// Retrieve data
-		else if (msg.getMessageType().equals(MessageType.ACK_POST)) {
-
-		}
-
-		// Post data
-		else if (msg.getMessageType().equals(MessageType.POST_PICTURE)) {
-
-		}
-
-		// Unknown
-		else {
-
-		}
 	}
 
 	// //
