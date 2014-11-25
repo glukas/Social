@@ -5,6 +5,7 @@ import java.security.SecureRandom;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
+import javax.crypto.Mac;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -32,8 +33,8 @@ public class CryptographyParameters {
 		try {
 			encryptionKeyGenerator = KeyGenerator.getInstance(encryptionAlgorithm);
 			encryptionKeyGenerator.init(128, secureRandom);
-			macKeyGenerator = KeyGenerator.getInstance("HmacSHA256");
-			macKeyGenerator.init(secureRandom);
+			macKeyGenerator = KeyGenerator.getInstance(authenticationAlgorithm);
+			macKeyGenerator.init(256, secureRandom);
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 		}
@@ -82,5 +83,15 @@ public class CryptographyParameters {
 			e.printStackTrace();
 		}
 		return c;
+	}
+
+	public static Mac getMac() {
+		Mac mac = null;
+		try {
+			mac = Mac.getInstance(authenticationAlgorithm);
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
+		return mac;
 	}
 }

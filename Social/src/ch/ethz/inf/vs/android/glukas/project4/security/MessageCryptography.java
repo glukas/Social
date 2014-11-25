@@ -17,6 +17,8 @@ import javax.crypto.SecretKey;
 import javax.crypto.ShortBufferException;
 import javax.crypto.spec.IvParameterSpec;
 
+import android.util.Base64;
+
 import ch.ethz.inf.vs.android.glukas.project4.protocol.PublicHeader;
 
 public class MessageCryptography {
@@ -25,9 +27,7 @@ public class MessageCryptography {
 	private final Mac mac;
 	private final Cipher cipher;
 	private final SecureRandom random;
-	
-	private final Charset charset = Charset.availableCharsets().get("UTF-8");
-	
+
 	MessageCryptography(CredentialStorage keyStorage, Mac mac, Cipher cipher, SecureRandom random) {
 		this.keyStore = keyStorage;
 		this.mac = mac;
@@ -50,18 +50,25 @@ public class MessageCryptography {
 			byte [] cryptedBytes = cipher.doFinal(messageBytes);
 			
 			//public header
-			int messageLength = cipher.getOutputSize(messageBytes.length) + ivBytes.length + PublicHeader.BYTES_LENGTH_HEADER;
+			int messageLength = cipher.getOutputSize(messageBytes.length) + ivBytes.length + PublicHeader.BYTES_LENGTH_HEADER + mac.getMacLength();
 			result = ByteBuffer.allocate(messageLength);
 			message.header.setLength(messageLength);
 			byte[] headerBytes = message.header.getbytes();
 			
+			//Authenticate
+			SecretKey authenticationKey = keyStore.getBroadcastAuthenticationKey(message.header.getReceiver());
+			mac.init(authenticationKey);
+			mac.update(headerBytes);
+			mac.update(ivBytes);
+			mac.update(cryptedBytes);
+			byte[] messageAuthenticationCode = mac.doFinal();
+			
 			//assemble message
 			result.put(headerBytes);
+			result.put(messageAuthenticationCode);
 			result.put(ivBytes);
 			result.put(cryptedBytes);
 			
-			//TODO Authenticate
-			//SecretKey authenticationKey = keyStore.getBroadcastAuthenticationKey(message.header.getReceiver());
 			
 		} catch (InvalidKeyException e) {
 			e.printStackTrace();
@@ -85,13 +92,24 @@ public class MessageCryptography {
 		//extract public header to get sender & recipient
 		PublicHeader header = new PublicHeader(messageBytes);
 		SecretKey encryptionKey = keyStore.getBroadcastEncryptionKey(header.getReceiver());
+		SecretKey authenticationKey = keyStore.getBroadcastAuthenticationKey(header.getReceiver());
+		
+		int headerAndMacLength = PublicHeader.BYTES_LENGTH_HEADER+mac.getMacLength();
 		byte[] textBytes = null;
 		try {
+			//Authenticate
+			mac.init(authenticationKey);
+			mac.update(message, 0, PublicHeader.BYTES_LENGTH_HEADER);
+			mac.update(message, headerAndMacLength, message.length-headerAndMacLength);
+			byte[] computedMessageAuthenticationCode = mac.doFinal();//header
+			byte[] receivedMessageAuthenticationCode = Arrays.copyOfRange(message, PublicHeader.BYTES_LENGTH_HEADER, headerAndMacLength);//IV and rest of ciphertext
+			if (!Arrays.equals(computedMessageAuthenticationCode, receivedMessageAuthenticationCode)) {
+				return null;
+			}
+			
 			//Decrypt (the IV is the first block)
 			cipher.init(Cipher.DECRYPT_MODE, encryptionKey);
-			messageBytes.position(PublicHeader.BYTES_LENGTH_HEADER);
-			textBytes = cipher.doFinal(message, PublicHeader.BYTES_LENGTH_HEADER, message.length-PublicHeader.BYTES_LENGTH_HEADER);
-			//TODO Authenticate
+			textBytes = cipher.doFinal(message, headerAndMacLength, message.length-headerAndMacLength);
 			
 		} catch (InvalidKeyException e) {
 			e.printStackTrace();

@@ -8,6 +8,7 @@ import java.security.SecureRandom;
 import java.util.Arrays;
 
 import javax.crypto.Cipher;
+import javax.crypto.Mac;
 import javax.crypto.NullCipher;
 
 import android.util.Log;
@@ -23,8 +24,9 @@ public class MessageCryptographyTest3 extends TestCase {
 		CredentialStorage store = new ZeroCredentialStorage();
 		Cipher cipher = CryptographyParameters.getCipher();
 		SecureRandom rand = CryptographyParameters.getRandom();
+		Mac mac = CryptographyParameters.getMac();
 		
-		MessageCryptography crypto = new MessageCryptography(store, null, cipher, rand);
+		MessageCryptography crypto = new MessageCryptography(store, mac, cipher, rand);
 		
 		String text = "123-abc-ABC";
 		PublicHeader header = new PublicHeader(0, new byte[3], (byte) 0, 0, new UserId("0"), new UserId("1"));
@@ -36,10 +38,12 @@ public class MessageCryptographyTest3 extends TestCase {
 		assertTrue(crypted.length > 0);
 		
 		NetworkMessage decrypted = crypto.decryptPost(crypted);
+		assertNotNull(decrypted);
 		assertTrue(decrypted.header.getbytes().length == PublicHeader.BYTES_LENGTH_HEADER);
 		
 		//assertEquals(header.getbytes(), decrypted.header.getbytes());
 		assertEquals(text, decrypted.text);
+		
 	}
 	
 	
