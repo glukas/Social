@@ -56,8 +56,10 @@ public class MessageCryptography {
 			return null;
 		} catch (IllegalBlockSizeException e) {
 			e.printStackTrace();
+			return null;
 		} catch (BadPaddingException e) {
 			e.printStackTrace();
+			return null;
 		}
 		
 		return result.array();
@@ -73,6 +75,7 @@ public class MessageCryptography {
 			
 			//Decrypt
 			cipher.init(Cipher.DECRYPT_MODE, encryptionKey);
+			messageBytes.position(PublicHeader.BYTES_LENGTH_HEADER);
 			int textSize = cipher.getOutputSize(messageBytes.remaining());
 			textBytes = ByteBuffer.allocate(textSize);
 			
@@ -87,8 +90,10 @@ public class MessageCryptography {
 			return null;
 		} catch (IllegalBlockSizeException e) {
 			e.printStackTrace();
+			return null;
 		} catch (BadPaddingException e) {
 			e.printStackTrace();
+			return null;
 		}
 		
 		String text = new String(textBytes.array());
