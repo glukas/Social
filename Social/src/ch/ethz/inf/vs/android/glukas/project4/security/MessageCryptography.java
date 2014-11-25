@@ -4,7 +4,9 @@ import java.nio.ByteBuffer;
 import java.security.InvalidKeyException;
 import java.security.SecureRandom;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.ShortBufferException;
@@ -26,21 +28,22 @@ public class MessageCryptography {
 	}
 	
 	byte[] encryptPost(NetworkMessage message) {
-		byte[] cryptedBytes = null;
+		
+		ByteBuffer result = null;
 		try {
 			//Encrypt
 			SecretKey encryptionKey = keyStore.getBroadcastEncryptionKey(message.header.getReceiver());
 			cipher.init(Cipher.ENCRYPT_MODE, encryptionKey, random);
 			byte[] messageBytes = message.text.getBytes();
 			
-			cryptedBytes = cipher.update(messageBytes);
-
+			cipher.update(messageBytes);
+			byte [] cryptedBytes = cipher.doFinal();
 			//TODO Authenticate
 			SecretKey authenticationKey = keyStore.getBroadcastAuthenticationKey(message.header.getReceiver());
 			
 			//prepend header
-			int messageLength = cryptedBytes.length + PublicHeader.HEADER_BYTE_SIZE;
-			ByteBuffer result = ByteBuffer.allocate(messageLength);
+			int messageLength = cryptedBytes.length + PublicHeader.BYTES_LENGTH_HEADER;
+			result = ByteBuffer.allocate(messageLength);
 			
 			//prepend public header
 			message.header.setLength(messageLength);
@@ -51,14 +54,18 @@ public class MessageCryptography {
 		} catch (InvalidKeyException e) {
 			e.printStackTrace();
 			return null;
+		} catch (IllegalBlockSizeException e) {
+			e.printStackTrace();
+		} catch (BadPaddingException e) {
+			e.printStackTrace();
 		}
 		
-		return cryptedBytes;
+		return result.array();
 	}
 	
 	NetworkMessage decryptPost(byte[] message) {
 		ByteBuffer messageBytes = ByteBuffer.wrap(message);
-		ByteBuffer textBytes;
+		ByteBuffer textBytes = null;
 		//extract public header to get sender & recipient
 		PublicHeader header = new PublicHeader(messageBytes);
 		SecretKey encryptionKey = keyStore.getBroadcastEncryptionKey(header.getReceiver());
@@ -68,8 +75,8 @@ public class MessageCryptography {
 			cipher.init(Cipher.DECRYPT_MODE, encryptionKey);
 			int textSize = cipher.getOutputSize(messageBytes.remaining());
 			textBytes = ByteBuffer.allocate(textSize);
-			cipher.update(messageBytes, textBytes);
 			
+			cipher.doFinal(messageBytes, textBytes);
 			//TODO Authenticate
 			
 		} catch (InvalidKeyException e) {
@@ -78,6 +85,10 @@ public class MessageCryptography {
 		} catch (ShortBufferException e) {
 			e.printStackTrace();
 			return null;
+		} catch (IllegalBlockSizeException e) {
+			e.printStackTrace();
+		} catch (BadPaddingException e) {
+			e.printStackTrace();
 		}
 		
 		String text = new String(textBytes.array());

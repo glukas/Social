@@ -17,13 +17,13 @@ public class DBCredentialStorage implements CredentialStorage {
 	@Override
 	public SecretKey getBroadcastEncryptionKey(UserId user) {
 		byte[] encryptionKey = database.getUserCredentials(user).broadcastEncryptionKey;
-		return KeyGeneration.getInstance().decodeEncryptionKey(encryptionKey);
+		return CryptographyParameters.getInstance().decodeEncryptionKey(encryptionKey);
 	}
 
 	@Override
 	public SecretKey getBroadcastAuthenticationKey(UserId user) {
 		byte[] authenticationKey = database.getUserCredentials(user).broadcastAuthenticationKey;
-		return KeyGeneration.getInstance().decodeEncryptionKey(authenticationKey);
+		return CryptographyParameters.getInstance().decodeEncryptionKey(authenticationKey);
 	}
 
 	@Override

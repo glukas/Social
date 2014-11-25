@@ -8,7 +8,7 @@ import ch.ethz.inf.vs.android.glukas.project4.User;
 import ch.ethz.inf.vs.android.glukas.project4.UserCredentials;
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
 import ch.ethz.inf.vs.android.glukas.project4.security.CredentialStorage;
-import ch.ethz.inf.vs.android.glukas.project4.security.KeyGeneration;
+import ch.ethz.inf.vs.android.glukas.project4.security.CryptographyParameters;
 
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;

@@ -8,8 +8,6 @@ import ch.ethz.inf.vs.android.glukas.project4.UserId;
  */
 public class PublicHeader {
 
-	public static final int HEADER_BYTE_SIZE = 44;
-	
 	private UserId sender;
 	private UserId receiver;
 	private byte consistency;

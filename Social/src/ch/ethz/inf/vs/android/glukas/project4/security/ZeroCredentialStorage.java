@@ -12,8 +12,8 @@ public class ZeroCredentialStorage implements CredentialStorage {
 
 	public static final ZeroCredentialStorage constantCredentials = new ZeroCredentialStorage();
 	
-	private SecretKey enc = KeyGeneration.getInstance().generateEncryptionKey();
-	private SecretKey auth = KeyGeneration.getInstance().generateMACKey();
+	private SecretKey enc = CryptographyParameters.getInstance().generateEncryptionKey();
+	private SecretKey auth = CryptographyParameters.getInstance().generateMACKey();
 	
 	@Override
 	public SecretKey getBroadcastEncryptionKey(UserId user) {
