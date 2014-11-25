@@ -26,7 +26,7 @@ public class MessageCryptographyTest3 extends TestCase {
 		
 		MessageCryptography crypto = new MessageCryptography(store, null, cipher, rand);
 		
-		String text = "1 2 3";
+		String text = "123-abc-ABC";
 		PublicHeader header = new PublicHeader(0, new byte[3], (byte) 0, 0, new UserId("0"), new UserId("1"));
 		assertTrue(header.getbytes().length == PublicHeader.BYTES_LENGTH_HEADER);
 		assertTrue(new PublicHeader(ByteBuffer.wrap(header.getbytes())).getbytes().length == PublicHeader.BYTES_LENGTH_HEADER);
@@ -37,8 +37,8 @@ public class MessageCryptographyTest3 extends TestCase {
 		
 		NetworkMessage decrypted = crypto.decryptPost(crypted);
 		assertTrue(decrypted.header.getbytes().length == PublicHeader.BYTES_LENGTH_HEADER);
+		
 		//assertEquals(header.getbytes(), decrypted.header.getbytes());
-		assertEquals(text, (new String(text.getBytes("UTF-8"))));
 		assertEquals(text, decrypted.text);
 	}
 	

@@ -40,13 +40,13 @@ public class MessageCryptography {
 		ByteBuffer result = null;
 		try {
 			//IV
-			byte[] ivBytes = random.generateSeed(CryptographyParameters.ENC_IV_BYTE_LENGTH);
+			byte[] ivBytes = random.generateSeed(cipher.getBlockSize());
 			IvParameterSpec ivSpec = new IvParameterSpec(ivBytes);
 			//Encrypt
 			SecretKey encryptionKey = keyStore.getBroadcastEncryptionKey(message.header.getReceiver());
 			cipher.init(Cipher.ENCRYPT_MODE, encryptionKey, ivSpec);
 			
-			byte[] messageBytes = message.text.getBytes(charset);
+			byte[] messageBytes = message.text.getBytes();
 			byte [] cryptedBytes = cipher.doFinal(messageBytes);
 			
 			//public header
@@ -82,26 +82,18 @@ public class MessageCryptography {
 	
 	NetworkMessage decryptPost(byte[] message) {
 		ByteBuffer messageBytes = ByteBuffer.wrap(message);
-		ByteBuffer textBytes = null;
 		//extract public header to get sender & recipient
 		PublicHeader header = new PublicHeader(messageBytes);
 		SecretKey encryptionKey = keyStore.getBroadcastEncryptionKey(header.getReceiver());
-		messageBytes.position(PublicHeader.BYTES_LENGTH_HEADER);
-		
+		byte[] textBytes = null;
 		try {
-			//Decrypt
+			//Decrypt (the IV is the first block)
 			cipher.init(Cipher.DECRYPT_MODE, encryptionKey);
 			messageBytes.position(PublicHeader.BYTES_LENGTH_HEADER);
-			int textSize = cipher.getOutputSize(messageBytes.remaining());
-			textBytes = ByteBuffer.allocate(textSize);
-			
-			cipher.doFinal(messageBytes, textBytes);
+			textBytes = cipher.doFinal(message, PublicHeader.BYTES_LENGTH_HEADER, message.length-PublicHeader.BYTES_LENGTH_HEADER);
 			//TODO Authenticate
 			
 		} catch (InvalidKeyException e) {
-			e.printStackTrace();
-			return null;
-		} catch (ShortBufferException e) {
 			e.printStackTrace();
 			return null;
 		} catch (IllegalBlockSizeException e) {
@@ -111,9 +103,10 @@ public class MessageCryptography {
 			e.printStackTrace();
 			return null;
 		}
-		byte[] textByteClean = Arrays.copyOfRange(textBytes.array(), CryptographyParameters.ENC_IV_BYTE_LENGTH, textBytes.array().length);
+		
+		byte[] textByteClean = Arrays.copyOfRange(textBytes, cipher.getBlockSize(), textBytes.length);
 		String text = new String(textByteClean);
-
+		
 		return new NetworkMessage(text, header);
 	}
 	

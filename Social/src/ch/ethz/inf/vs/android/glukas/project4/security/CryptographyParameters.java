@@ -15,10 +15,7 @@ public class CryptographyParameters {
 	private static final String encryptionAlgorithm = "AES";
 	private static final String authenticationAlgorithm = "HmacSHA256";
 	private static final String encryptionMode = "CBC";
-	private static final String encryptionPadding = "PKCS5Padding";
-	
-	//The length of the initialization vector for encryption in bytes
-	public static final int ENC_IV_BYTE_LENGTH = 16;
+	private static final String encryptionPadding = "PKCS7Padding";
 	
 	public static final CryptographyParameters getInstance() {
 		return keyGen;
