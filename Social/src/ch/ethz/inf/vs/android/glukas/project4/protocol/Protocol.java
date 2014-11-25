@@ -4,13 +4,14 @@ import java.util.List;
 
 import android.content.Context;
 import ch.ethz.inf.vs.android.glukas.project4.Post;
+import ch.ethz.inf.vs.android.glukas.project4.User;
 import ch.ethz.inf.vs.android.glukas.project4.UserDelegate;
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
-import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseDelegate;
-import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseManager;
+import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseAccess;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.DatabaseException;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.FailureReason;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.NetworkException;
+import ch.ethz.inf.vs.android.glukas.project4.exceptions.UnhandledFunctionnality;
 import ch.ethz.inf.vs.android.glukas.project4.networking.MessageRelay;
 import ch.ethz.inf.vs.android.glukas.project4.networking.MessageRelayDelegate;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.Message.MessageType;
@@ -32,58 +33,55 @@ import ch.ethz.inf.vs.android.glukas.project4.security.NetworkMessage;
 public class Protocol implements ProtocolDelegate, SecureChannelDelegate,
 		MessageRelayDelegate {
 
-	// //
+	////
 	// Life cycle
-	// //
+	////
 
 	private static Protocol instance;
 
 	/**
-	 * Get a instance of Protocol. If it's the first time, it can take some
-	 * time. (Has to retrieve data from the database.)
+	 * Get a instance of Protocol.
 	 */
-	public static Protocol getInstance(Context context) {
+	public static Protocol getInstance(Context context, DatabaseAccess db) {
 		if (instance == null) {
-			return new Protocol(context);
+			return new Protocol(context, db);
 		} else {
 			return instance;
 		}
 	}
 
-	private Protocol(Context context) {
+	private Protocol(Context context, DatabaseAccess db) {
 		// TODO : instantiate delegates (user, security layers)
-
-		database = new DatabaseManager(context);
+		// TODO : instantiate messages relays and channels 
+		database = db;
 		secureChannel.setDelegate(this);
 		messageRelay.setDelegate(this);
-		userHandler.setDelegate(this);
-		// TODO : method for that
-		// localUserId = database.getUserId();
+		localUser = database.getUser();
 	}
 
-	// //
+	////
 	// Members
-	// //
+	////
 
 	// Communications with other components
 	private SecureChannel secureChannel;
 	private MessageRelay messageRelay;
 	private UserDelegate userHandler;
-	private DatabaseDelegate database;
+	private DatabaseAccess database;
 
-	private UserId localUserId;
+	private User localUser;
 
-	// //
+	////
 	// ProtocolDelegate
-	// //
+	////
 
 	@Override
 	public void connect() throws NetworkException {
 		String msg = JSONObjectFactory.createJSONObject(
-				new Message(MessageType.CONNECT), -1).toString();
+				new Message(MessageType.CONNECT), 0).toString();
 
 		PublicHeader header = new PublicHeader(0, null,
-				StatusByte.CONNECT.getByte(), 0, localUserId, null);
+				StatusByte.CONNECT.getByte(), 0, localUser.getId(), null);
 
 		messageRelay.connect(msg, header);
 	}
@@ -91,10 +89,10 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate,
 	@Override
 	public void disconnect() throws NetworkException {
 		String msg = JSONObjectFactory.createJSONObject(
-				new Message(MessageType.DISCONNECT), -1).toString();
+				new Message(MessageType.DISCONNECT), 0).toString();
 
 		PublicHeader header = new PublicHeader(0, null,
-				StatusByte.DISCONNECT.getByte(), 0, localUserId, null);
+				StatusByte.DISCONNECT.getByte(), 0, localUser.getId(), null);
 
 		messageRelay.disconnect(msg, header);
 	}
@@ -102,9 +100,9 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate,
 	@Override
 	public void postPost(Post post) throws DatabaseException {
 		// The order matters !
-		database.putUserPost(post);
-		int msgId = post.getId();
-		// TODO : ask Alessio if these methods are feasible
+		//database.putUserPost(post);
+		//int msgId = post.getId();
+		// TODO : methods actually added in DBAccess, just has to use them
 		// int maxNumPosts = DatabaseManager.getNumPosts();
 		// database.setUserMaxId(msgId);
 		// database.setUserNumPosts(maxNumPosts);
@@ -121,7 +119,7 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate,
 		Message msg = new Message(MessageType.GET_STATE);
 
 		PublicHeader header = new PublicHeader(0, null,
-				StatusByte.DATA.getByte(), 0, localUserId, listUserId.get(0));
+				StatusByte.DATA.getByte(), 0, localUser.getId(), listUserId.get(0));
 
 		secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory
 				.createJSONObject(msg, 0).toString(), header));
@@ -129,12 +127,22 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate,
 
 	@Override
 	public void askFriendship(String distUsername) throws NetworkException {
-		// TODO : sketch whole process (linked with security)
+		//for the moment, we only use NFC
+		try {
+			throw new UnhandledFunctionnality();
+		} catch (UnhandledFunctionnality e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
 	public void discoverFriends() throws NetworkException {
-		// TODO : sketch whole process (linked with security)
+		//for the moment, we only use NFC
+		try {
+			throw new UnhandledFunctionnality();
+		} catch (UnhandledFunctionnality e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -148,7 +156,7 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate,
 
 	@Override
 	public void onMessageReceived(NetworkMessage message) {
-		Message msg = MessageParser.parseMessage(message.text, message.header);
+		Message msg = MessageParser.parseMessage(message.text, message.header, database);
 
 		// TODO : main part, a lot of cases split depending on MessageType
 

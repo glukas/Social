@@ -4,13 +4,13 @@ import javax.crypto.SecretKey;
 
 import ch.ethz.inf.vs.android.glukas.project4.UserCredentials;
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
-import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseDelegate;
+import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseAccess;
 
 public class DBCredentialStorage implements CredentialStorage {
 
-	DatabaseDelegate database;
+	DatabaseAccess database;
 	
-	DBCredentialStorage(DatabaseDelegate db) {
+	DBCredentialStorage(DatabaseAccess db) {
 		database = db;
 	}
 	

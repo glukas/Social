@@ -24,7 +24,7 @@ import android.util.Log;
  * @comment these will be the basic functionalities, more will be added.
  */
 
-public class DatabaseManager extends SQLiteOpenHelper implements DatabaseDelegate{
+public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 
 	private static final String TAG = "----DATABASE----";
 	
@@ -306,6 +306,12 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseDelegat
 	public void setFriendPostsId(int newMaxPostsId, UserId id) {
 		// TODO Auto-generated method stub, added (by Vincent, if search someone to blame ^^) in DatabaseDelegate
 		
+	}
+
+	@Override
+	public User getFriend(UserId id) {
+		// TODO Auto-generated method stub, added (by Vincent, if search someone to blame ^^) in DatabaseDelegate
+		return null;
 	}
 
 }

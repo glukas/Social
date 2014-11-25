@@ -13,7 +13,7 @@ import ch.ethz.inf.vs.android.glukas.project4.Wall;
  * Please consider all methods with a TODO as still having a non 
  * (complete) meaningful declaration.
  */
-public interface DatabaseDelegate {
+public interface DatabaseAccess {
 
 	////
 	// User management
@@ -135,6 +135,14 @@ public interface DatabaseDelegate {
 	 * @param id the id of the friend to delete.
 	 */
 	public void deleteFriend(UserId id);
+	
+	//TODO
+	/**
+	 * Get a friend targeted by his / her id
+	 * @param id
+	 * @return a friend if exists an entry in database, null otherwise
+	 */
+	public User getFriend(UserId id);
 	
 	
 	////

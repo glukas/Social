@@ -1,10 +1,19 @@
 package ch.ethz.inf.vs.android.glukas.project4.protocol;
 
+import ch.ethz.inf.vs.android.glukas.project4.User;
+
 /**
  * A Message used by the protocol send over the network. (Either by the user or received from outside world)
  * It's used to do the internal logic inside the protocol.
  */
 public class Message {
+	
+	/**
+	 * Create a new empty Message
+	 */
+	public Message() {
+		
+	}
 	
 	/**
 	 * Create new simple Message 
@@ -15,8 +24,8 @@ public class Message {
 	}
 	
 	//header
-	protected String usernameSender;
-	protected String usernameReceiver;
+	protected User sender;
+	protected User receiver;
 	protected int postId;
 	protected MessageType requestType;
 	
@@ -30,12 +39,12 @@ public class Message {
 		this.requestType = requestType;
 	}
 
-	public void setUsernameSender(String usernameSender) {
-		this.usernameSender = usernameSender;
+	public void setSender(User newSender) {
+		this.sender = newSender;
 	}
 
-	public void setUsernameReceiver(String usernameReceiver) {
-		this.usernameReceiver = usernameSender;
+	public void setReceiver(User newReceiver) {
+		this.receiver = newReceiver;
 	}
 
 	public void setPostId(int postId) {
@@ -59,12 +68,12 @@ public class Message {
 		return requestType;
 	}
 
-	public String getUsernameSender() {
-		return usernameSender;
+	public User getSender() {
+		return sender;
 	}
 
-	public String getUsernameReceiver() {
-		return usernameReceiver;
+	public User getReceiver() {
+		return receiver;
 	}
 
 	public int getPostId() {
