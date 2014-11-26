@@ -23,13 +23,13 @@ public class CryptographyParameters {
 	}
 	
 	//Note: not so "secure" on android 4.3 and lower.
-	private static SecureRandom secureRandom = new SecureRandom();
+	private final SecureRandom secureRandom = new SecureRandom();
 	
 	private KeyGenerator encryptionKeyGenerator;
 	
 	private KeyGenerator macKeyGenerator;
 	
-	private CryptographyParameters() {
+	CryptographyParameters() {
 		try {
 			encryptionKeyGenerator = KeyGenerator.getInstance(encryptionAlgorithm);
 			encryptionKeyGenerator.init(128, secureRandom);
@@ -70,7 +70,7 @@ public class CryptographyParameters {
 	}
 	
 	public static SecureRandom getRandom() {
-		return secureRandom;
+		return new SecureRandom();
 	}
 	
 	public static Cipher getCipher() {

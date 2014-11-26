@@ -9,21 +9,23 @@ import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseAccess;
 public class DBCredentialStorage implements CredentialStorage {
 
 	DatabaseAccess database;
+	CryptographyParameters parameters;
 	
-	DBCredentialStorage(DatabaseAccess db) {
+	public DBCredentialStorage(DatabaseAccess db) {
 		database = db;
+		parameters = new CryptographyParameters();
 	}
 	
 	@Override
 	public SecretKey getBroadcastEncryptionKey(UserId user) {
 		byte[] encryptionKey = database.getUserCredentials(user).broadcastEncryptionKey;
-		return CryptographyParameters.getInstance().decodeEncryptionKey(encryptionKey);
+		return parameters.decodeEncryptionKey(encryptionKey);
 	}
 
 	@Override
 	public SecretKey getBroadcastAuthenticationKey(UserId user) {
 		byte[] authenticationKey = database.getUserCredentials(user).broadcastAuthenticationKey;
-		return CryptographyParameters.getInstance().decodeEncryptionKey(authenticationKey);
+		return parameters.decodeEncryptionKey(authenticationKey);
 	}
 
 	@Override
