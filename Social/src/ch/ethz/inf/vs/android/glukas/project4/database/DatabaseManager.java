@@ -3,6 +3,7 @@ package ch.ethz.inf.vs.android.glukas.project4.database;
 import java.util.Date;
 import java.util.List;
 
+import ch.ethz.inf.vs.android.glukas.project4.BasicUser;
 import ch.ethz.inf.vs.android.glukas.project4.Post;
 import ch.ethz.inf.vs.android.glukas.project4.User;
 import ch.ethz.inf.vs.android.glukas.project4.UserCredentials;
@@ -33,71 +34,71 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 	private static final int DATABASE_VERSION = 1;
 
 	// DDL
-	/**
-	 * String containing SQL code to create table friends.
-	 * TODO: add integrity checks
-	 */
-	private static final String SQL_CREATE_FRIENDS = Utility.CREATE_TABLE + " " + FriendsEntry.TABLE_NAME + " (" 
-			+ FriendsEntry._ID + " " + Utility.INTEGER_TYPE + " PRIMARY KEY AUTOINCREMENT, "
-			// Index 0: user_id 
-			+ FriendsEntry.USER_ID + " " + Utility.BLOB_TYPE + ", "
-			// Index 1: friend_id
-			+ FriendsEntry.FRIEND_ID + " " + Utility.BLOB_TYPE
-			// Foreign keys references
-			+ Utility.FOREIGN_KEY + "(" + FriendsEntry.USER_ID + ")" + " " + Utility.REFERENCES + " " + UsersEntry.TABLE_NAME + "(" + UsersEntry.USER_ID + ")"
-				+ " " + Utility.ON_DELETE + " " + Utility.CASCADE
-			+ Utility.FOREIGN_KEY + "(" + FriendsEntry.FRIEND_ID + ")" + " " + Utility.REFERENCES + " " + UsersEntry.TABLE_NAME + "(" + UsersEntry.USER_ID + ")"
-				+ " " + Utility.ON_DELETE + " " + Utility.CASCADE
-			+ ");";
-	
-	/**
-	 * String containing SQL code to create table users.
-	 * TODO: add integrity checks and remaining columns
-	 */
-	private static final String SQL_CREATE_USERS = Utility.CREATE_TABLE + " " + UsersEntry.TABLE_NAME + " (" 
-			// Index 0: _id
-			+ UsersEntry._ID + " " + Utility.INTEGER_TYPE + " AUTOINCREMENT, "
-			// Index 1: user_id
-			+ UsersEntry.USER_ID + " " + Utility.BLOB_TYPE + " " + Utility.PRIMARY_KEY + " " + Utility.NOT_NULL + ", "
-			// Index 2: username
-			+ UsersEntry.USERNAME + " " + Utility.TEXT_TYPE + ");" + ", "
-			// Index 3: count
-			+ UsersEntry.COUNT + " " + Utility.INTEGER_TYPE + ", "
-			// Index 4: max
-			+ UsersEntry.MAX + " " + Utility.INTEGER_TYPE + ", "
-			// Index 5: broadcast_enc_key
-			+ UsersEntry.BROADCAST_ENC_KEY + " " + Utility.BLOB_TYPE + ", "
-			// Index 6: broadcast_auth_key
-			+ UsersEntry.BROADCAST_AUTH_KEY + " " + Utility.BLOB_TYPE + ", "
-			// Primary key
-			+ Utility.PRIMARY_KEY + " (" + UsersEntry.USER_ID + ")"
-			+ ");";
-	
-	/**
-	 * String containing SQL code to create table posts.
-	 * TODO: add integrity checks
-	 */
-	private static final String SQL_CREATE_POSTS = Utility.CREATE_TABLE + " " + PostsEntry.TABLE_NAME + " (" 
-			// Index 0: _id
-			+ PostsEntry._ID + " " + Utility.INTEGER_TYPE
-			// Index 1: poster_id
-			+ PostsEntry.POSTER_ID + " " + Utility.BLOB_TYPE + ", "
-			// Index 2: wall_id
-			+ PostsEntry.WALL_ID + " " + Utility.BLOB_TYPE + ", "
-			// Index 3: datetime
-			+ PostsEntry.DATE_TIME + " " + Utility.TEXT_TYPE + ", "
-			// Index 4: text
-			+ PostsEntry.TEXT + " " + Utility.TEXT_TYPE + ", "
-			// Index 5: image
-			+ PostsEntry.IMAGE + " " + Utility.BLOB_TYPE + ", "
-			// Primary key
-			+ Utility.PRIMARY_KEY + " (" + PostsEntry._ID + ", " + PostsEntry.WALL_ID + "),"
-			// Foreign key references
-			+ Utility.FOREIGN_KEY + "(" + PostsEntry.POSTER_ID + ")" + " " + Utility.REFERENCES + " " + UsersEntry.TABLE_NAME + "(" + UsersEntry.USER_ID + ") " 
-				 + Utility.ON_DELETE + " " + Utility.SET_NULL + ", "
-			+ Utility.FOREIGN_KEY + "(" + PostsEntry.WALL_ID + ")" + " " + Utility.REFERENCES + " " + UsersEntry.TABLE_NAME + "(" + UsersEntry.USER_ID + ") "
-				+ Utility.ON_DELETE + " " + Utility.CASCADE
-			+ ");";
+		/**
+		 * String containing SQL code to create table friends.
+		 * TODO: add integrity checks
+		 */
+		private static final String SQL_CREATE_FRIENDS = Utility.CREATE_TABLE + " " + FriendsEntry.TABLE_NAME + " (" 
+				+ FriendsEntry._ID + " " + Utility.INTEGER_TYPE + " PRIMARY KEY AUTOINCREMENT, "
+				// Index 0: user_id 
+				+ FriendsEntry.USER_ID + " " + Utility.BLOB_TYPE + ", "
+				// Index 1: friend_id
+				+ FriendsEntry.FRIEND_ID + " " + Utility.BLOB_TYPE + ", "
+				// Foreign keys references
+				+ Utility.FOREIGN_KEY + "(" + FriendsEntry.USER_ID + ")" + " " + Utility.REFERENCES + " " + UsersEntry.TABLE_NAME + "(" + UsersEntry.USER_ID + ")"
+					+ " " + Utility.ON_DELETE + " " + Utility.CASCADE + ", "
+				+ Utility.FOREIGN_KEY + "(" + FriendsEntry.FRIEND_ID + ")" + " " + Utility.REFERENCES + " " + UsersEntry.TABLE_NAME + "(" + UsersEntry.USER_ID + ")"
+					+ " " + Utility.ON_DELETE + " " + Utility.CASCADE
+				+ ");";
+		
+		/**
+		 * String containing SQL code to create table users.
+		 * TODO: add integrity checks and remaining columns
+		 */
+		private static final String SQL_CREATE_USERS = Utility.CREATE_TABLE + " " + UsersEntry.TABLE_NAME + " (" 
+				// Index 0: _id
+				+ UsersEntry._ID + " " + Utility.INTEGER_TYPE + ", "//" AUTOINCREMENT, "
+				// Index 1: user_id
+				+ UsersEntry.USER_ID + " " + Utility.BLOB_TYPE + ", "
+				// Index 2: username
+				+ UsersEntry.USERNAME + " " + Utility.TEXT_TYPE + ", "
+				// Index 3: count
+				+ UsersEntry.COUNT + " " + Utility.INTEGER_TYPE + ", "
+				// Index 4: max
+				+ UsersEntry.MAX + " " + Utility.INTEGER_TYPE + ", "
+				// Index 5: broadcast_enc_key
+				+ UsersEntry.BROADCAST_ENC_KEY + " " + Utility.BLOB_TYPE + ", "
+				// Index 6: broadcast_auth_key
+				+ UsersEntry.BROADCAST_AUTH_KEY + " " + Utility.BLOB_TYPE + ", "
+				// Primary key
+				+ Utility.PRIMARY_KEY + " (" + UsersEntry.USER_ID + ")"
+				+ ");";
+		
+		/**
+		 * String containing SQL code to create table posts.
+		 * TODO: add integrity checks
+		 */
+		private static final String SQL_CREATE_POSTS = Utility.CREATE_TABLE + " " + PostsEntry.TABLE_NAME + " (" 
+				// Index 0: _id
+				+ PostsEntry._ID + " " + Utility.INTEGER_TYPE + ", "
+				// Index 1: poster_id
+				+ PostsEntry.POSTER_ID + " " + Utility.BLOB_TYPE + ", "
+				// Index 2: wall_id
+				+ PostsEntry.WALL_ID + " " + Utility.BLOB_TYPE + ", "
+				// Index 3: datetime
+				+ PostsEntry.DATE_TIME + " " + Utility.TEXT_TYPE + ", "
+				// Index 4: text
+				+ PostsEntry.TEXT + " " + Utility.TEXT_TYPE + ", "
+				// Index 5: image
+				+ PostsEntry.IMAGE + " " + Utility.BLOB_TYPE + ", "
+				// Primary key
+				+ Utility.PRIMARY_KEY + " (" + PostsEntry._ID + ", " + PostsEntry.WALL_ID + "), "
+				// Foreign key references
+				+ Utility.FOREIGN_KEY + " (" + PostsEntry.POSTER_ID + ")" + " " + Utility.REFERENCES + " " + UsersEntry.TABLE_NAME + "(" + UsersEntry.USER_ID + ") " 
+					 + Utility.ON_DELETE + " " + Utility.SET_NULL + ", "
+				+ Utility.FOREIGN_KEY + " (" + PostsEntry.WALL_ID + ")" + " " + Utility.REFERENCES + " " + UsersEntry.TABLE_NAME + "(" + UsersEntry.USER_ID + ") "
+					+ Utility.ON_DELETE + " " + Utility.CASCADE
+				+ ");";
 
 	// CREATION
 	public DatabaseManager(Context context) {
@@ -135,7 +136,7 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 	
 	@Override
 	// Get the user object from the database.
-	public User getUser(){
+	public User getUser() {
 		return Users.getUser(this.getReadableDatabase());
 	}
 
@@ -231,20 +232,22 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 		Friends.updateFriendMaxPostsId(newMaxPostsId, id, this.getWritableDatabase());
 	}
 
-	// TODO: 
+	// TODO: Get the friend user
 	@Override
 	public User getFriend(UserId id) {
 		return null;
 	}
 	
+	// TODO: set friend's list
 	@Override
-	public void setFriends(UserId user, List<UserId> friends) {
+	public void setFriendsList(UserId user, List<BasicUser> friends) {
 		// TODO Auto-generated method stub
 		
 	}
 
+	// only ids and usernames
 	@Override
-	public List<UserId> getFriends(UserId id) {
+	public List<BasicUser> getFriendsList(UserId id) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -329,5 +332,6 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 		Walls.deleteFriendWall(friendid, this.getWritableDatabase());
 	}
 
+	
 
 }

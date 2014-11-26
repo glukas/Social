@@ -25,8 +25,6 @@ class Users {
 		// Get data.
 		UserId id = user.getId();
 		String username = user.getUsername();
-		int count = user.getPostsCount();
-		int max = user.getMaxId();
 		byte[] encryption_key = user.getCredentials().broadcastEncryptionKey;
 		byte[] authentication_key = user.getCredentials().broadcastAuthenticationKey;
 		
@@ -34,8 +32,6 @@ class Users {
 		ContentValues values = new ContentValues();
 		values.put(UsersEntry.USER_ID, Utility.toSQLiteId(id));
 		values.put(UsersEntry.USERNAME, username);
-		values.put(UsersEntry.COUNT, count);
-		values.put(UsersEntry.MAX, max);
 		values.put(UsersEntry.BROADCAST_ENC_KEY, encryption_key);
 		values.put(UsersEntry.BROADCAST_AUTH_KEY, authentication_key);
 
@@ -92,6 +88,7 @@ class Users {
 		Friends.updateFriendMaxPostsId(newMax, Utility.userID, db);
 	}
 	
+	// TODO: join tables to get username
 	// Get the user's list of friends (with only ids)
 	public static List<User> getUserFriends(SQLiteDatabase db) {
 		//
@@ -106,16 +103,16 @@ class Users {
 		
 		List<User> friends = new ArrayList<User>();
 		
-		if(cursor.moveToFirst()) {
-			while(!cursor.isAfterLast()) {
-				friends.add(new User(new UserId(cursor.getBlob(0))));
-				cursor.moveToNext();
-			}
-			cursor.close();
-			return friends;
-		} else {
-			cursor.close();
+//		if(cursor.moveToFirst()) {
+//			while(!cursor.isAfterLast()) {
+//				friends.add(new Friend(new UserId(cursor.getBlob(0))));
+//				cursor.moveToNext();
+//			}
+//			cursor.close();
+//			return friends;
+//		} else {
+//			cursor.close();
 			return null;
-		}
+//		}
 	}
 }

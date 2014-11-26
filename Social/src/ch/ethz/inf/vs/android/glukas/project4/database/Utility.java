@@ -56,7 +56,7 @@ class Utility {
 	 */
 	public static final byte[] toByteArray(Bitmap bitmapImage) {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		bitmapImage.compress(Bitmap.CompressFormat.PNG, 100, bos);	// TODO: adapt quality (second parameter)
+		bitmapImage.compress(Bitmap.CompressFormat.JPEG, 100, bos);	// TODO: adapt quality (second parameter)
 		return bos.toByteArray();
 	}
 	

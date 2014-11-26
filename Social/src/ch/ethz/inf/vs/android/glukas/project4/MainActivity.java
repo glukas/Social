@@ -44,7 +44,7 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 	private void createNextRequest() {
 		//TODO (Vincent?/Young?/Samuel?) replace with this device's user
 		UserId dummyId = new UserId("1");
-		nextRequest = new FriendshipRequest(new User(dummyId, "Alice", null, null, ZeroCredentialStorage.constantCredentials.getUserCredentials(dummyId)));
+		nextRequest = new FriendshipRequest(new User(dummyId, "Alice", ZeroCredentialStorage.constantCredentials.getUserCredentials(dummyId)));
 		nfcAdapter.setNdefPushMessageCallback(nextRequest, this);
 		nfcAdapter.setOnNdefPushCompleteCallback(this, this);
 	}

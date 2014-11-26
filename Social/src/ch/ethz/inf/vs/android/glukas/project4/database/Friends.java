@@ -180,7 +180,7 @@ class Friends {
 			byte[] auth_key = cursor.getBlob(6);
 			UserCredentials credentials = new UserCredentials(id, enc_key, auth_key);
 			cursor.close();
-			return new User(id, username, null, null, credentials, count, max);
+			return new User(id, username, credentials);
 		} else {
 			cursor.close();
 			return null;

@@ -93,7 +93,7 @@ public abstract class FriendshipMessage implements CreateNdefMessageCallback {
 		communicationHandle = records[1].getPayload();
 		UserId senderId = new UserId(records[2].getPayload());
 		UserCredentials credentials = new UserCredentials(senderId, records[3].getPayload(), records[4].getPayload());
- 		sender = new User(senderId, username, null, null, credentials);
+ 		sender = new User(senderId, username, credentials);
 	}
 	
 	@Override

@@ -1,6 +1,8 @@
 package ch.ethz.inf.vs.android.glukas.project4.database;
 
 import java.util.List;
+
+import ch.ethz.inf.vs.android.glukas.project4.BasicUser;
 import ch.ethz.inf.vs.android.glukas.project4.Post;
 import ch.ethz.inf.vs.android.glukas.project4.User;
 import ch.ethz.inf.vs.android.glukas.project4.UserCredentials;
@@ -113,7 +115,7 @@ public interface DatabaseAccess {
 	 * @param id1 the id of the friend (128 bits)
 	 * @param id2
 	 */
-	public void setFriends(UserId user, List<UserId> friends);
+	public void setFriendsList(UserId user, List<BasicUser> friends);
 	
 	/**
 	 * Get a list of all friends of the friend with id.
@@ -121,7 +123,7 @@ public interface DatabaseAccess {
 	 * @return List of UserIds of a the friends of the user with id 'id'
 	 * 	       These friends need not necessarily be common friends.
 	 */
-	public List<UserId> getFriends(UserId id);
+	public List<BasicUser> getFriendsList(UserId id);
 	
 	/**
 	 * Get an user name from an user id

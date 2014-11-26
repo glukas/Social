@@ -1,7 +1,7 @@
 /**
  * The package contains all necessary classes to manage and interact with the database.
  * In order to use the provided functionalities only the class DatabaseManeger should be instantiated.
- * Furthermore the 
+ * 
  * 
  * FIXME: DATABASE INFORMATIONS:
  * The database is composed of 3 tables:

@@ -8,26 +8,14 @@ import android.util.Pair;
 /**
  * This class represents a chat user.
  */
-public class User {
-
-	private UserId id;
-	private String username;
-	private Wall wall;
-	private List<User> friends;
+public class User extends BasicUser {
 	
 	private UserCredentials credentials;
-	// Number of posts (partial order)
-	private int postsCount;
-	// Max post id
-	private int maxId;
 	
 	// Extra stuff. For the moment, I propose that we just ignore extra stuff.
 	// It will be easy to add specialties on the top of everything.
 	// int age;
 
-	public User(UserId id) {
-		this.id = id;
-	}
 	/**
 	 * Construct a new User
 	 * @param id
@@ -35,32 +23,10 @@ public class User {
 	 * @param wall
 	 * @param friends
 	 */
-	public User(UserId id, String username, Wall wall, List<User> friends) {
-		this.id = id;
-		this.username = username;
-		this.wall = wall;
-		this.friends = friends;
-		this.credentials = null;
-	}
-	
-	public User(UserId id, String username, Wall wall, List<User> friends, UserCredentials credentials) {
-		this.id = id;
-		this.username = username;
-		this.wall = wall;
-		this.friends = friends;
+	public User(UserId id, String username, UserCredentials credentials) {
+		super(id, username);
 		this.credentials = credentials;
 	}
-	
-	public User(UserId id, String username, Wall wall, List<User> friends, UserCredentials credentials, int postsCount, int maxId) {
-		this.id = id;
-		this.username = username;
-		this.wall = wall;
-		this.friends = friends;
-		this.credentials = credentials;
-		this.postsCount = postsCount;
-		this.maxId = maxId;
-	}
-	
 	
 	// Getters.
 	public UserId getId() {
@@ -71,35 +37,8 @@ public class User {
 	public String getUsername() {
 		return username;
 	}
-	
-	public Wall getWall() {
-		return wall;
-	}
-	
-	public List<User> getFriends() {
-		return friends;
-	}
 
 	public UserCredentials getCredentials() {
 		return credentials;
-	}
-	
-	public int getPostsCount() {
-		return postsCount;
-	}
-	
-	public int getMaxId() {
-		return maxId;
-	}
-	
-	// Setters.
-	// TODO: add, but only for fields that can be modified!
-	
-	public void setPostsCount(int newCount) {
-		this.postsCount = newCount;
-	}
-	
-	public void setMaxId(int newMax) {
-		this.maxId = newMax;
 	}
 }
