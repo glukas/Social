@@ -24,33 +24,7 @@ public class Post {
 	private Date datetime;
 	// Id of the user that posted the message
 	private UserId poster;
-
-	/**
-	 * Create new Image Post
-	 * @param text
-	 * @param image
-	 * @param datetime
-	 */
-	public Post(String text, Bitmap image, Date datetime, Wall wall) {
-		// TODO : ask Alessio if he can writes static methods for getMaxId and getNumPosts
-		this.id = -1;
-		this.text = text;
-		this.image = image;
-		this.datetime = datetime;
-	}
-	
-	/**
-	 * Create new Text Post
-	 * @param text
-	 * @param datetime
-	 */
-	public Post(String text, Date datetime, Wall wall) {
-		// TODO : ask Alessio if he can writes static methods for getMaxId and getNumPosts
-		this.id = -1;
-		this.text = text;
-		this.image = null;
-		this.datetime = datetime;
-	}
+	private PostType type;
 	
 	/**
 	 * Create new Post. This constructor is used by the database to retrieve some already stored
@@ -63,6 +37,11 @@ public class Post {
 	public Post(int id, UserId Poster, String text, Bitmap image, Date datetime) {
 		this.id = id;
 		this.text = text;
+		if (image == null) {
+			type = PostType.PICTURE;
+		} else {
+			type = PostType.TEXT;
+		}
 		this.image = image;
 		this.datetime = datetime;
 	}
@@ -98,8 +77,11 @@ public class Post {
 	}
 	
 	public Bitmap getImage() {
-		//TODO : lazy initialization (Vincent & Young)
-		return this.image;
+		if (type.equals(PostType.TEXT)){
+			return null;
+		} else {
+			return image;
+		}
 	}
 	
 	public Date getDateTime() {
@@ -108,5 +90,17 @@ public class Post {
 	
 	public  UserId getPoster() {
 		return this.poster;
+	}
+	
+	public PostType getType() {
+		return type;
+	}
+
+	/**
+	 * Used to differentiate between different kinds of posts
+	 */
+	public enum PostType{
+		PICTURE,
+		TEXT;
 	}
 }

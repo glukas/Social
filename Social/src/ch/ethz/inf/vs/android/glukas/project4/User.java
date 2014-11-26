@@ -1,10 +1,5 @@
 package ch.ethz.inf.vs.android.glukas.project4;
 
-import java.util.List;
-
-
-import android.util.Pair;
-
 /**
  * This class represents a chat user.
  */

@@ -58,6 +58,7 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate,
 		secureChannel.setDelegate(this);
 		messageRelay.setDelegate(this);
 		localUser = database.getUser();
+		sender = new Sender(secureChannel);
 	}
 
 	////
@@ -69,6 +70,7 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate,
 	private MessageRelay messageRelay;
 	private UserDelegate userHandler;
 	private DatabaseAccess database;
+	private Sender sender;
 
 	private User localUser;
 	
@@ -122,13 +124,14 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate,
 		if (listUserId.size() > 1) {
 			new DatabaseException().printStackTrace();
 		}
+		//retrieve data already known from database
+		
+		//ask distant user if already all messages are in database
 		Message msg = new Message(MessageType.GET_STATE);
-
-		PublicHeader header = new PublicHeader(0, null,
-				StatusByte.DATA.getByte(), 0, localUser.getId(), listUserId.get(0));
-
-		secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory
-				.createJSONObject(msg, 0).toString(), header));
+		PublicHeader header = new PublicHeader(0, null, StatusByte.DATA.getByte(), 0, localUser.getId(), listUserId.get(0));
+		sender.addMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg, 0).toString(), header));
+		
+		//TODO find mechanism to notify that we are now waiting on state of the user
 	}
 
 	@Override
@@ -233,7 +236,7 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate,
 	
 	private void onGetPostsReceived(Message msg) {
 		List<Post> listPost = database.getAllFriendPostsFrom(localUser.getId(), msg.getId());
-		//TODO : send all posts of this listPost
+		sender.addPostsAsync(listPost, localUser, msg.getSender(), true);
 	}
 	
 	private void onShowImageReceived(Message msg) {
@@ -275,7 +278,7 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate,
 		String msgToSend = JSONObjectFactory.createJSONObject(new Message(localUser, userToSend, maxPostId, maxNumMsgs)).toString();
 		PublicHeader header = new PublicHeader(0, null, StatusByte.SEND.getByte(), 0, localUser.getId(), userToSend.getId());
 		//send reply
-		secureChannel.sendMessage(new NetworkMessage(msgToSend, header));
+		sender.addMessage(new NetworkMessage(msgToSend, header));
 	}
 	
 	//unexpected messages

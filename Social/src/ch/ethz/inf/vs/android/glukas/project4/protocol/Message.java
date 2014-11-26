@@ -1,6 +1,8 @@
 package ch.ethz.inf.vs.android.glukas.project4.protocol;
 
+import ch.ethz.inf.vs.android.glukas.project4.Post;
 import ch.ethz.inf.vs.android.glukas.project4.User;
+import ch.ethz.inf.vs.android.glukas.project4.Post.PostType;
 
 /**
  * A Message used by the protocol send over the network. (Either by the user or received from outside world)
@@ -29,6 +31,30 @@ public class Message {
 		this.requestType = MessageType.SEND_STATE;
 		this.id = id;
 		this.numM = numM;
+	}
+	
+	
+	public Message(Post post, User receiver, User sender, boolean isSend){
+		this.sender = sender;
+		this.receiver = receiver;
+		postId = post.getId();
+		message = post.getText();
+		id = post.getId();
+		if (isSend) {
+			if (post.getType().equals(PostType.PICTURE)){
+				requestType = MessageType.SEND_PICTURE;
+				httpLink = post.getImageLink();
+			} else {
+				requestType = MessageType.SEND_TEXT;
+			}
+		} else {
+			if (post.getType().equals(PostType.PICTURE)){
+				requestType = MessageType.POST_PICTURE;
+				httpLink = post.getImageLink();
+			} else {
+				requestType = MessageType.POST_TEXT;
+			}
+		}
 	}
 	
 	/**
