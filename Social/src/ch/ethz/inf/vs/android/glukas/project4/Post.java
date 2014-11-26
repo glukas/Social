@@ -1,6 +1,10 @@
 package ch.ethz.inf.vs.android.glukas.project4;
 
 import java.util.Date;
+
+import ch.ethz.inf.vs.android.glukas.project4.exceptions.UnknowRequestType;
+import ch.ethz.inf.vs.android.glukas.project4.protocol.Message;
+import ch.ethz.inf.vs.android.glukas.project4.protocol.Message.MessageType;
 import android.graphics.Bitmap;
 
 /**
@@ -13,6 +17,7 @@ public class Post {
 	// It would be nice if we can manage to have multiple images per post. But maybe it make things to 
 	// complicate
 	private Bitmap image;
+	private String imageLink;
 	//the id is crucial for sorting.
 	private int id;
 	//date will not be used for sorting, but can provide friendly user content
@@ -62,7 +67,28 @@ public class Post {
 		this.datetime = datetime;
 	}
 	
+	public Post(Message msg, int id) {
+		MessageType type = msg.getRequestType();
+		if (type.equals(MessageType.POST_PICTURE)) {
+			this.id = msg.getId();
+			this.text = msg.getMessage();
+			this.image = null;
+			this.imageLink = msg.getHttpLink();
+		} else if (type.equals(MessageType.POST_TEXT)) {
+			this.id = msg.getId();
+			this.text = msg.getMessage();
+			this.image = null;
+			this.imageLink = null;
+		} else {
+			throw new UnknowRequestType(type);
+		}
+	}
+	
 	// Getters.
+	public String getImageLink() {
+		return this.imageLink;
+	}
+	
 	public int getId() {
 		return this.id;
 	}
@@ -72,13 +98,13 @@ public class Post {
 	}
 	
 	public Bitmap getImage() {
+		//TODO : lazy initialization (Vincent & Young)
 		return this.image;
 	}
 	
 	public Date getDateTime() {
 		return this.datetime;
 	}
-	
 	
 	public  UserId getPoster() {
 		return this.poster;

@@ -20,7 +20,6 @@ public class PublicHeader {
 	 */
 	public static final int BYTES_LENGTH_HEADER = 44;
 	
-
 	/**
 	 * Construct a new PublicHeader from explicit arguments
 	 * 

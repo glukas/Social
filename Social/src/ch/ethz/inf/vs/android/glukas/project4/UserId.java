@@ -31,7 +31,9 @@ public class UserId {
 	 */
 	public byte[] getBytes() {
 		byte[] array = id.toByteArray();
+		//if the array provided by BigInteger is less than 16 bytes, extend this array
 		if (array.length < LENGTH){
+			//extend with zero if integer is non-negative, else with 1. (Two's complement)
 			byte extendByte = (array[0] < 0 ? (byte)0xff : new Byte("0"));
 			byte[] tmp = new byte[LENGTH];
 			for (int i = 0; i < LENGTH; i++){

@@ -16,6 +16,22 @@ public class Message {
 	}
 	
 	/**
+	 * Create a new Message of type SEND_STATE
+	 * @param sender
+	 * @param receiver
+	 * @param type
+	 * @param id
+	 * @param numM
+	 */
+	public Message(User sender, User receiver, int id, int numM) {
+		this.sender = sender;
+		this.receiver = receiver;
+		this.requestType = MessageType.SEND_STATE;
+		this.id = id;
+		this.numM = numM;
+	}
+	
+	/**
 	 * Create new simple Message 
 	 * @param type of the message. (Should only be subset of all types)
 	 */
@@ -26,15 +42,15 @@ public class Message {
 	//header
 	protected User sender;
 	protected User receiver;
-	protected int postId;
+	protected int postId = 0;
 	protected MessageType requestType;
 	
 	//content
-	protected String httpLink;
-	protected String message;
-	protected String username;
-	protected int id;
-	protected int numM;
+	protected String httpLink = "";
+	protected String message = "";
+	protected String username = "";
+	protected int id = 0;
+	protected int numM = 0;
 	
 	////
 	//Getters and Setters
@@ -110,6 +126,31 @@ public class Message {
 
 	public void setNumM(int numM) {
 		this.numM = numM;
+	}
+	
+	@Override
+	public String toString() {
+		if (sender != null) {
+			if (receiver != null){
+				return "Message of "+sender.getUsername()+" ("+sender.getId()+") received by "+receiver.getUsername()+" ("+receiver.getId()+
+						" )"+" with content : "+"(LINK)"+httpLink+" (MESSAGE) "+message+" (USERNAME)"+username+" (ID)"+id+
+						" (NUM_M)"+numM;
+			} else {
+				return "Message of "+sender.getUsername()+" ("+sender.getId()+") received by UNKNOWN with content : "
+						+"(LINK)"+httpLink+" (MESSAGE) "+message+" (USERNAME)"+username+" (ID)"+id+
+						" (NUM_M)"+numM;
+			}
+		} else {
+			if (receiver != null){
+				return "Message of UNKNOWN received by "+receiver.getUsername()+" ("+receiver.getId()+
+						" )"+" with content : "+"(LINK)"+httpLink+" (MESSAGE) "+message+" (USERNAME)"+username+" (ID)"+id+
+						" (NUM_M)"+numM;
+			} else {
+				return "Message of UNKNOWN received by UNKNOWN"+
+						" with content : "+"(LINK)"+httpLink+" (MESSAGE) "+message+" (USERNAME)"+username+" (ID)"+id+
+						" (NUM_M)"+numM;
+			}
+		}
 	}
 
 	/**
