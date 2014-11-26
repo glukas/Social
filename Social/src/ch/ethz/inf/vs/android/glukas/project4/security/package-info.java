@@ -49,8 +49,8 @@
  *       Public-key signatures are done using RSA-SHA256 ("Hash and Sign")
  *       The public keys are 2^11 bits (so a key pair has size 2^12 and both pairs have size 2^13).
  * 
- * 		 Private key encryption is done by combining a AES-256 in CBC mode and a HMAC based on SHA256 ("Encrypt-then-Authenticate")
- * 		 So a private key is 256 bits, and the a key pair is 512 bits.
+ * 		 Private key encryption is done by combining a AES-128 in CBC mode (PKCS7Padding padding) and a HMAC based on SHA256 in an "Encrypt-then-Authenticate" fashion.
+ * 		 So a private key is 128 or 256 bits, and a key pair is 128+256 bits.
  * 
  * (I)   Key exchange in physical proximity:
  *  
