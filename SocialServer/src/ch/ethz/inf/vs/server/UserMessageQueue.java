@@ -6,23 +6,22 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.PriorityQueue;
 
+import ch.ethz.inf.vs.android.glukas.project4.UserId;
+
 public class UserMessageQueue {
 	
-	private BigInteger recipient;
+	private UserId recipient;
 	private PriorityQueue<Message> messages = new PriorityQueue<Message>();
-	
-	public UserMessageQueue(BigInteger user){
-		this.recipient = user;
-	}
+
 	
 	public UserMessageQueue(Message m){
-		this.recipient = m.getRecipient();
+		this.recipient = m.getHeader().getReceiver();
 		this.messages.add(m);
 	}
 	
 	public UserMessageQueue(byte[] bytes){
 		Message m = new Message(bytes);
-		this.recipient = m.getRecipient();
+		this.recipient = m.getHeader().getReceiver();
 		this.messages.add(m);
 	}
 	
@@ -33,7 +32,7 @@ public class UserMessageQueue {
 		Iterator<Message> it = messages.iterator();
 		while(it.hasNext()){
 			Message next = it.next();
-			if(next.getClock() >= since.getClock()){
+			if(next.getHeader().getMessageId() >= since.getHeader().getMessageId()){
 				list.add(next);
 			} else {
 				break;
@@ -44,7 +43,7 @@ public class UserMessageQueue {
 	
 	public void addMessage(Message m){
 		//Only add if its really the right recipient
-		if(m.getRecipient() == recipient){
+		if(m.getHeader().getReceiver().getId() == recipient.getId()){
 			messages.add(m);
 		}
 	}
