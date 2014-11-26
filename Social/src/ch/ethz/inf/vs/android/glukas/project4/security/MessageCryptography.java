@@ -88,13 +88,16 @@ public class MessageCryptography {
 	}
 	
 	NetworkMessage decryptPost(byte[] message) {
+		int headerAndMacLength = PublicHeader.BYTES_LENGTH_HEADER+mac.getMacLength();
+	
+		if (message.length < headerAndMacLength) return null;//Too short message to be legal
+		
 		ByteBuffer messageBytes = ByteBuffer.wrap(message);
 		//extract public header to get sender & recipient
 		PublicHeader header = new PublicHeader(messageBytes);
 		SecretKey encryptionKey = keyStore.getBroadcastEncryptionKey(header.getReceiver());
 		SecretKey authenticationKey = keyStore.getBroadcastAuthenticationKey(header.getReceiver());
 		
-		int headerAndMacLength = PublicHeader.BYTES_LENGTH_HEADER+mac.getMacLength();
 		byte[] textBytes = null;
 		try {
 			//Authenticate

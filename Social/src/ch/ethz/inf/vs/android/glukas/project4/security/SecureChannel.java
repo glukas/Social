@@ -7,6 +7,12 @@ import ch.ethz.inf.vs.android.glukas.project4.networking.AsyncServerDelegate;
 import ch.ethz.inf.vs.android.glukas.project4.networking.MessageRelay;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.PublicHeader;
 
+/**
+ * Note this class is not thread safe.
+ * Any method call should occur on the thread that instanciated this object.
+ * @author lukas
+ *
+ */
 public class SecureChannel implements AsyncServerDelegate {
 
 	private SecureChannelDelegate secureChannelDelegate;

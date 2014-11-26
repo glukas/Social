@@ -19,32 +19,59 @@ import junit.framework.TestCase;
 
 public class MessageCryptographyTest3 extends TestCase {
 
-	public void testDecOfEncIsSame() throws UnsupportedEncodingException {
-		
+	MessageCryptography crypto;
+	
+	public void setUp() {
 		CredentialStorage store = new ZeroCredentialStorage();
 		Cipher cipher = CryptographyParameters.getCipher();
 		SecureRandom rand = CryptographyParameters.getRandom();
 		Mac mac = CryptographyParameters.getMac();
 		
-		MessageCryptography crypto = new MessageCryptography(store, mac, cipher, rand);
-		
-		String text = "123-abc-ABC";
+		crypto = new MessageCryptography(store, mac, cipher, rand);
+	}
+	
+	public void testDecOfEncIsSame() {
+		String [] texts = {"", "1", "123-abc-ABC", "ak3icj jeoo!!!-. asdrji312950söfvv  öö..,äüpüjjd iieodo     8873jjjtoiuh<<<<<<"};
+		for (String text : texts) {
+			correctnessTest(text);
+		}
+	}
+	
+	public void correctnessTest(String text) {
 		PublicHeader header = new PublicHeader(0, new byte[3], (byte) 0, 0, new UserId("0"), new UserId("1"));
-		assertTrue(header.getbytes().length == PublicHeader.BYTES_LENGTH_HEADER);
-		assertTrue(new PublicHeader(ByteBuffer.wrap(header.getbytes())).getbytes().length == PublicHeader.BYTES_LENGTH_HEADER);
-		//assertEquals(new PublicHeader(ByteBuffer.wrap(header.getbytes())).getbytes(), header.getbytes());
+		//assertTrue(header.getbytes().length == PublicHeader.BYTES_LENGTH_HEADER);
+		//assertTrue(new PublicHeader(ByteBuffer.wrap(header.getbytes())).getbytes().length == PublicHeader.BYTES_LENGTH_HEADER);
+		//assertTrue(Arrays.equals(new PublicHeader(ByteBuffer.wrap(header.getbytes())).getbytes(), header.getbytes()));
 		NetworkMessage message = new NetworkMessage(text, header);
 		byte[] crypted = crypto.encryptPost(message);
-		assertTrue(crypted.length > 0);
+		assertTrue(crypted.length >= PublicHeader.BYTES_LENGTH_HEADER);
 		
 		NetworkMessage decrypted = crypto.decryptPost(crypted);
 		assertNotNull(decrypted);
 		assertTrue(decrypted.header.getbytes().length == PublicHeader.BYTES_LENGTH_HEADER);
 		
-		//assertEquals(header.getbytes(), decrypted.header.getbytes());
+		assertTrue(Arrays.equals(header.getbytes(),decrypted.header.getbytes()));
 		assertEquals(text, decrypted.text);
-		
 	}
 	
+	public void testAuthFailsGracefullyForTooShortMessages() {
+		byte[] crypted = {0, 1, 2, 0, 0};
+		assertNull(crypto.decryptPost(crypted));
+		
+		crypted = new byte[PublicHeader.BYTES_LENGTH_HEADER-1];
+		assertNull(crypto.decryptPost(crypted));
+	}
+	
+	public void testAuthFailsForWrongMac() {
+		
+		String text = "abc-def-ghi-890";
+		
+		PublicHeader header = new PublicHeader(0, new byte[3], (byte) 0, 0, new UserId("-10"), new UserId("-11"));
+		NetworkMessage message = new NetworkMessage(text, header);
+		byte[] crypted = crypto.encryptPost(message);
+		crypted[PublicHeader.BYTES_LENGTH_HEADER] = 1;
+		assertNull(crypto.decryptPost(crypted));
+		
+	}
 	
 }
