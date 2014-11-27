@@ -113,6 +113,10 @@ public class PublicHeader {
 		this.length = length;
 	}
 	
+	////
+	// Public methods
+	////
+	
 	/**
 	 * Returns the header as byte array
 	 */
@@ -127,5 +131,17 @@ public class PublicHeader {
 		buf.put(sender.getBytes());
 		buf.put(receiver.getBytes());
 		return buf.array();
+	}
+	
+	/**
+	 * Indicates if the header is a header of a server status message
+	 * @return boolean value
+	 */
+	public boolean isServerStatusMessage() {
+		StatusByte status = StatusByte.constructStatusByte(consistency);
+		if (status.equals(StatusByte.CONNECT) || status.equals(StatusByte.DISCONNECT)) {
+			return true;
+		}
+		return false;
 	}
 }

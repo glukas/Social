@@ -29,48 +29,41 @@ public class JSONObjectFactory {
 		JSONObject obj = new JSONObject();
 		
 		try {
-			// Server
-		if (request.getRequestType().equals(MessageType.CONNECT)) {
-			setConnectObj(request, obj);
-		} else if (request.getRequestType().equals(MessageType.DISCONNECT)) {
-			setDisconnectObj(request, obj);
-
 			// Friends
-		} else if (request.getRequestType().equals(MessageType.SEARCH_USER)) {
-			setSearchUserObj(request, obj);
-		} else if (request.getRequestType().equals(MessageType.ACCEPT_FRIENDSHIP)) {
-			setAcceptFriendshipObj(request, obj);
-		} else if (request.getRequestType().equals(MessageType.REFUSE_FRIENDSHIP)) {
-			setRefuseFriendshipObj(request, obj);
-		} else if (request.getRequestType().equals(MessageType.ASK_FRIENDSHIP)) {
-			setAskFriendshipObj(request, obj);
-		} else if (request.getRequestType().equals(MessageType.BROADCAST)) {
-			setBroadCastObj(request, obj);
-
-			// Post new messages
-		} else if (request.getRequestType().equals(MessageType.POST_PICTURE)) {
-			setPostPictureObj(request, obj);
-		} else if (request.getRequestType().equals(MessageType.POST_TEXT)) {
-			setPostTextObj(request, obj);
-		} else if (request.getRequestType().equals(MessageType.ACK_POST)) {
-			setAckPostObj(request, obj);
-
-			// Retrieve data
-		} else if (request.getRequestType().equals(MessageType.GET_POSTS)) {
-			setGetPostsObj(request, obj);
-		} else if (request.getRequestType().equals(MessageType.SHOW_IMAGE)) {
-			setShowImageObj(request, obj);
-		} else if (request.getRequestType().equals(MessageType.SEND_PICTURE)) {
-			setSendPictureObj(request, obj);
-		} else if (request.getRequestType().equals(MessageType.SEND_TEXT)) {
-			setSendTextObj(request, obj);
-		} else if (request.getRequestType().equals(MessageType.GET_STATE)) {
-			setGetStateObj(request, obj);
-
-			// In case of Unknown message
-		} else {
-				throw new UnknowRequestType(request.getRequestType());
+			if (request.getRequestType().equals(MessageType.SEARCH_USER)) {
+				setSearchUserObj(request, obj);
+			} else if (request.getRequestType().equals(MessageType.ACCEPT_FRIENDSHIP)) {
+				setAcceptFriendshipObj(request, obj);
+			} else if (request.getRequestType().equals(MessageType.REFUSE_FRIENDSHIP)) {
+				setRefuseFriendshipObj(request, obj);
+			} else if (request.getRequestType().equals(MessageType.ASK_FRIENDSHIP)) {
+				setAskFriendshipObj(request, obj); 
+			
+				// Post new messages
+			} else if (request.getRequestType().equals(MessageType.POST_PICTURE)) {
+				setPostPictureObj(request, obj);
+			} else if (request.getRequestType().equals(MessageType.POST_TEXT)) {
+				setPostTextObj(request, obj);
+			} else if (request.getRequestType().equals(MessageType.ACK_POST)) {
+				setAckPostObj(request, obj);
+	
+				// Retrieve data
+			} else if (request.getRequestType().equals(MessageType.GET_POSTS)) {
+				setGetPostsObj(request, obj);
+			} else if (request.getRequestType().equals(MessageType.SHOW_IMAGE)) {
+				setShowImageObj(request, obj);
+			} else if (request.getRequestType().equals(MessageType.SEND_PICTURE)) {
+				setSendPictureObj(request, obj);
+			} else if (request.getRequestType().equals(MessageType.SEND_TEXT)) {
+				setSendTextObj(request, obj);
+			} else if (request.getRequestType().equals(MessageType.GET_STATE)) {
+				setGetStateObj(request, obj);
+	
+				// In case of Unknown message
+			} else {
+					throw new UnknowRequestType(request.getRequestType());
 			}
+			
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
@@ -98,18 +91,6 @@ public class JSONObjectFactory {
 	}
 
 	////
-	// Server Message Setters
-	////
-
-	private static void setConnectObj(Message request, JSONObject obj) throws JSONException {
-		obj.put(Cmds.CMD.getStr(), Args.CONNECT.getStr());
-	}
-
-	private static void setDisconnectObj(Message request, JSONObject obj) throws JSONException {
-		obj.put(Cmds.CMD.getStr(), Args.DISCONNECT.getStr());
-	}
-
-	////
 	// Friends Message Setters
 	////
 
@@ -134,11 +115,6 @@ public class JSONObjectFactory {
 	private static void setAskFriendshipObj(Message request, JSONObject obj) throws JSONException {
 		obj.put(Cmds.CMD.getStr(), Args.ASK_FRIEND.getStr());
 		obj.put(Cmds.FROM.getStr(), request.getSender().getUsername());
-	}
-
-	private static void setBroadCastObj(Message request, JSONObject obj) throws JSONException {
-		obj.put(Cmds.CMD.getStr(), Args.BROADCAST.getStr());
-		obj.put(Cmds.USER.getStr(), request.getSender().getUsername());
 	}
 
 	////
@@ -192,6 +168,7 @@ public class JSONObjectFactory {
 
 	private static void setGetPostsObj(Message request, JSONObject obj) throws JSONException {
 		obj.put(Cmds.CMD.getStr(), Args.GET_POSTS.getStr());
+		obj.put(Cmds.ID.getStr(), request.getId());
 	}
 
 	private static void setShowImageObj(Message request, JSONObject obj) {

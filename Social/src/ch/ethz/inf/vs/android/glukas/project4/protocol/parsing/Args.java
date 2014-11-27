@@ -10,7 +10,6 @@ public enum Args{
 	GET_POSTS("getPosts"),
 	POST_TXT("postText"),
 	POST_PIC("postPicture"),
-	BROADCAST("broadcast"),
 	SEARCH("search"),
 	ACK("acknowledge"),
 	REP_FRIEND("replyFriendship"),

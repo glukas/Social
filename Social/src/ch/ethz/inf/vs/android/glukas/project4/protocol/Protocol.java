@@ -6,7 +6,7 @@ import java.util.TreeSet;
 import android.content.Context;
 import android.util.Log;
 import ch.ethz.inf.vs.android.glukas.project4.Post;
-import ch.ethz.inf.vs.android.glukas.project4.User;
+import ch.ethz.inf.vs.android.glukas.project4.BasicUser;
 import ch.ethz.inf.vs.android.glukas.project4.UserDelegate;
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseAccess;
@@ -69,7 +69,7 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate {
 	private DatabaseAccess database;
 
 	//caching
-	private User localUser;
+	private BasicUser localUser;
 	private volatile Set<UserId> wallAsked;
 	
 	//exceptional behaviors
@@ -171,14 +171,9 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate {
 		Message msg = MessageParser.parseMessage(message.text, message.header, database);
 		
 		MessageType type = msg.getRequestType();
-			// Server
-		if (type.equals(MessageType.CONNECT)) {
-			onConnectReceived(msg);
-		} else if (type.equals(MessageType.DISCONNECT)) {
-			onDisconnectReceived(msg);
 	
 			// Friends
-		} else if (type.equals(MessageType.SEARCH_USER)) {
+		if (type.equals(MessageType.SEARCH_USER)) {
 			onSearchUserReceived(msg);
 		} else if (type.equals(MessageType.ACCEPT_FRIENDSHIP)) {
 			onAcceptFriendshipReceived(msg);
@@ -186,19 +181,19 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate {
 			onRefuseFriendshipReceived(msg);
 		} else if (type.equals(MessageType.ASK_FRIENDSHIP)) {
 			onAskFriendshipReceived(msg);
-		} else if (type.equals(MessageType.BROADCAST)) {
-			onBroadcastReceived(msg);
+		}
 	
 			// Post new messages
-		} else if (type.equals(MessageType.POST_PICTURE)) {
+		else if (type.equals(MessageType.POST_PICTURE)) {
 			onPostPictureReceived(msg);
 		} else if (type.equals(MessageType.POST_TEXT)) {
 			onPostTextReceived(msg);
 		} else if (type.equals(MessageType.ACK_POST)) {
 			onAckPostReceived(msg);
+		}
 	
 			// Retrieve data
-		} else if (type.equals(MessageType.GET_POSTS)) {
+		else if (type.equals(MessageType.GET_POSTS)) {
 			onGetPostsReceived(msg);
 		} else if (type.equals(MessageType.SHOW_IMAGE)) {
 			onShowImageReceived(msg);
@@ -292,7 +287,7 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate {
 		int maxPostId = database.getFriendMaxPostsId(localUser.getId());
 		int maxNumMsgs = database.getFriendMaxPostsId(localUser.getId());
 		//create message encapsulating all informations
-		User userToSend = msg.getSender();
+		BasicUser userToSend = msg.getSender();
 		String msgToSend = JSONObjectFactory.createJSONObject(MessageFactory.newSendStateMessage(localUser, userToSend, maxPostId, maxNumMsgs)).toString();
 		PublicHeader header = new PublicHeader(0, null, StatusByte.SEND.getByte(), 0, localUser.getId(), userToSend.getId());
 		//send reply
@@ -316,22 +311,7 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate {
 		Log.d(getClass().toString(), unexpectedMsg+msg.toString());
 	}
 	
-	private void onConnectReceived(Message msg) {
-		//User should not be targeted by these kind of messages
-		Log.d(getClass().toString(), unexpectedMsg+msg.toString());
-	}
-	
-	private void onDisconnectReceived(Message msg) {
-		//User should not be targeted by these kind of messages
-		Log.d(getClass().toString(), unexpectedMsg+msg.toString());
-	}
-	
 	private void onSearchUserReceived(Message msg) {
-		//User should not be targeted by these kind of messages
-		Log.d(getClass().toString(), unexpectedMsg+msg.toString());
-	}
-	
-	private void onBroadcastReceived(Message msg) {
 		//User should not be targeted by these kind of messages
 		Log.d(getClass().toString(), unexpectedMsg+msg.toString());
 	}
