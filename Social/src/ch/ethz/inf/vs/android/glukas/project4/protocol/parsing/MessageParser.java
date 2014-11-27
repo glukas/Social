@@ -2,8 +2,6 @@ package ch.ethz.inf.vs.android.glukas.project4.protocol.parsing;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import android.util.Log;
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseAccess;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.ProtocolException;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.Message;
@@ -25,8 +23,6 @@ public class MessageParser {
 		msg.setReceiver(db.getFriend(header.getReceiver()));
 		msg.setPostId(header.getMessageId());
 		
-		Log.i("DEBUG", "###"+"Header parsed");
-		
 		// Get status of the message
 		StatusByte statusByte = StatusByte.constructStatusByte(header.getConsistency());
 		
@@ -34,7 +30,6 @@ public class MessageParser {
 		try {
 			parseMessage(msg, message, statusByte);
 		} catch (JSONException e) {
-			Log.i("DEBUG", "###"+"JSON exception");
 			e.printStackTrace();
 		}
 
@@ -68,7 +63,6 @@ public class MessageParser {
 		
 		// Data retrieving
 		else if (command.equals(Args.GET_POSTS.getStr())) {
-			Log.i("DEBUG", "###"+"GET_POST ENTER");
 			parseGetPosts(msg, obj);
 		} else if (command.equals(Args.SEND_PIC.getStr())) {
 			parseSendPic(msg, obj);

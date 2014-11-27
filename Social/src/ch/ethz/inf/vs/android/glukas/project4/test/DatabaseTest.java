@@ -10,7 +10,7 @@ import ch.ethz.inf.vs.android.glukas.project4.UserId;
 import ch.ethz.inf.vs.android.glukas.project4.Wall;
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseAccess;
 
-public class StaticDatabase implements DatabaseAccess {
+public class DatabaseTest implements DatabaseAccess {
 
 	@Override
 	public void putUser(User user) {
@@ -123,7 +123,11 @@ public class StaticDatabase implements DatabaseAccess {
 	@Override
 	public User getFriend(UserId id) {
 		// TODO Auto-generated method stub
-		return null;
+		if (id.equals(Data.dummyReceiverId)){
+			return new User(Data.dummyReceiverId, Data.dummyReceiver.getUsername(), null);
+		} else {
+			return new User(Data.dummySenderId, Data.dummySender.getUsername(), null);
+		}
 	}
 
 	@Override

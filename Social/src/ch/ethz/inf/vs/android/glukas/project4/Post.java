@@ -38,9 +38,9 @@ public class Post {
 		this.id = id;
 		this.text = text;
 		if (image == null) {
-			type = PostType.PICTURE;
-		} else {
 			type = PostType.TEXT;
+		} else {
+			type = PostType.PICTURE;
 		}
 		this.image = image;
 		this.datetime = datetime;
@@ -57,7 +57,7 @@ public class Post {
 			this.id = msg.getId();
 			this.text = msg.getMessage();
 			this.image = null;
-			this.imageLink = null;
+			this.imageLink = "";
 		} else {
 			throw new UnknowRequestType(type);
 		}

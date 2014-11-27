@@ -2,7 +2,6 @@ package ch.ethz.inf.vs.android.glukas.project4.protocol.parsing;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.UnhandledFunctionnality;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.UnknowRequestType;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.Message;
@@ -82,7 +81,7 @@ public class JSONObjectFactory {
 			if (request.getRequestType().equals(MessageType.SEND_STATE)) {
 				setSendStateObj(request, obj, numberOfMessages);
 			} else {
-				JSONObjectFactory.createJSONObject(request);
+				throw new UnknowRequestType(request.getRequestType());
 			}
 		} catch (JSONException ex) {
 			ex.printStackTrace();
@@ -144,8 +143,8 @@ public class JSONObjectFactory {
 	////
 	
 	private static void setSendTextObj(Message request, JSONObject obj) throws JSONException {
-		obj.put(Cmds.CMD.getStr(), Args.SEND_TXT);
-		obj.put(Cmds.ID.getStr(), String.valueOf(request.getPostId()));
+		obj.put(Cmds.CMD.getStr(), Args.SEND_TXT.getStr());
+		obj.put(Cmds.ID.getStr(), request.getPostId());
 		obj.put(Cmds.TEXT.getStr(), request.getMessage());
 	}
 
@@ -157,12 +156,12 @@ public class JSONObjectFactory {
 	}
 	
 	private static void setGetStateObj(Message request, JSONObject obj) throws JSONException {
-		obj.put(Cmds.CMD.getStr(), Args.GET_STATE.toString());
+		obj.put(Cmds.CMD.getStr(), Args.GET_STATE.getStr());
 	}
 
 	private static void setSendStateObj(Message request, JSONObject obj, int numberofmessages) throws JSONException {
-		obj.put(Cmds.CMD.toString(), Args.SEND_STATE.toString());
-		obj.put(Cmds.ID.getStr(), String.valueOf(request.getPostId()));
+		obj.put(Cmds.CMD.getStr(), Args.SEND_STATE.getStr());
+		obj.put(Cmds.ID.getStr(), request.getId());
 		obj.put(Cmds.NUM_M.getStr(), numberofmessages);
 	}
 

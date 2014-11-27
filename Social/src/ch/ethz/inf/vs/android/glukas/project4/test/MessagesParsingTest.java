@@ -3,10 +3,7 @@ package ch.ethz.inf.vs.android.glukas.project4.test;
 import org.junit.Test;
 import android.test.AndroidTestCase;
 import android.util.Log;
-import ch.ethz.inf.vs.android.glukas.project4.BasicUser;
-import ch.ethz.inf.vs.android.glukas.project4.UserId;
-import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseAccess;
-import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseManager;
+import ch.ethz.inf.vs.android.glukas.project4.Post;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.Message;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.MessageFactory;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.PublicHeader;
@@ -16,64 +13,101 @@ import ch.ethz.inf.vs.android.glukas.project4.protocol.parsing.MessageParser;
 
 public class MessagesParsingTest extends AndroidTestCase {
 	
-	private final int dummyOldPostCount = 34;
-	private final int dummyPostId = 56;
-	private final int dummyNumMsg = 78;
-	private final UserId dummySenderId = new UserId("11111");
-	private final UserId dummyReceiverId = new UserId("-22222");
-	private final BasicUser dummySender = new BasicUser(dummySenderId, "Dummy Sender");
-	private final BasicUser dummyReceiver = new BasicUser(dummyReceiverId, "Dummy Receiver");
-	private final DatabaseAccess db = new DatabaseManager(null);
-	private final String tag = "###";
-	
 	@Test
 	public void testGetPostMessage() {
-		Message getPostMessage1 = MessageFactory.newGetPostsMessage(dummyOldPostCount, dummySender, dummyReceiver);
+		Message getPostMessage1 = MessageFactory.newGetPostsMessage(Data.dummyOldPostCount, Data.dummySender, Data.dummyReceiver);
 		String getPostMessageTxt = JSONObjectFactory.createJSONObject(getPostMessage1).toString();
-		PublicHeader header = new PublicHeader(0, null, StatusByte.SEND.getByte(), 0, dummySender.getId(), dummyReceiver.getId());
-		
-		Log.i("DEBUG", tag+" "+header.getSender());
-		Message getPostMessage2 = MessageParser.parseMessage(getPostMessageTxt, header, db);
+		PublicHeader header = new PublicHeader(0, null, StatusByte.SEND.getByte(), 0, Data.dummySender.getId(), Data.dummyReceiver.getId());
+		Message getPostMessage2 = MessageParser.parseMessage(getPostMessageTxt, header, Data.db);
 		boolean equals = getPostMessage1.toString().equals(getPostMessage2.toString());
 		if (!equals){
-			Log.d("Before Parsing", tag+" "+getPostMessage1.toString());
-			Log.d("After Parsing", tag+" "+getPostMessage2.toString());
+			Log.d("Before Parsing", Data.tag+" "+getPostMessage1.toString());
+			Log.d("After Parsing", Data.tag+" "+getPostMessage2.toString());
 		}
 		assertTrue(equals);
 	}
 	
 	@Test
 	public void testSendStateMessage() {
-		Message sendStateMessage1 = MessageFactory.newSendStateMessage(dummySender, dummyReceiver, dummyPostId, dummyNumMsg);
-		String sendStateMessageTxt = JSONObjectFactory.createJSONObject(sendStateMessage1).toString();
-		PublicHeader header = new PublicHeader(0, null, StatusByte.SEND.getByte(), 0, dummySender.getId(), dummyReceiver.getId());
-		Message sendStateMessage2 = MessageParser.parseMessage(sendStateMessageTxt, header, db);
+		Message sendStateMessage1 = MessageFactory.newSendStateMessage(Data.dummySender, Data.dummyReceiver, Data.dummyPostId, Data.dummyNumMsg);
+		String sendStateMessageTxt = JSONObjectFactory.createJSONObject(sendStateMessage1, sendStateMessage1.getNumM()).toString();
+		PublicHeader header = new PublicHeader(0, null, StatusByte.SEND.getByte(), 0, Data.dummySender.getId(), Data.dummyReceiver.getId());
+		
+		//Log.i("DEBUG",Data.tag+sendStateMessageTxt);
+		Message sendStateMessage2 = MessageParser.parseMessage(sendStateMessageTxt, header, Data.db);
 		boolean equals = sendStateMessage1.toString().equals(sendStateMessage2.toString());
-		assertTrue(equals);
 		if (!equals){
-			Log.d("Before Parsing", tag+" "+sendStateMessage1.toString());
-			Log.d("After Parsing", tag+" "+sendStateMessage2.toString());
+			Log.d("Before Parsing", Data.tag+" "+sendStateMessage1.toString());
+			Log.d("After Parsing", Data.tag+" "+sendStateMessage2.toString());
 		}
 		assertTrue(equals);
 	}
 
 	@Test
 	public static void testGetStateMessage() {
+		Message getStateMessage1 = MessageFactory.newGetStateMessage(Data.dummySender, Data.dummyReceiver);
+		String getStateMessageTxt = JSONObjectFactory.createJSONObject(getStateMessage1).toString();
+		PublicHeader header = new PublicHeader(0, null, StatusByte.SEND.getByte(), 0, Data.dummySender.getId(), Data.dummyReceiver.getId());
+		
+		//Log.i("DEBUG",Data.tag+getStateMessageTxt);
+		Message sendStateMessage2 = MessageParser.parseMessage(getStateMessageTxt, header, Data.db);
+		boolean equals = getStateMessage1.toString().equals(sendStateMessage2.toString());
+		if (!equals){
+			Log.d("Before Parsing", Data.tag+" "+getStateMessage1.toString());
+			Log.d("After Parsing", Data.tag+" "+sendStateMessage2.toString());
+		}
+		assertTrue(equals);
 		
 	}
 	
 	@Test
 	public static void testAckMessage() {
+		Message getStateMessage1 = MessageFactory.newAckMessage(Data.dummySender, Data.dummyReceiver);
+		String getStateMessageTxt = JSONObjectFactory.createJSONObject(getStateMessage1).toString();
+		PublicHeader header = new PublicHeader(0, null, StatusByte.SEND.getByte(), 0, Data.dummySender.getId(), Data.dummyReceiver.getId());
 		
+		//Log.i("DEBUG",Data.tag+getStateMessageTxt);
+		Message sendStateMessage2 = MessageParser.parseMessage(getStateMessageTxt, header, Data.db);
+		boolean equals = getStateMessage1.toString().equals(sendStateMessage2.toString());
+		if (!equals){
+			Log.d("Before Parsing", Data.tag+" "+getStateMessage1.toString());
+			Log.d("After Parsing", Data.tag+" "+sendStateMessage2.toString());
+		}
+		assertTrue(equals);
 	}
 	
 	@Test
 	public static void testPostMessage() {
+		Post post = new Post(67, Data.dummySenderId, "I'm a post!", null, null);
+		Message getPostMessage1 = MessageFactory.newPostMessage(post, Data.dummySender, Data.dummyReceiver, false);
+		String getPostMessageTxt = JSONObjectFactory.createJSONObject(getPostMessage1).toString();
+		PublicHeader header = new PublicHeader(0, null, StatusByte.SEND.getByte(), 0, Data.dummySender.getId(), Data.dummyReceiver.getId());
+		
+		//Log.i("DEBUG",Data.tag+getPostMessageTxt);
+		Message sendPostMessage2 = MessageParser.parseMessage(getPostMessageTxt, header, Data.db);
+		boolean equals = getPostMessage1.toString().equals(sendPostMessage2.toString());
+		if (!equals){
+			Log.d("Before Parsing", Data.tag+" "+getPostMessage1.toString());
+			Log.d("After Parsing", Data.tag+" "+sendPostMessage2.toString());
+		}
+		assertTrue(equals);
 		
 	}
 	
 	@Test
 	public static void testSendMessage() {
+		Post post = new Post(67, Data.dummySenderId, "I'm a post!", null, null);
+		Message getPostMessage1 = MessageFactory.newPostMessage(post, Data.dummySender, Data.dummyReceiver, true);
+		String getPostMessageTxt = JSONObjectFactory.createJSONObject(getPostMessage1).toString();
+		PublicHeader header = new PublicHeader(0, null, StatusByte.SEND.getByte(), 0, Data.dummySender.getId(), Data.dummyReceiver.getId());
 		
+		//Log.i("DEBUG",Data.tag+getPostMessageTxt);
+		Message sendPostMessage2 = MessageParser.parseMessage(getPostMessageTxt, header, Data.db);
+		boolean equals = getPostMessage1.toString().equals(sendPostMessage2.toString());
+		if (!equals){
+			Log.d("Before Parsing", Data.tag+" "+getPostMessage1.toString());
+			Log.d("After Parsing", Data.tag+" "+sendPostMessage2.toString());
+		}
+		assertTrue(equals);
 	}
 }

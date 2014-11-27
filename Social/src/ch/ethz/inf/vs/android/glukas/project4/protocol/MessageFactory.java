@@ -37,13 +37,13 @@ public class MessageFactory {
 			if (post.getType().equals(PostType.PICTURE)){
 				return new Message(sender, receiver, post.getId(), MessageType.SEND_PICTURE, post.getImageLink(), post.getText(), "", post.getId(), 0);
 			} else {
-				return new Message(sender, receiver, post.getId(), MessageType.SEND_TEXT, "", "", "", post.getId(), 0);
+				return new Message(sender, receiver, post.getId(), MessageType.SEND_TEXT, "", post.getText(), "", post.getId(), 0);
 			}
 		} else {
 			if (post.getType().equals(PostType.PICTURE)){
 				return new Message(sender, receiver, post.getId(), MessageType.POST_PICTURE, post.getImageLink(), post.getText(), "", post.getId(), 0);
 			} else {
-				return new Message(sender, receiver, post.getId(), MessageType.POST_TEXT, "", "", "", post.getId(), 0);
+				return new Message(sender, receiver, post.getId(), MessageType.POST_TEXT, "", post.getText(), "", post.getId(), 0);
 			}
 		}
 	}
@@ -58,6 +58,26 @@ public class MessageFactory {
 	 */
 	public static Message newSendStateMessage(BasicUser sender, BasicUser receiver, int id, int numM) {
 		return new Message(sender, receiver, 0, MessageType.SEND_STATE, "", "", "", id, numM);
+	}
+	
+	/**
+	 * New get state Message
+	 * @param sender
+	 * @param receiver
+	 * @return
+	 */
+	public static Message newGetStateMessage(BasicUser sender, BasicUser receiver) {
+		return new Message(sender, receiver, 0, MessageType.GET_STATE, "", "", "", 0, 0);
+	}
+	
+	/**
+	 * New ack Message
+	 * @param sender
+	 * @param receiver
+	 * @return
+	 */
+	public static Message newAckMessage(BasicUser sender, BasicUser receiver) {
+		return new Message(sender, receiver, 0, MessageType.ACK_POST, "", "", "", 0, 0);
 	}
 	
 	/**
