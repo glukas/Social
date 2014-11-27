@@ -110,16 +110,22 @@ public class TCPCommunicator {
 		in.readFully(headerBytes);
 		header = new PublicHeader(ByteBuffer.wrap(headerBytes));
 		
-		
-		//set message based on header
-		messageBytes = new byte[header.getLength() - PublicHeader.BYTES_LENGTH_HEADER];
-		in.readFully(messageBytes);
-		
-
-		//Combine header and message
+		//Create packet and save header in it
 		byte[] packet = new byte[header.getLength()];
 		System.arraycopy(header.getbytes(), 0, packet, 0, header.getbytes().length);
-		System.arraycopy(messageBytes, 0, packet, header.getbytes().length, messageBytes.length);
+		
+		//Check for empty message
+		if(header.getLength() > PublicHeader.BYTES_LENGTH_HEADER){
+			//Message not empty
+			//set message based on header
+			messageBytes = new byte[header.getLength() - PublicHeader.BYTES_LENGTH_HEADER];
+			in.readFully(messageBytes);
+
+
+			//Combine header and message
+			System.arraycopy(messageBytes, 0, packet, header.getbytes().length, messageBytes.length);
+		}
+		
 		return packet;
 	}
 

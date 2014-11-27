@@ -23,11 +23,13 @@ public class Message implements Comparable<Message>, Comparator<Message> {
 	
 	private PublicHeader header;
 	
-	private byte[] message;
+	private byte[] message = null;
 	
 	private byte[] original;
 	
 	private long timestamp;
+	
+	public boolean isEmpty = true;
 	
 
 	public Message(byte[] bytes){
@@ -36,15 +38,18 @@ public class Message implements Comparable<Message>, Comparator<Message> {
 		
 		this.header = new PublicHeader(ByteBuffer.wrap(bytes));
 		
-		this.message = Arrays.copyOfRange(bytes, PublicHeader.BYTES_LENGTH_HEADER, header.getLength());
+		//Leave message null if empty message
+		if(PublicHeader.BYTES_LENGTH_HEADER < header.getLength()){
+			this.message = Arrays.copyOfRange(bytes, PublicHeader.BYTES_LENGTH_HEADER, header.getLength());
+			isEmpty = false;
+		}
 	}
 	
 	//Used to create a dummy message, which only has a clock value
 	public Message(int messageId){
 		this.timestamp = System.currentTimeMillis();
 		byte b = 0;
-		this.header = new PublicHeader(0, new byte[]{0x00}, b, messageId, new UserId("0"), new UserId("0"));
-		this.message = new byte[]{0x00};
+		this.header = new PublicHeader(0, null, b, messageId, new UserId("0"), new UserId("0"));
 	}
 
 	public PublicHeader getHeader(){

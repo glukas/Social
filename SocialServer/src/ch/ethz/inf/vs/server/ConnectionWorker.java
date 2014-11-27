@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
+import ch.ethz.inf.vs.android.glukas.project4.protocol.PublicHeader;
 import ch.ethz.inf.vs.server.MessageBuffer;
 
 public class ConnectionWorker implements Runnable {
@@ -20,7 +21,7 @@ public class ConnectionWorker implements Runnable {
 		  Message received = new Message(data);
 		  System.out.println("Received data has size: " + data.length + " bytes");
 		  System.out.println("Status: " + Integer.toHexString(received.getHeader().getConsistency()));
-		  String s = new String(received.getMessage(), StandardCharsets.UTF_8);
+		  String s = (received.isEmpty ? "<empty>" : new String(received.getMessage(), StandardCharsets.UTF_8));
 
 		  System.out.println("Server read: " + s);
 
@@ -32,6 +33,14 @@ public class ConnectionWorker implements Runnable {
 	  
 	  private boolean isConnected(UserId user){
 		  return connectedUsers.containsKey(user.getId());
+	  }
+	  
+	  private void sendACK(ServerEvent event){
+		  byte status = event.message.getHeader().getConsistency();
+		  UserId user = event.message.getHeader().getSender();
+		  PublicHeader header = new PublicHeader(PublicHeader.BYTES_LENGTH_HEADER, null, status, 0, new UserId("0"), user);
+		  Message ack = new Message(header.getbytes());
+		  event.server.send(event.socket, ack);
 	  }
 
 	  public void run() {
@@ -64,25 +73,46 @@ public class ConnectionWorker implements Runnable {
 	      		//save the socket in the connectedUsers HashMap
 	      		System.out.println("Connected User: " + sender.getId().toString());
 	      		connectedUsers.put(sender.getId(), dataEvent.socket);
+	      		//Send ACK
+	      		sendACK(dataEvent);
+	      		
 	      		break;
 	      	case 0x01:
 	      		//DISCONNECT
 	      		//remove the user from connectedUsers
 	      		System.out.println("Deconnect User: " + sender.getId().toString());
 	      		connectedUsers.remove(sender.getId());
+	      		//Send ACK
+	      		sendACK(dataEvent);
+	      		
 	      		break;
 	      	case 0x02:
 	      		//DATA
 	      		//Send the data to the user
 	      		//TODO For now we store all messages, late we can drop them if send was successful
 	      		System.out.println("DATA request from User: " + sender.getId().toString());
-	      		List<Message> data = cache.getMessagesSince(receiver, 0);
-	      		if(isConnected(sender)){
-	      			SocketChannel socket = connectedUsers.get(sender.getId());
-	      			//Send all messages
-	      			for(Message m : data){
-	      				dataEvent.server.send(socket, m);
+	      		if(sender.getId().equals(receiver.getId())){
+	      			System.out.println("---- Fetch all cached messages");
+	      			
+	      			List<Message> data = cache.getMessagesSince(receiver, 0);
+	      			System.out.println("---- Found " + data.size() + " cached messages for User " + receiver.getId());
+	      			if(isConnected(sender)){
+	      				SocketChannel socket = connectedUsers.get(sender.getId());
+	      				//Send all messages
+	      				for(Message m : data){
+	      					dataEvent.server.send(socket, m);
+	      				}
 	      			}
+	      		} else {
+	      			if(isConnected(receiver)){
+		      			//User is online, forward DATA request
+	      				System.out.println("---- User online, forward request");
+		      			SocketChannel socket = connectedUsers.get(receiver.getId());
+		      			dataEvent.server.send(socket, dataEvent.message);
+		      		} else {
+		      			//User not online, drop the request
+		      			System.out.println("---- User offline, drop request");
+		      		}
 	      		}
 	      		
 	      		break;
@@ -109,8 +139,9 @@ public class ConnectionWorker implements Runnable {
 	      			System.out.println("---- send message to User " + receiver.getId());
 	      			dataEvent.server.send(socket, dataEvent.message);
 	      		} else {
-	      			//Do not cache the message?!
+	      			//Cache the message
 	      			System.out.println("---- User is not connected");
+	      			cache.addMessage(dataEvent.message);
 	      		}
 	      		break;
 	      	default:

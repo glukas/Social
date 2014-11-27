@@ -1,14 +1,13 @@
 package ch.ethz.inf.vs.test;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.Arrays;
 import java.util.Random;
 
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
 import ch.ethz.inf.vs.android.glukas.project4.networking.TCPCommunicator;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.PublicHeader;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.StatusByte;
+import ch.ethz.inf.vs.server.Message;
 
 public class DummyClient implements Runnable {
 	
@@ -27,7 +26,7 @@ public class DummyClient implements Runnable {
 		this.port = port;
 		this.clientId = id;
 		this.clients = clients;
-		this.comm = new TCPCommunicator("winti.mooo.com", port);
+		this.comm = new TCPCommunicator("winti.mooo.com", this.port);
 		this.me = new UserId(Integer.toString(clientId));
 		this.server = new UserId("0");
 		running = true;
@@ -63,7 +62,8 @@ public class DummyClient implements Runnable {
 		//Combine header and message
 		byte[] packet = new byte[header.getLength()];
 		System.arraycopy(header.getbytes(), 0, packet, 0, header.getbytes().length);
-		System.arraycopy(message, 0, packet, header.getbytes().length, message.length);
+		if(message != null)
+			System.arraycopy(message, 0, packet, header.getbytes().length, message.length);
 		return packet;
 	}
 	
@@ -84,23 +84,27 @@ public class DummyClient implements Runnable {
 	}
 	
 	private void onMessageReceive(byte[] m){
-		PublicHeader header = new PublicHeader(ByteBuffer.wrap(m));
-		String message = new String(Arrays.copyOfRange(m, PublicHeader.BYTES_LENGTH_HEADER, header.getLength()));
-		System.out.println("Client " + clientId + " received message: //STATUS//" + header.getConsistency() + "//MESSAGE//" + message);
+		Message received = new Message(m);
+		
+		//is ACK
+		if(received.isEmpty && (received.getHeader().getConsistency() == 0x00 || received.getHeader().getConsistency() == 0x01)){
+			System.out.println("Received ACK");
+		}
+		
+		String message = (received.isEmpty ? "<empty>" : new String(received.getMessage()));
+		System.out.println("Client " + clientId + " received message: //STATUS//" + received.getHeader().getConsistency() + "//MESSAGE//" + message);
 	}
 	
 	private void sendConnect() throws IOException{
-		byte[] m = ("0").getBytes();
-		PublicHeader header = new PublicHeader(PublicHeader.BYTES_LENGTH_HEADER + m.length, null, StatusByte.CONNECT.getByte(), 0, me, server );
-		System.out.println("Client " + clientId + " sends message: //STATUS//" + header.getConsistency() + "//MESSAGE//" + new String(m));
-		comm.sendMessage(createPacket(header, m));
+		PublicHeader header = new PublicHeader(PublicHeader.BYTES_LENGTH_HEADER, null, StatusByte.CONNECT.getByte(), 0, me, server );
+		System.out.println("Client " + clientId + " sends message: //STATUS//" + header.getConsistency() + "//MESSAGE//<empty>");
+		comm.sendMessage(createPacket(header, null));
 	}
 	
 	private void sendDisconnect() throws IOException{
-		byte[] m = ("0").getBytes();
-		PublicHeader header = new PublicHeader(PublicHeader.BYTES_LENGTH_HEADER + m.length, null, StatusByte.DISCONNECT.getByte(), 0, me, server );
-		System.out.println("Client " + clientId + " sends message: //STATUS//" + header.getConsistency() + "//MESSAGE//" + new String(m));
-		comm.sendMessage(createPacket(header, m));
+		PublicHeader header = new PublicHeader(PublicHeader.BYTES_LENGTH_HEADER, null, StatusByte.DISCONNECT.getByte(), 0, me, server );
+		System.out.println("Client " + clientId + " sends message: //STATUS//" + header.getConsistency() + "//MESSAGE//<empty>");
+		comm.sendMessage(createPacket(header, null));
 	}
 	
 	private void sendPost() throws IOException{
@@ -112,10 +116,9 @@ public class DummyClient implements Runnable {
 	
 	private void sendData() throws IOException{
 		//Fetch all my data
-		byte[] m = ("0").getBytes();
-		PublicHeader header = new PublicHeader(PublicHeader.BYTES_LENGTH_HEADER + m.length, null, StatusByte.DATA.getByte(), 0, me, me );
-		System.out.println("Client " + clientId + " sends DATA: //STATUS//" + header.getConsistency() + "//MESSAGE//" + new String(m));
-		comm.sendMessage(createPacket(header, m));
+		PublicHeader header = new PublicHeader(PublicHeader.BYTES_LENGTH_HEADER, null, StatusByte.DATA.getByte(), 0, me, me );
+		System.out.println("Client " + clientId + " sends DATA: //STATUS//" + header.getConsistency() + "//MESSAGE//<empty>");
+		comm.sendMessage(createPacket(header, null));
 	}
 	
 	private void sendMessage() throws IOException{
@@ -128,6 +131,15 @@ public class DummyClient implements Runnable {
 	
 	private void sendUnknown(){
 		
+	}
+	
+	private void reconnect() throws IOException, InterruptedException{
+			System.out.println("Client " + Integer.toString(clientId) + " performs a reconnect!");
+			sendDisconnect();
+			Thread.sleep((int)Math.floor(Math.random()*10000));
+			System.out.println("Client " + Integer.toString(clientId) + " is back!");
+			sendConnect();
+			sendData();
 	}
 
 	@Override
@@ -162,7 +174,7 @@ public class DummyClient implements Runnable {
 					sendMessage();
 					break;
 				case 3:
-					sendUnknown();
+					reconnect();
 					break;
 				default:
 					break;
@@ -177,10 +189,13 @@ public class DummyClient implements Runnable {
 		
 		try {
 			sendDisconnect();
+			Thread.sleep(1000);
+			
+			//Shutdown
 			running = false;
 			comm.finishConnection();
 			System.out.println("Client " + Integer.toString(clientId) + " stopped!");
-		} catch (IOException e) {
+		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		}
 

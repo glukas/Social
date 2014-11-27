@@ -162,33 +162,41 @@ public class Server implements Runnable {
 		//Set the message Buffer limit to message size
 		headerBuffer.rewind();
 		int messageLength = headerBuffer.getInt();
-		System.out.println("MessageLength: " + messageLength + " bytes");
-		//Do not read more than the message size
-		this.messageBuffer.limit(messageLength - PublicHeader.BYTES_LENGTH_HEADER);
 		
-		try {
-			numRead = socketChannel.read(this.messageBuffer);
-			System.out.println(numRead + "bytes read! (Message)");
-		} catch (IOException e) {
-			// Connection got closed
-			System.out.println("One remote connection got closed!");
-			key.cancel();
-			socketChannel.close();
-			return;
-		}
-
-		if (numRead == -1) {
-			// Remote shut down connection cleanly
-			key.channel().close();
-			key.cancel();
-			return;
-		}
-		
-		//Combine header and message
+		//create packet and save header in it
 		byte[] packet = new byte[messageLength];
 		System.arraycopy(headerBuffer.array(), 0, packet, 0, PublicHeader.BYTES_LENGTH_HEADER);
-		System.arraycopy(messageBuffer.array(), 0, packet, PublicHeader.BYTES_LENGTH_HEADER, messageLength - PublicHeader.BYTES_LENGTH_HEADER);
 		
+		System.out.println("MessageLength: " + messageLength + " bytes");
+		
+		//Check wether message is empty
+		if(messageLength > PublicHeader.BYTES_LENGTH_HEADER){
+			//Message not empty
+			
+			//Do not read more than the message size
+			this.messageBuffer.limit(messageLength - PublicHeader.BYTES_LENGTH_HEADER);
+
+			try {
+				numRead = socketChannel.read(this.messageBuffer);
+				System.out.println(numRead + "bytes read! (Message)");
+			} catch (IOException e) {
+				// Connection got closed
+				System.out.println("One remote connection got closed!");
+				key.cancel();
+				socketChannel.close();
+				return;
+			}
+
+			if (numRead == -1) {
+				// Remote shut down connection cleanly
+				key.channel().close();
+				key.cancel();
+				return;
+			}
+
+			//Combine header and message
+			System.arraycopy(messageBuffer.array(), 0, packet, PublicHeader.BYTES_LENGTH_HEADER, messageLength - PublicHeader.BYTES_LENGTH_HEADER);
+		}
 		
 		// Hand the data off to our worker thread
 		this.worker.processData(this, socketChannel, packet, numRead); 
