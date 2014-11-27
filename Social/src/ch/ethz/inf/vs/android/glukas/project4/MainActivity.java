@@ -1,25 +1,18 @@
 package ch.ethz.inf.vs.android.glukas.project4;
 
 import java.util.List;
-
-import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseAccess;
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseManager;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.FailureReason;
-import ch.ethz.inf.vs.android.glukas.project4.exceptions.NetworkException;
 import ch.ethz.inf.vs.android.glukas.project4.networking.FriendshipRequest;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.Protocol;
-import ch.ethz.inf.vs.android.glukas.project4.protocol.ProtocolDelegate;
 import ch.ethz.inf.vs.android.glukas.project4.security.ZeroCredentialStorage;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
 import android.nfc.NfcAdapter.OnNdefPushCompleteCallback;
 import android.nfc.NfcEvent;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -60,12 +53,7 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 
 			@Override
 			public void onClick(View v) {
-				try {
-					mProtocol.connect();
-				} catch (NetworkException e) {
-					Log.d(tag, "NetworkException on connect.");
-					e.printStackTrace();
-				}
+				mProtocol.connect();
 			}
 		});
 
@@ -108,12 +96,7 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 		mAlertBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int whichButton) {
 				String userName = input.getText().toString();
-				try {
-					mProtocol.askFriendship(userName);
-				} catch (NetworkException e) {
-					Log.d(tag, "NetworkException on friend request.");
-					e.printStackTrace();
-				}
+				mProtocol.askFriendship(userName);
 			}
 		});
 

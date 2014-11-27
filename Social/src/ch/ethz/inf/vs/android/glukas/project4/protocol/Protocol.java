@@ -3,7 +3,6 @@ package ch.ethz.inf.vs.android.glukas.project4.protocol;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-
 import android.content.Context;
 import android.util.Log;
 import ch.ethz.inf.vs.android.glukas.project4.Post;
@@ -13,7 +12,6 @@ import ch.ethz.inf.vs.android.glukas.project4.UserId;
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseAccess;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.DatabaseException;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.FailureReason;
-import ch.ethz.inf.vs.android.glukas.project4.exceptions.NetworkException;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.UnhandledFunctionnality;
 import ch.ethz.inf.vs.android.glukas.project4.networking.MessageRelay;
 import ch.ethz.inf.vs.android.glukas.project4.networking.MessageRelayDelegate;
@@ -75,7 +73,7 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate,
 
 	//caching
 	private User localUser;
-	private Set<UserId> wallAsked;
+	private volatile Set<UserId> wallAsked;
 	
 	//exceptional behaviors
 	private final String unexpectedMsg = "Unexpected message arrived : ";
@@ -85,26 +83,16 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate,
 	////
 
 	@Override
-	public void connect() throws NetworkException {
-		//TODO (only sketch)
-		String msg = JSONObjectFactory.createJSONObject(
-				MessageFactory.newTypeMessage(MessageType.CONNECT), 0).toString();
-
-		PublicHeader header = new PublicHeader(0, null,
-				StatusByte.CONNECT.getByte(), 0, localUser.getId(), null);
-
+	public void connect() {
+		String msg = JSONObjectFactory.createJSONObject(MessageFactory.newTypeMessage(MessageType.CONNECT)).toString();
+		PublicHeader header = new PublicHeader(0, null, StatusByte.CONNECT.getByte(), 0, localUser.getId(), null);
 		messageRelay.connect(msg, header);
 	}
 
 	@Override
-	public void disconnect() throws NetworkException {
-		//TODO (only sketch)
-		String msg = JSONObjectFactory.createJSONObject(
-				MessageFactory.newTypeMessage(MessageType.DISCONNECT), 0).toString();
-
-		PublicHeader header = new PublicHeader(0, null,
-				StatusByte.DISCONNECT.getByte(), 0, localUser.getId(), null);
-
+	public void disconnect() {
+		String msg = JSONObjectFactory.createJSONObject(MessageFactory.newTypeMessage(MessageType.DISCONNECT)).toString();
+		PublicHeader header = new PublicHeader(0, null, StatusByte.DISCONNECT.getByte(), 0, localUser.getId(), null);
 		messageRelay.disconnect(msg, header);
 	}
 
@@ -120,18 +108,35 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate,
 	}
 
 	@Override
-	public void getUserWall(String distUsername) throws NetworkException {
-		List<UserId> listUserId = database.getFriendId(distUsername);
-		// if the list is bigger than one, then the user has two friends with
-		// common user name
-		// TODO proper exceptions handling
-		if (listUserId == null || listUserId.size() == 0 || listUserId.size() > 1) {
-			new DatabaseException().printStackTrace();
-		}
-		UserId userId = listUserId.get(0);
+	public void getUserWall(UserId userId) {
+		getUserPosts(userId, 0);
+	}
+	
+	@Override
+	public void getUserPosts(UserId userId, int postId) {
 		//retrieve data already known from database
-		
+		database.getAllFriendPostsFrom(userId, postId);
 		//ask distant user if already all messages are in database
+		Message msg = MessageFactory.newTypeMessage(MessageType.GET_STATE);
+		PublicHeader header = new PublicHeader(0, null, StatusByte.DATA.getByte(), 0, localUser.getId(), userId);
+		secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg, 0).toString(), header));
+		wallAsked.add(userId);
+	}
+	
+	@Override
+	public void getSomeUserPosts(UserId userId, int numberPosts) {
+		int oldestPost = database.getFriendMaxPostsId(userId);
+		getSomeUserPosts(userId, numberPosts, oldestPost);
+	}
+	
+	@Override
+	public void getSomeUserPosts(UserId userId, int numberPosts, int postId) {
+		//List<Post> listPosts = database.getSomeUserPosts(userId, numberPosts, postId);
+		List<Post> listPosts = null;
+		for (Post p : listPosts){
+			userHandler.onPostReceived(p);
+		}
+		
 		Message msg = MessageFactory.newTypeMessage(MessageType.GET_STATE);
 		PublicHeader header = new PublicHeader(0, null, StatusByte.DATA.getByte(), 0, localUser.getId(), userId);
 		secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg, 0).toString(), header));
@@ -139,7 +144,7 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate,
 	}
 
 	@Override
-	public void askFriendship(String distUsername) throws NetworkException {
+	public void askFriendship(String distUsername) {
 		//for the moment, we only use NFC
 		try {
 			throw new UnhandledFunctionnality();
@@ -149,7 +154,7 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate,
 	}
 
 	@Override
-	public void discoverFriends() throws NetworkException {
+	public void discoverFriends() {
 		//for the moment, we only use NFC
 		try {
 			throw new UnhandledFunctionnality();

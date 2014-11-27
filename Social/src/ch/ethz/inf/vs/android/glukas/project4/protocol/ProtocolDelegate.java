@@ -2,6 +2,7 @@ package ch.ethz.inf.vs.android.glukas.project4.protocol;
 
 import ch.ethz.inf.vs.android.glukas.project4.Post;
 import ch.ethz.inf.vs.android.glukas.project4.UserDelegate;
+import ch.ethz.inf.vs.android.glukas.project4.UserId;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.DatabaseException;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.NetworkException;
 
@@ -23,14 +24,14 @@ public interface ProtocolDelegate {
 	 * It has to be done before any other methods call
 	 * @throws NetworkException, if network is not accessible
 	 */
-	public void connect() throws NetworkException;
+	public void connect();
 	
 	/**
 	 * Disconnect the user from the network.
 	 * To regular quit of the application, this method should be called
 	 * @throws NetworkException, if network is not accessible
 	 */
-	public void disconnect() throws NetworkException;
+	public void disconnect();
 	
 	/**
 	 * Post a post of the user on his / her own wall
@@ -41,21 +42,41 @@ public interface ProtocolDelegate {
 	
 	/**
 	 * Get a wall from a distant user
-	 * @param DistUsername, the user to get the wall
-	 * @throws NetworkException, if network is not accessible
+	 * @param userId, the user to get the wall
 	 */
-	public void getUserWall(String distUsername) throws NetworkException;
+	public void getUserWall(UserId userId);
+	
+	/**
+	 * Get posts of a distant user starting at provided id
+	 * @param userId, the user to get the wall
+	 * @param postId, id of the oldest post wanted
+	 */
+	public void getUserPosts(UserId userId, int postId);
+	
+	/**
+	 * Get latest posts of a distant user
+	 * @param userId, the user to get posts
+	 * @param numberPosts, number of posts wanted from the latest one
+	 */
+	public void getSomeUserPosts(UserId userId, int numberPosts);
+	
+	/**
+	 * Get latest posts of a distant user
+	 * @param userId, the user to get posts
+	 * @param numberPosts, number of posts wanted from postId
+	 * @param postId
+	 */
+	public void getSomeUserPosts(UserId userId, int numberPosts, int postId);
 	
 	/**
 	 * Ask an user to be friend
 	 * @param DistUsername
 	 * @throws NetworkException, if network is not accessible
 	 */
-	public void askFriendship(String distUsername) throws NetworkException;
+	public void askFriendship(String distUsername);
 
 	/**
-	 * Search for accessible persons on the local bluetooth network
+	 * Search for accessible persons over all user's friends
 	 */
-	public void discoverFriends() throws NetworkException;
-	
+	public void discoverFriends();
 }

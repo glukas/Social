@@ -3,13 +3,8 @@ package ch.ethz.inf.vs.android.glukas.project4.networking;
 import java.math.BigInteger;
 
 import ch.ethz.inf.vs.android.glukas.project4.User;
-import ch.ethz.inf.vs.android.glukas.project4.protocol.parsing.JSONObjectFactory;
 import ch.ethz.inf.vs.android.glukas.project4.security.CryptographyParameters;
 import android.nfc.NdefMessage;
-import android.nfc.NdefRecord;
-import android.nfc.NfcAdapter.CreateNdefMessageCallback;
-import android.nfc.NfcAdapter.OnNdefPushCompleteCallback;
-import android.nfc.NfcEvent;
 import android.util.Log;
 
 public class FriendshipRequest extends FriendshipMessage {
