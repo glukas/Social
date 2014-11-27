@@ -72,7 +72,7 @@ public class MessageCryptography {
 			
 		} catch (InvalidKeyException e) {
 			e.printStackTrace();
-			return null;
+			throw new RuntimeException("invalid key");
 		} catch (IllegalBlockSizeException e) {
 			e.printStackTrace();
 			return null;

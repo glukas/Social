@@ -12,44 +12,10 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class CryptographyParameters {
 
-	private static final CryptographyParameters keyGen = new CryptographyParameters();
 	private static final String encryptionAlgorithm = "AES";
 	private static final String authenticationAlgorithm = "HmacSHA256";
 	private static final String encryptionMode = "CBC";
 	private static final String encryptionPadding = "PKCS7Padding";
-	
-	public static final CryptographyParameters getInstance() {
-		return keyGen;
-	}
-	
-	//Note: not so "secure" on android 4.3 and lower.
-	private final SecureRandom secureRandom = new SecureRandom();
-	
-	private KeyGenerator encryptionKeyGenerator;
-	
-	private KeyGenerator macKeyGenerator;
-	
-	CryptographyParameters() {
-		try {
-			encryptionKeyGenerator = KeyGenerator.getInstance(encryptionAlgorithm);
-			encryptionKeyGenerator.init(128, secureRandom);
-			macKeyGenerator = KeyGenerator.getInstance(authenticationAlgorithm);
-			macKeyGenerator.init(256, secureRandom);
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	//This can be used to generate user Ids.
-	public byte[] getPseudorandom(int numberOfBytes) {
-		byte[] bytes = new byte[numberOfBytes];
-		secureRandom.nextBytes(bytes);
-		return bytes;
-	}
-	
-	public byte[] generateUserId() {
-		return getPseudorandom(16);
-	}
 	
 	public SecretKey decodeAuthenticationKey(byte[] authenticationKey) {
 		SecretKeySpec spec = new SecretKeySpec(authenticationKey, authenticationAlgorithm);
@@ -59,14 +25,6 @@ public class CryptographyParameters {
 	public SecretKey decodeEncryptionKey(byte[] encryptionKey) {
 		SecretKeySpec spec = new SecretKeySpec(encryptionKey, encryptionAlgorithm);
 		return spec;
-	}
-	
-	public SecretKey generateEncryptionKey() {
-		return encryptionKeyGenerator.generateKey();
-	}
-	
-	public SecretKey generateMACKey() {
-		return macKeyGenerator.generateKey();
 	}
 	
 	public static SecureRandom getRandom() {
@@ -93,5 +51,27 @@ public class CryptographyParameters {
 			e.printStackTrace();
 		}
 		return mac;
+	}
+	
+	public static KeyGenerator getEncryptionKeyGenerator() {
+		KeyGenerator encryptionKeyGenerator = null;
+		try {
+			encryptionKeyGenerator = KeyGenerator.getInstance(encryptionAlgorithm);
+			encryptionKeyGenerator.init(128, getRandom());
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
+		return encryptionKeyGenerator;
+	}
+	
+	public static KeyGenerator getAuthenticationKeyGenerator() {
+		KeyGenerator macKeyGenerator = null;
+		try {
+			macKeyGenerator = KeyGenerator.getInstance(authenticationAlgorithm);
+			macKeyGenerator.init(256, getRandom());
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
+		return macKeyGenerator;
 	}
 }
