@@ -6,7 +6,6 @@ package ch.ethz.inf.vs.android.glukas.project4.protocol.parsing;
 enum Cmds{
 	CMD("cmd"),
 	FROM("from"),
-	USER("user"),
 	ID("id"),
 	TEXT("text"),
 	PIC("picture"),

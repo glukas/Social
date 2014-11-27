@@ -1,8 +1,8 @@
 package ch.ethz.inf.vs.android.glukas.project4.protocol;
 
+import ch.ethz.inf.vs.android.glukas.project4.BasicUser;
 import ch.ethz.inf.vs.android.glukas.project4.Post;
 import ch.ethz.inf.vs.android.glukas.project4.Post.PostType;
-import ch.ethz.inf.vs.android.glukas.project4.User;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.Message.MessageType;
 
 /**
@@ -32,18 +32,18 @@ public class MessageFactory {
 	 * @param isSend
 	 * @return
 	 */
-	public static Message newPostMessage(Post post, User sender, User receiver, boolean isSend) {
+	public static Message newPostMessage(Post post, BasicUser sender, BasicUser receiver, boolean isSend) {
 		if (isSend) {
 			if (post.getType().equals(PostType.PICTURE)){
 				return new Message(sender, receiver, post.getId(), MessageType.SEND_PICTURE, post.getImageLink(), post.getText(), "", post.getId(), 0);
 			} else {
-				return new Message(sender, receiver, post.getId(), MessageType.SEND_TEXT, "", "", "", post.getId(), 0);
+				return new Message(sender, receiver, post.getId(), MessageType.SEND_TEXT, "", post.getText(), "", post.getId(), 0);
 			}
 		} else {
 			if (post.getType().equals(PostType.PICTURE)){
 				return new Message(sender, receiver, post.getId(), MessageType.POST_PICTURE, post.getImageLink(), post.getText(), "", post.getId(), 0);
 			} else {
-				return new Message(sender, receiver, post.getId(), MessageType.POST_TEXT, "", "", "", post.getId(), 0);
+				return new Message(sender, receiver, post.getId(), MessageType.POST_TEXT, "", post.getText(), "", post.getId(), 0);
 			}
 		}
 	}
@@ -56,8 +56,28 @@ public class MessageFactory {
 	 * @param numM
 	 * @return
 	 */
-	public static Message newSendStateMessage(User sender, User receiver, int id, int numM) {
+	public static Message newSendStateMessage(BasicUser sender, BasicUser receiver, int id, int numM) {
 		return new Message(sender, receiver, 0, MessageType.SEND_STATE, "", "", "", id, numM);
+	}
+	
+	/**
+	 * New get state Message
+	 * @param sender
+	 * @param receiver
+	 * @return
+	 */
+	public static Message newGetStateMessage(BasicUser sender, BasicUser receiver) {
+		return new Message(sender, receiver, 0, MessageType.GET_STATE, "", "", "", 0, 0);
+	}
+	
+	/**
+	 * New ack Message
+	 * @param sender
+	 * @param receiver
+	 * @return
+	 */
+	public static Message newAckMessage(BasicUser sender, BasicUser receiver) {
+		return new Message(sender, receiver, 0, MessageType.ACK_POST, "", "", "", 0, 0);
 	}
 	
 	/**
@@ -67,7 +87,7 @@ public class MessageFactory {
 	 * @param receiver
 	 * @return
 	 */
-	public static Message newGetPostsMessage(int oldCountPost, User sender, User receiver) {
+	public static Message newGetPostsMessage(int oldCountPost, BasicUser sender, BasicUser receiver) {
 		return new Message(sender, receiver, 0, MessageType.GET_POSTS, "", "", "", oldCountPost, 0);
 	}
 	
@@ -87,5 +107,4 @@ public class MessageFactory {
 	public static Message newTypeMessage(MessageType type) {
 		return new Message(null, null, 0, type, "", "", "", 0, 0);
 	}
-
 }

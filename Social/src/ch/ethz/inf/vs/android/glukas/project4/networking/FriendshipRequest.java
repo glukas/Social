@@ -3,13 +3,9 @@ package ch.ethz.inf.vs.android.glukas.project4.networking;
 import java.math.BigInteger;
 
 import ch.ethz.inf.vs.android.glukas.project4.User;
-import ch.ethz.inf.vs.android.glukas.project4.protocol.parsing.JSONObjectFactory;
+import ch.ethz.inf.vs.android.glukas.project4.UserId;
 import ch.ethz.inf.vs.android.glukas.project4.security.CryptographyParameters;
 import android.nfc.NdefMessage;
-import android.nfc.NdefRecord;
-import android.nfc.NfcAdapter.CreateNdefMessageCallback;
-import android.nfc.NfcAdapter.OnNdefPushCompleteCallback;
-import android.nfc.NfcEvent;
 import android.util.Log;
 
 public class FriendshipRequest extends FriendshipMessage {
@@ -24,7 +20,7 @@ public class FriendshipRequest extends FriendshipMessage {
 	public FriendshipRequest(User sender) {
 		this.messageType = MessageType.Request;
 		this.sender = sender;
-		this.communicationHandle = CryptographyParameters.getInstance().getPseudorandom(16);
+		this.communicationHandle = new UserId().getBytes();
 		Log.v(this.getClass().toString(), "create comm handle : " + new BigInteger(communicationHandle));
 	}
 	

@@ -3,24 +3,21 @@ package ch.ethz.inf.vs.android.glukas.project4.protocol;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-
 import android.content.Context;
 import android.util.Log;
 import ch.ethz.inf.vs.android.glukas.project4.Post;
-import ch.ethz.inf.vs.android.glukas.project4.User;
+import ch.ethz.inf.vs.android.glukas.project4.BasicUser;
 import ch.ethz.inf.vs.android.glukas.project4.UserDelegate;
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseAccess;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.DatabaseException;
-import ch.ethz.inf.vs.android.glukas.project4.exceptions.FailureReason;
-import ch.ethz.inf.vs.android.glukas.project4.exceptions.NetworkException;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.UnhandledFunctionnality;
 import ch.ethz.inf.vs.android.glukas.project4.networking.MessageRelay;
-import ch.ethz.inf.vs.android.glukas.project4.networking.MessageRelayDelegate;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.Message.MessageType;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.Message;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.parsing.JSONObjectFactory;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.parsing.MessageParser;
+import ch.ethz.inf.vs.android.glukas.project4.security.DBCredentialStorage;
 import ch.ethz.inf.vs.android.glukas.project4.security.SecureChannel;
 import ch.ethz.inf.vs.android.glukas.project4.security.SecureChannelDelegate;
 import ch.ethz.inf.vs.android.glukas.project4.security.NetworkMessage;
@@ -33,8 +30,7 @@ import ch.ethz.inf.vs.android.glukas.project4.security.NetworkMessage;
  * UserDelegate. On an other hand, it handles calls back from the network,
  * through implementing SecureChannelDelegate.
  */
-public class Protocol implements ProtocolDelegate, SecureChannelDelegate,
-		MessageRelayDelegate {
+public class Protocol implements ProtocolDelegate, SecureChannelDelegate {
 
 	////
 	// Life cycle
@@ -54,12 +50,11 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate,
 	}
 
 	private Protocol(Context context, DatabaseAccess db) {
-		// TODO : instantiate delegates (user, security layers)
-		// TODO : instantiate messages relays and channels 
 		database = db;
-		secureChannel.setDelegate(this);
-		messageRelay.setDelegate(this);
 		localUser = database.getUser();
+		secureChannel = new SecureChannel("winti.moo.com", 9000, new DBCredentialStorage(db));
+		secureChannel.setDelegate(this);
+		messageRelay = new MessageRelay(secureChannel);
 		wallAsked = new TreeSet<UserId>();
 	}
 
@@ -74,8 +69,8 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate,
 	private DatabaseAccess database;
 
 	//caching
-	private User localUser;
-	private Set<UserId> wallAsked;
+	private BasicUser localUser;
+	private volatile Set<UserId> wallAsked;
 	
 	//exceptional behaviors
 	private final String unexpectedMsg = "Unexpected message arrived : ";
@@ -85,27 +80,13 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate,
 	////
 
 	@Override
-	public void connect() throws NetworkException {
-		//TODO (only sketch)
-		String msg = JSONObjectFactory.createJSONObject(
-				MessageFactory.newTypeMessage(MessageType.CONNECT), 0).toString();
-
-		PublicHeader header = new PublicHeader(0, null,
-				StatusByte.CONNECT.getByte(), 0, localUser.getId(), null);
-
-		messageRelay.connect(msg, header);
+	public void connect() {
+		messageRelay.connect(localUser.getId());
 	}
 
 	@Override
-	public void disconnect() throws NetworkException {
-		//TODO (only sketch)
-		String msg = JSONObjectFactory.createJSONObject(
-				MessageFactory.newTypeMessage(MessageType.DISCONNECT), 0).toString();
-
-		PublicHeader header = new PublicHeader(0, null,
-				StatusByte.DISCONNECT.getByte(), 0, localUser.getId(), null);
-
-		messageRelay.disconnect(msg, header);
+	public void disconnect() {
+		messageRelay.disconnect(localUser.getId());
 	}
 
 	@Override
@@ -120,18 +101,35 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate,
 	}
 
 	@Override
-	public void getUserWall(String distUsername) throws NetworkException {
-		List<UserId> listUserId = database.getFriendId(distUsername);
-		// if the list is bigger than one, then the user has two friends with
-		// common user name
-		// TODO proper exceptions handling
-		if (listUserId == null || listUserId.size() == 0 || listUserId.size() > 1) {
-			new DatabaseException().printStackTrace();
-		}
-		UserId userId = listUserId.get(0);
+	public void getUserWall(UserId userId) {
+		getUserPosts(userId, 0);
+	}
+	
+	@Override
+	public void getUserPosts(UserId userId, int postId) {
 		//retrieve data already known from database
-		
+		database.getAllFriendPostsFrom(userId, postId);
 		//ask distant user if already all messages are in database
+		Message msg = MessageFactory.newTypeMessage(MessageType.GET_STATE);
+		PublicHeader header = new PublicHeader(0, null, StatusByte.DATA.getByte(), 0, localUser.getId(), userId);
+		secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg, 0).toString(), header));
+		wallAsked.add(userId);
+	}
+	
+	@Override
+	public void getSomeUserPosts(UserId userId, int numberPosts) {
+		int oldestPost = database.getFriendMaxPostsId(userId);
+		getSomeUserPosts(userId, numberPosts, oldestPost);
+	}
+	
+	@Override
+	public void getSomeUserPosts(UserId userId, int numberPosts, int postId) {
+		//List<Post> listPosts = database.getSomeUserPosts(userId, numberPosts, postId);
+		List<Post> listPosts = null;
+		for (Post p : listPosts){
+			userHandler.onPostReceived(p);
+		}
+		
 		Message msg = MessageFactory.newTypeMessage(MessageType.GET_STATE);
 		PublicHeader header = new PublicHeader(0, null, StatusByte.DATA.getByte(), 0, localUser.getId(), userId);
 		secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg, 0).toString(), header));
@@ -139,7 +137,7 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate,
 	}
 
 	@Override
-	public void askFriendship(String distUsername) throws NetworkException {
+	public void askFriendship(String distUsername) {
 		//for the moment, we only use NFC
 		try {
 			throw new UnhandledFunctionnality();
@@ -149,7 +147,7 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate,
 	}
 
 	@Override
-	public void discoverFriends() throws NetworkException {
+	public void discoverFriends() {
 		//for the moment, we only use NFC
 		try {
 			throw new UnhandledFunctionnality();
@@ -173,14 +171,9 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate,
 		Message msg = MessageParser.parseMessage(message.text, message.header, database);
 		
 		MessageType type = msg.getRequestType();
-			// Server
-		if (type.equals(MessageType.CONNECT)) {
-			onConnectReceived(msg);
-		} else if (type.equals(MessageType.DISCONNECT)) {
-			onDisconnectReceived(msg);
 	
 			// Friends
-		} else if (type.equals(MessageType.SEARCH_USER)) {
+		if (type.equals(MessageType.SEARCH_USER)) {
 			onSearchUserReceived(msg);
 		} else if (type.equals(MessageType.ACCEPT_FRIENDSHIP)) {
 			onAcceptFriendshipReceived(msg);
@@ -188,19 +181,19 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate,
 			onRefuseFriendshipReceived(msg);
 		} else if (type.equals(MessageType.ASK_FRIENDSHIP)) {
 			onAskFriendshipReceived(msg);
-		} else if (type.equals(MessageType.BROADCAST)) {
-			onBroadcastReceived(msg);
+		}
 	
 			// Post new messages
-		} else if (type.equals(MessageType.POST_PICTURE)) {
+		else if (type.equals(MessageType.POST_PICTURE)) {
 			onPostPictureReceived(msg);
 		} else if (type.equals(MessageType.POST_TEXT)) {
 			onPostTextReceived(msg);
 		} else if (type.equals(MessageType.ACK_POST)) {
 			onAckPostReceived(msg);
+		}
 	
 			// Retrieve data
-		} else if (type.equals(MessageType.GET_POSTS)) {
+		else if (type.equals(MessageType.GET_POSTS)) {
 			onGetPostsReceived(msg);
 		} else if (type.equals(MessageType.SHOW_IMAGE)) {
 			onShowImageReceived(msg);
@@ -230,7 +223,6 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate,
 		int msgId = database.getFriendMaxPostsId(localUser.getId());
 		Post post = new Post(msg, msgId);
 		database.putFriendPost(post, localUser.getId());
-		//TODO : implement acknowledgment 
 	}
 	
 	private void onAckPostReceived(Message msg) {
@@ -295,7 +287,7 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate,
 		int maxPostId = database.getFriendMaxPostsId(localUser.getId());
 		int maxNumMsgs = database.getFriendMaxPostsId(localUser.getId());
 		//create message encapsulating all informations
-		User userToSend = msg.getSender();
+		BasicUser userToSend = msg.getSender();
 		String msgToSend = JSONObjectFactory.createJSONObject(MessageFactory.newSendStateMessage(localUser, userToSend, maxPostId, maxNumMsgs)).toString();
 		PublicHeader header = new PublicHeader(0, null, StatusByte.SEND.getByte(), 0, localUser.getId(), userToSend.getId());
 		//send reply
@@ -319,48 +311,8 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate,
 		Log.d(getClass().toString(), unexpectedMsg+msg.toString());
 	}
 	
-	private void onConnectReceived(Message msg) {
-		//User should not be targeted by these kind of messages
-		Log.d(getClass().toString(), unexpectedMsg+msg.toString());
-	}
-	
-	private void onDisconnectReceived(Message msg) {
-		//User should not be targeted by these kind of messages
-		Log.d(getClass().toString(), unexpectedMsg+msg.toString());
-	}
-	
 	private void onSearchUserReceived(Message msg) {
 		//User should not be targeted by these kind of messages
 		Log.d(getClass().toString(), unexpectedMsg+msg.toString());
-	}
-	
-	private void onBroadcastReceived(Message msg) {
-		//User should not be targeted by these kind of messages
-		Log.d(getClass().toString(), unexpectedMsg+msg.toString());
-	}
-
-	////
-	// MessageRelayDelegate
-	////
-
-	@Override
-	public void onRegistrationSucceeded(UserId self, UserId other) {
-		userHandler.onConnectionSucceeded();
-	}
-
-	@Override
-	public void onRegistrationFailed(UserId self, UserId other,
-			FailureReason reason) {
-		userHandler.onConnectionFailed(reason);
-	}
-
-	@Override
-	public void onDeregistrationSucceeded() {
-		userHandler.onDisconnectionSucceeded();
-	}
-
-	@Override
-	public void onDeregistrationFailed(FailureReason reason) {
-		userHandler.onDisconnectionFailed(reason);
 	}
 }

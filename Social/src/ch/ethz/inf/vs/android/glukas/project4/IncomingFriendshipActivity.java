@@ -14,9 +14,6 @@ import android.os.Parcelable;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -75,7 +72,7 @@ public class IncomingFriendshipActivity extends Activity implements OnNdefPushCo
         request = new FriendshipRequest(msg);
         //TODO (Vincent?/Young?/Samuel?) replace with this device's user
         UserId dummyId = new UserId("0");
-        response = request.createAcceptingResponse(new User(dummyId, "Bob",  ZeroCredentialStorage.constantCredentials.getUserCredentials(dummyId)));
+        response = request.createAcceptingResponse(new User(dummyId, "Bob", new UserCredentials(dummyId)));
  
 		nfcAdapter = NfcAdapter.getDefaultAdapter(this);
 		//TODO better error handling

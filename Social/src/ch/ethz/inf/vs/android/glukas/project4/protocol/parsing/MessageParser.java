@@ -78,9 +78,7 @@ public class MessageParser {
 		}
 		
 		// Broadcast & ACK
-		else if (command.equals(Args.BROADCAST.getStr())) {
-			parseBroadcast(msg, obj);
-		} else if (command.equals(Args.ACK.getStr())) {
+		else if (command.equals(Args.ACK.getStr())) {
 			parseAck(msg, obj);
 		}
 		
@@ -106,12 +104,6 @@ public class MessageParser {
 		msg.setRequestType(MessageType.POST_TEXT);
 		msg.setId(id);
 		msg.setMessage(text);
-	}
-	
-	private static void parseBroadcast(Message msg, JSONObject obj) throws JSONException {
-		String user = obj.getString(Cmds.USER.getStr());
-		msg.setRequestType(MessageType.BROADCAST);
-		msg.setUsername(user);
 	}
 	
 	private static void parseAck(Message msg, JSONObject obj) throws JSONException {

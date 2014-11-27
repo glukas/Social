@@ -10,7 +10,7 @@ public enum StatusByte {
 	DATA("2"),
 	POST("3"),
 	SEND("4"),
-	UNKNOWN("F");
+	UNKNOWN("15");
 	
 	private final byte state;
 	

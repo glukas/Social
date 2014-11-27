@@ -72,7 +72,7 @@ public class MessageCryptography {
 			
 		} catch (InvalidKeyException e) {
 			e.printStackTrace();
-			return null;
+			throw new RuntimeException("invalid key");
 		} catch (IllegalBlockSizeException e) {
 			e.printStackTrace();
 			return null;
@@ -88,13 +88,20 @@ public class MessageCryptography {
 	}
 	
 	NetworkMessage decryptPost(byte[] message) {
-		int headerAndMacLength = PublicHeader.BYTES_LENGTH_HEADER+mac.getMacLength();
-	
-		if (message.length < headerAndMacLength) return null;//Too short message to be legal
+		if (message.length < PublicHeader.BYTES_LENGTH_HEADER) return null;//Too short message (not even a header)
 		
 		ByteBuffer messageBytes = ByteBuffer.wrap(message);
 		//extract public header to get sender & recipient
 		PublicHeader header = new PublicHeader(messageBytes);
+		
+		if (header.isServerStatusMessage()) {//Status messages are not authenticated or encrypted
+			return new NetworkMessage("", header);
+		}
+		
+		int headerAndMacLength = PublicHeader.BYTES_LENGTH_HEADER+mac.getMacLength();
+		int headerAndMacAndIvLength = headerAndMacLength+cipher.getBlockSize();
+		if (message.length < headerAndMacAndIvLength) return null;//Too short message to be legal, needs to have MAC tag and IV
+		
 		SecretKey encryptionKey = keyStore.getBroadcastEncryptionKey(header.getReceiver());
 		SecretKey authenticationKey = keyStore.getBroadcastAuthenticationKey(header.getReceiver());
 		
@@ -109,13 +116,16 @@ public class MessageCryptography {
 			if (!Arrays.equals(computedMessageAuthenticationCode, receivedMessageAuthenticationCode)) {
 				return null;
 			}
-			
-			//Decrypt (the IV is the first block)
-			cipher.init(Cipher.DECRYPT_MODE, encryptionKey);
-			textBytes = cipher.doFinal(message, headerAndMacLength, message.length-headerAndMacLength);
+			//Decrypt
+			byte[] ivBytes = Arrays.copyOfRange(message, headerAndMacLength, headerAndMacAndIvLength);
+			IvParameterSpec ivSpec = new IvParameterSpec(ivBytes);
+			cipher.init(Cipher.DECRYPT_MODE, encryptionKey, ivSpec);
+			textBytes = cipher.doFinal(message, headerAndMacAndIvLength, message.length-headerAndMacAndIvLength);
 			
 		} catch (InvalidKeyException e) {
 			e.printStackTrace();
+			//RuntimeException ex = new RuntimeException(e);
+			//throw ex;
 			return null;
 		} catch (IllegalBlockSizeException e) {
 			e.printStackTrace();
@@ -123,9 +133,11 @@ public class MessageCryptography {
 		} catch (BadPaddingException e) {
 			e.printStackTrace();
 			return null;
+		} catch (InvalidAlgorithmParameterException e) {
+			e.printStackTrace();
 		}
 		
-		byte[] textByteClean = Arrays.copyOfRange(textBytes, cipher.getBlockSize(), textBytes.length);
+		byte[] textByteClean = textBytes;
 		String text = new String(textByteClean);
 		
 		return new NetworkMessage(text, header);

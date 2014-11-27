@@ -32,12 +32,26 @@ Week 24 - 30 November :
 	
 	Vincent :
 		+Add to Database interface some methods
-		-Protocol instantiation
-		-Check (write tests for) parser and creater of JSON messages
+		+Protocol instantiation
+		+Check (write tests for) parser and creater of JSON messages
 		+onMessageReceived implementation
 		+Define ConsistencyByte
 		+Talk with Mathias for application on server
 
 Week 1 - 7 December
+
+	Testing of the model, the parsing
+
+	Young & Vincent :
+		-test connect, disconnect to server
+		-test creation of messages
+		-test postPost
+		-test getWall
+		-test make friend
+		-test onMessageReceived
+
+Week 8 - 14 December
+
+	
 
 	

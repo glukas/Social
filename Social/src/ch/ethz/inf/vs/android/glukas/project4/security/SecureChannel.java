@@ -57,6 +57,15 @@ public class SecureChannel implements AsyncServerDelegate {
 		//}
 		this.asyncServer.sendMessage(encrypted);
 	}
+	
+	/**
+	 * Asynchronously sends a public header
+	 * to the server. 
+	 * @param header
+	 */
+	public void sendHeader(PublicHeader header) {
+		this.asyncServer.sendMessage(header.getbytes());
+	}
 
 	////
 	//ASYNC SERVER DELEGATE

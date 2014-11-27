@@ -66,6 +66,7 @@
  *  
  *  This protocol is used to communicate with the server. Above there's the definition of the JSONObject
  *  in the form : 
+ *  HEADER
  *  NAME1 :: VALUE1
  *  NAME2 :: VALUE2
  *  and so on.
@@ -77,68 +78,87 @@
  *  NUM_M is an integer
  *  LINK is a string
  *  MESSAGE is a string
+ *  HEADER is [header : length, reserved, status, msgId, senderId, receiverId]
+ *  	with fields defined as above and
+ *  	LENGTH, is the length of the message
+ *  	RESERVED, are the three bytes reserved for future use
+ *  	CONNECTION, is the connection status byte
+ *  	DISCONNECTION, is the disconnection status byte
+ *  	LOCAL_USER_ID, is the UserId of the local user
+ *  	SERVER_ID, is the UserId of the server
  *  
- *  and where names and values in lower case are strings
+ *  
+ *  Note that for empty messages, only headers are important
  *  
  *  connection message (to server):
- *  	cmd :: connect
+ *   	[header : LENGTH, RESERVED, CONNECTION, 0, LOCAL_USER_ID, SERVER_ID]
  *  
  *  disconnection message (from server):
- *  	cmd :: disconnect
+ *  	[header : LENGTH, RESERVED, DISCONNECTION, 0, LOCAL_USER_ID, SERVER_ID]
  *  
  *  accept friendship message:
+ *  	[header : LENGTH, RESERVED, SEND, 0, LOCAL_USER_ID, FRIEND_USER_ID]
  *  	cmd :: replyFriendship
  *  	response :: accept
  *  
  *  refuse friendship message:
+ *  	[header : LENGTH, RESERVED, SEND, 0, LOCAL_USER_ID, FRIEND_USER_ID]
  *  	cmd :: replyFriendship
  *  	response :: reject
  *  
  *  demand friendship message:
+ *  	[header : LENGTH, RESERVED, SEND, 0, LOCAL_USER_ID, FRIEND_USER_ID]
  *  	cmd :: askFriendship
  *  	from :: USERNAME
  *  
  *  get someone's posts
+ *  	[header : LENGTH, RESERVED, DATA, 0, LOCAL_USER_ID, FRIEND_USER_ID]
  *  	cmd :: getPosts
  *  	id :: ID
  *  
  *  get someone's current state
+ *  	[header : LENGTH, RESERVED, DATA, 0, LOCAL_USER_ID, FRIEND_USER_ID]
  *  	cmd :: getState
  *  
  *  send current state
+ *  	[header : LENGTH, RESERVED, SEND, 0, LOCAL_USER_ID, FRIEND_USER_ID]
  *  	cmd :: sendState
  *  	id :: ID
  *  	numMessages :: NUM_M
  *  
  *  post text message on someone's wall:
+ *  	[header : LENGTH, RESERVED, POST, ID, LOCAL_USER_ID, FRIEND_USER_ID]
  *  	cmd :: postText
  *  	id :: ID
  *  	text :: MESSAGE
  *  
  *  post picture message on someone's wall:
+ *  	[header : LENGTH, RESERVED, POST, ID, LOCAL_USER_ID, FRIEND_USER_ID]
  *  	cmd :: postPicture
  *  	id :: ID
  *  	text :: MESSAGE
  *  	picture :: LINK
  *  
  *  send a text message to someone:
+ *  	[header : LENGTH, RESERVED, SEND, ID, LOCAL_USER_ID, FRIEND_USER_ID]
  *  	cmd :: sendText
  *  	id :: ID
  *  	text :: MESSAGE
  *  
  *  send a picture message to someone:
+ *  	[header : LENGTH, RESERVED, SEND, ID, LOCAL_USER_ID, FRIEND_USER_ID]
  *  	cmd :: sendPicture
  *  	id :: ID
  *  	text :: MESSAGE
  *  	picture :: LINK
  *  
- *  broadcast user's name:
- *  	cmd :: broadcast
- *  	user :: USERNAME
- *  
  *  acknowledge a post:
+ *  	[header : LENGTH, RESERVED, SEND, ID, LOCAL_USER_ID, FRIEND_USER_ID]
  *  	cmd :: ack
  *  	id :: ID
+ *  
+ *  server acknowledge a message to server
+ * 		[header : LENGTH, RESERVED, CONNECT OR DISCONNECT, 0, SERVER_ID, LOCAL_USER_ID]
  *  
  */
 

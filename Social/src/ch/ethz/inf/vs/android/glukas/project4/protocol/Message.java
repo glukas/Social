@@ -1,6 +1,6 @@
 package ch.ethz.inf.vs.android.glukas.project4.protocol;
 
-import ch.ethz.inf.vs.android.glukas.project4.User;
+import ch.ethz.inf.vs.android.glukas.project4.BasicUser;
 
 /**
  * A Message used by the protocol send over the network. (Either by the user or received from outside world)
@@ -20,7 +20,7 @@ public class Message {
 	 * @param id
 	 * @param numM
 	 */
-	public Message(User sender, User receiver, int postId, MessageType type, String link, String msg, String username, int id, int numM){
+	public Message(BasicUser sender, BasicUser receiver, int postId, MessageType type, String link, String msg, String username, int id, int numM){
 		this.sender = sender;
 		this.receiver = receiver;
 		this.postId = postId;
@@ -33,8 +33,8 @@ public class Message {
 	}
 	
 	//header
-	protected User sender;
-	protected User receiver;
+	protected BasicUser sender;
+	protected BasicUser receiver;
 	protected int postId;
 	protected MessageType requestType;
 	
@@ -49,19 +49,19 @@ public class Message {
 	//Getters and Setters
 	////
 	
-	public User getSender() {
+	public BasicUser getSender() {
 		return sender;
 	}
 
-	public void setSender(User sender) {
+	public void setSender(BasicUser sender) {
 		this.sender = sender;
 	}
 
-	public User getReceiver() {
+	public BasicUser getReceiver() {
 		return receiver;
 	}
 
-	public void setReceiver(User receiver) {
+	public void setReceiver(BasicUser receiver) {
 		this.receiver = receiver;
 	}
 
@@ -121,6 +121,10 @@ public class Message {
 		this.numM = numM;
 	}
 	
+	////
+	//Public Methods
+	////
+	
 	@Override
 	public String toString() {
 		if (sender != null) {
@@ -151,16 +155,11 @@ public class Message {
 	 */
 	public enum MessageType {
 		
-		//server
-		CONNECT,
-		DISCONNECT,
-		
 		//friends
 		ACCEPT_FRIENDSHIP,
 		REFUSE_FRIENDSHIP,
 		ASK_FRIENDSHIP,
 		SEARCH_USER,
-		BROADCAST,
 		
 		//post new messages
 		POST_PICTURE,
