@@ -1,8 +1,6 @@
 package ch.ethz.inf.vs.android.glukas.project4.protocol;
 
-import ch.ethz.inf.vs.android.glukas.project4.Post;
 import ch.ethz.inf.vs.android.glukas.project4.User;
-import ch.ethz.inf.vs.android.glukas.project4.Post.PostType;
 
 /**
  * A Message used by the protocol send over the network. (Either by the user or received from outside world)
@@ -11,72 +9,41 @@ import ch.ethz.inf.vs.android.glukas.project4.Post.PostType;
 public class Message {
 	
 	/**
-	 * Create a new empty Message
-	 */
-	public Message() {
-		
-	}
-	
-	/**
-	 * Create a new Message of type SEND_STATE
+	 * New Message
 	 * @param sender
 	 * @param receiver
+	 * @param postId
 	 * @param type
+	 * @param link
+	 * @param msg
+	 * @param username
 	 * @param id
 	 * @param numM
 	 */
-	public Message(User sender, User receiver, int id, int numM) {
+	public Message(User sender, User receiver, int postId, MessageType type, String link, String msg, String username, int id, int numM){
 		this.sender = sender;
 		this.receiver = receiver;
-		this.requestType = MessageType.SEND_STATE;
+		this.postId = postId;
+		this.requestType = type;
+		this.httpLink = link;
+		this.message = msg;
+		this.username = username;
 		this.id = id;
 		this.numM = numM;
-	}
-	
-	
-	public Message(Post post, User receiver, User sender, boolean isSend){
-		this.sender = sender;
-		this.receiver = receiver;
-		postId = post.getId();
-		message = post.getText();
-		id = post.getId();
-		if (isSend) {
-			if (post.getType().equals(PostType.PICTURE)){
-				requestType = MessageType.SEND_PICTURE;
-				httpLink = post.getImageLink();
-			} else {
-				requestType = MessageType.SEND_TEXT;
-			}
-		} else {
-			if (post.getType().equals(PostType.PICTURE)){
-				requestType = MessageType.POST_PICTURE;
-				httpLink = post.getImageLink();
-			} else {
-				requestType = MessageType.POST_TEXT;
-			}
-		}
-	}
-	
-	/**
-	 * Create new simple Message 
-	 * @param type of the message. (Should only be subset of all types)
-	 */
-	public Message(MessageType type) {
-		this.requestType = type;
 	}
 	
 	//header
 	protected User sender;
 	protected User receiver;
-	protected int postId = 0;
+	protected int postId;
 	protected MessageType requestType;
 	
 	//content
-	protected String httpLink = "";
-	protected String message = "";
-	protected String username = "";
-	protected int id = 0;
-	protected int numM = 0;
+	protected String httpLink;
+	protected String message;
+	protected String username;
+	protected int id;
+	protected int numM;
 	
 	////
 	//Getters and Setters

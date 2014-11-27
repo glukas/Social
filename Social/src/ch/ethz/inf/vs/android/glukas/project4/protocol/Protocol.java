@@ -1,6 +1,8 @@
 package ch.ethz.inf.vs.android.glukas.project4.protocol;
 
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import android.content.Context;
 import android.util.Log;
@@ -58,7 +60,7 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate,
 		secureChannel.setDelegate(this);
 		messageRelay.setDelegate(this);
 		localUser = database.getUser();
-		sender = new Sender(secureChannel);
+		wallAsked = new TreeSet<UserId>();
 	}
 
 	////
@@ -70,10 +72,12 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate,
 	private MessageRelay messageRelay;
 	private UserDelegate userHandler;
 	private DatabaseAccess database;
-	private Sender sender;
 
+	//caching
 	private User localUser;
+	private Set<UserId> wallAsked;
 	
+	//exceptional behaviors
 	private final String unexpectedMsg = "Unexpected message arrived : ";
 
 	////
@@ -84,7 +88,7 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate,
 	public void connect() throws NetworkException {
 		//TODO (only sketch)
 		String msg = JSONObjectFactory.createJSONObject(
-				new Message(MessageType.CONNECT), 0).toString();
+				MessageFactory.newTypeMessage(MessageType.CONNECT), 0).toString();
 
 		PublicHeader header = new PublicHeader(0, null,
 				StatusByte.CONNECT.getByte(), 0, localUser.getId(), null);
@@ -96,7 +100,7 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate,
 	public void disconnect() throws NetworkException {
 		//TODO (only sketch)
 		String msg = JSONObjectFactory.createJSONObject(
-				new Message(MessageType.DISCONNECT), 0).toString();
+				MessageFactory.newTypeMessage(MessageType.DISCONNECT), 0).toString();
 
 		PublicHeader header = new PublicHeader(0, null,
 				StatusByte.DISCONNECT.getByte(), 0, localUser.getId(), null);
@@ -120,18 +124,18 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate,
 		List<UserId> listUserId = database.getFriendId(distUsername);
 		// if the list is bigger than one, then the user has two friends with
 		// common user name
-		// TODO (only sketch)
-		if (listUserId.size() > 1) {
+		// TODO proper exceptions handling
+		if (listUserId == null || listUserId.size() == 0 || listUserId.size() > 1) {
 			new DatabaseException().printStackTrace();
 		}
+		UserId userId = listUserId.get(0);
 		//retrieve data already known from database
 		
 		//ask distant user if already all messages are in database
-		Message msg = new Message(MessageType.GET_STATE);
-		PublicHeader header = new PublicHeader(0, null, StatusByte.DATA.getByte(), 0, localUser.getId(), listUserId.get(0));
-		sender.addMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg, 0).toString(), header));
-		
-		//TODO find mechanism to notify that we are now waiting on state of the user
+		Message msg = MessageFactory.newTypeMessage(MessageType.GET_STATE);
+		PublicHeader header = new PublicHeader(0, null, StatusByte.DATA.getByte(), 0, localUser.getId(), userId);
+		secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg, 0).toString(), header));
+		wallAsked.add(userId);
 	}
 
 	@Override
@@ -235,8 +239,13 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate,
 	}
 	
 	private void onGetPostsReceived(Message msg) {
-		List<Post> listPost = database.getAllFriendPostsFrom(localUser.getId(), msg.getId());
-		sender.addPostsAsync(listPost, localUser, msg.getSender(), true);
+		List<Post> listPosts = database.getAllFriendPostsFrom(localUser.getId(), msg.getId());
+		for (Post post : listPosts){
+			String msgTxt = JSONObjectFactory.createJSONObject(MessageFactory.newPostMessage(post, localUser, msg.getSender(), true)).toString();
+			PublicHeader header = new PublicHeader(0, null, StatusByte.SEND.getByte(), post.getId(), localUser.getId(), msg.getSender().getId());
+			NetworkMessage networkMsg = new NetworkMessage(msgTxt, header);
+			secureChannel.sendMessage(networkMsg);
+		}
 	}
 	
 	private void onShowImageReceived(Message msg) {
@@ -264,6 +273,18 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate,
 		UserId userId = msg.getSender().getId();
 		int maxNumMsgs = msg.getNumM();
 		int maxPostId = msg.getId();
+		
+		//check if local user was waiting on this wall
+		boolean isWaitingOnWall = wallAsked.contains(userId);
+		if (isWaitingOnWall) {
+			//ask to have posts that local user doesn't have in database
+			int oldMaxPostId = database.getFriendMaxPostsId(userId);
+			Message msgToSend = MessageFactory.newGetPostsMessage(oldMaxPostId, localUser, msg.getSender());
+			PublicHeader header = new PublicHeader(0, null, StatusByte.SEND.getByte(), 0, localUser.getId(), userId);
+			NetworkMessage networkMessage = new NetworkMessage(JSONObjectFactory.createJSONObject(msgToSend).toString(), header);
+			secureChannel.sendMessage(networkMessage);
+		}
+		
 		//And stores informations into the database
 		database.setFriendMaxPostsId(maxNumMsgs, userId);
 		database.setFriendPostsCount(maxPostId, userId);
@@ -275,10 +296,10 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate,
 		int maxNumMsgs = database.getFriendMaxPostsId(localUser.getId());
 		//create message encapsulating all informations
 		User userToSend = msg.getSender();
-		String msgToSend = JSONObjectFactory.createJSONObject(new Message(localUser, userToSend, maxPostId, maxNumMsgs)).toString();
+		String msgToSend = JSONObjectFactory.createJSONObject(MessageFactory.newSendStateMessage(localUser, userToSend, maxPostId, maxNumMsgs)).toString();
 		PublicHeader header = new PublicHeader(0, null, StatusByte.SEND.getByte(), 0, localUser.getId(), userToSend.getId());
 		//send reply
-		sender.addMessage(new NetworkMessage(msgToSend, header));
+		secureChannel.sendMessage(new NetworkMessage(msgToSend, header));
 	}
 	
 	//unexpected messages

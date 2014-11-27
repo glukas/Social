@@ -34,7 +34,7 @@ Week 24 - 30 November :
 		+Add to Database interface some methods
 		-Protocol instantiation
 		-Check (write tests for) parser and creater of JSON messages
-		-onMessageReceived implementation
+		+onMessageReceived implementation
 		+Define ConsistencyByte
 		+Talk with Mathias for application on server
 

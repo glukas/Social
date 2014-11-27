@@ -6,6 +6,7 @@ import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseAccess;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.ProtocolException;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.Message;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.Message.MessageType;
+import ch.ethz.inf.vs.android.glukas.project4.protocol.MessageFactory;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.PublicHeader;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.StatusByte;
 
@@ -17,7 +18,7 @@ public class MessageParser {
 	public static Message parseMessage(String message, PublicHeader header, DatabaseAccess db) {
 
 		// Parse the header
-		Message msg = new Message();
+		Message msg = MessageFactory.newEmptyMessage();
 		msg.setSender(db.getFriend(header.getSender()));
 		msg.setReceiver(db.getFriend(header.getReceiver()));
 		msg.setPostId(header.getMessageId());
