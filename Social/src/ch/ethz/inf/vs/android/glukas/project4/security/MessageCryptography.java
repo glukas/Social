@@ -88,13 +88,20 @@ public class MessageCryptography {
 	}
 	
 	NetworkMessage decryptPost(byte[] message) {
-		int headerAndMacLength = PublicHeader.BYTES_LENGTH_HEADER+mac.getMacLength();
-		int headerAndMacAndIvLength = headerAndMacLength+cipher.getBlockSize();
-		if (message.length < headerAndMacAndIvLength) return null;//Too short message to be legal
+		if (message.length < PublicHeader.BYTES_LENGTH_HEADER) return null;//Too short message (not even a header)
 		
 		ByteBuffer messageBytes = ByteBuffer.wrap(message);
 		//extract public header to get sender & recipient
 		PublicHeader header = new PublicHeader(messageBytes);
+		
+		if (header.isServerStatusMessage()) {//Status messages are not authenticated or encrypted
+			return new NetworkMessage("", header);
+		}
+		
+		int headerAndMacLength = PublicHeader.BYTES_LENGTH_HEADER+mac.getMacLength();
+		int headerAndMacAndIvLength = headerAndMacLength+cipher.getBlockSize();
+		if (message.length < headerAndMacAndIvLength) return null;//Too short message to be legal, needs to have MAC tag and IV
+		
 		SecretKey encryptionKey = keyStore.getBroadcastEncryptionKey(header.getReceiver());
 		SecretKey authenticationKey = keyStore.getBroadcastAuthenticationKey(header.getReceiver());
 		

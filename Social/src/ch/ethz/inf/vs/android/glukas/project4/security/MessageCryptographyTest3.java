@@ -15,6 +15,7 @@ import android.util.Log;
 
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.PublicHeader;
+import ch.ethz.inf.vs.android.glukas.project4.protocol.StatusByte;
 import junit.framework.TestCase;
 
 public class MessageCryptographyTest3 extends TestCase {
@@ -38,7 +39,7 @@ public class MessageCryptographyTest3 extends TestCase {
 	}
 	
 	public void correctnessTest(String text) {
-		PublicHeader header = new PublicHeader(0, new byte[3], (byte) 0, 0, new UserId("0"), new UserId("1"));
+		PublicHeader header = new PublicHeader(0, new byte[3], StatusByte.POST.getByte() , 0, new UserId("0"), new UserId("1"));
 		assertTrue(header.getbytes().length == PublicHeader.BYTES_LENGTH_HEADER);
 		assertTrue(new PublicHeader(ByteBuffer.wrap(header.getbytes())).getbytes().length == PublicHeader.BYTES_LENGTH_HEADER);
 		assertTrue(Arrays.equals(new PublicHeader(ByteBuffer.wrap(header.getbytes())).getbytes(), header.getbytes()));
@@ -62,7 +63,9 @@ public class MessageCryptographyTest3 extends TestCase {
 		crypted = new byte[PublicHeader.BYTES_LENGTH_HEADER-1];
 		assertNull(crypto.decryptPost(crypted));
 		
-		crypted = new byte[PublicHeader.BYTES_LENGTH_HEADER+1];
+		//posts need to be authenticated
+		PublicHeader header = new PublicHeader(0, new byte[3], StatusByte.POST.getByte() , 0, new UserId("0"), new UserId("1"));
+		crypted = header.getbytes();
 		assertNull(crypto.decryptPost(crypted));
 	}
 	
@@ -70,7 +73,7 @@ public class MessageCryptographyTest3 extends TestCase {
 		
 		String text = "abc-def-ghi-890";
 		
-		PublicHeader header = new PublicHeader(0, new byte[3], (byte) 0, 0, new UserId("-10"), new UserId("-11"));
+		PublicHeader header = new PublicHeader(0, new byte[3], StatusByte.POST.getByte(), 0, new UserId("-10"), new UserId("-11"));
 		NetworkMessage message = new NetworkMessage(text, header);
 		byte[] crypted = crypto.encryptPost(message);
 		crypted[PublicHeader.BYTES_LENGTH_HEADER] = 1;
