@@ -9,4 +9,11 @@
     <string name="title_activity_incoming_friendship">IncomingFriendshipActivity</string>
     <string name="title_activity_contact_detail">ContactDetailActivity</string>
 	<string name ="acceptFriendship">Accept Friendship</string>
+	<string name="server_connect">Connect to server</string>
+	<string name="connection_failed">Error while connecting to the server</string>
+	<string name="connection_screen_info">Welcome to Social.\n\nThis application provides a way to share your thoughts and impressions with other users.\n\nMessages are encrypted and authenticated to ensure your privacy.</string>
+	<string name="home_wall_button">My Wall</string>
+	<string name="home_add_friend_button">Add Friend</string>
+	<string name="home_post_button">Show Friends</string>
+	<string name="home_show_friends_button">View friends</string>
 </resources>
