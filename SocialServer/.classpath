@@ -2,6 +2,6 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="Social.jar"/>
+	<classpathentry kind="lib" path="Social.jar" sourcepath="/Social/src"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

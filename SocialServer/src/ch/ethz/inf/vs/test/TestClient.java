@@ -11,15 +11,16 @@ import java.util.concurrent.TimeUnit;
 public class TestClient {
 	
 	public static void main(String[] args) {
-		int clients = 5;
+		int clients = 1;
 		ExecutorService threadPool = Executors.newCachedThreadPool();
 		//Start some dummy clients
 		System.out.println("How many clients?");
-		//clients = Integer.parseInt(System.console().readLine());
-		
+		clients = Integer.parseInt(System.console().readLine());
+
 		for(int i = 0; i < clients; i++){
 			threadPool.execute(
-						new DummyClient(9000, i)
+					//client ids from 1...clients, 0 is the server
+					new DummyClient(9000, i+1, clients)
 					);
 		}
 		

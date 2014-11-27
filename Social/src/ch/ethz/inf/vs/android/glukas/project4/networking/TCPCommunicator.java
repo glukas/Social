@@ -110,17 +110,17 @@ public class TCPCommunicator {
 		in.readFully(headerBytes);
 		header = new PublicHeader(ByteBuffer.wrap(headerBytes));
 		
+		
 		//set message based on header
-		messageBytes = new byte[header.getLength()];
+		messageBytes = new byte[header.getLength() - PublicHeader.BYTES_LENGTH_HEADER];
+		in.readFully(messageBytes);
 		
-		// copy header to front of message
-		System.arraycopy(headerBytes, 0, messageBytes, 0, headerBytes.length);
-		
-		//read the rest of message
-		in.readFully(messageBytes, PublicHeader.BYTES_LENGTH_HEADER, header.getLength() - PublicHeader.BYTES_LENGTH_HEADER);
-				
-		
-		return messageBytes;
+
+		//Combine header and message
+		byte[] packet = new byte[header.getLength()];
+		System.arraycopy(header.getbytes(), 0, packet, 0, header.getbytes().length);
+		System.arraycopy(messageBytes, 0, packet, header.getbytes().length, messageBytes.length);
+		return packet;
 	}
 
 	////

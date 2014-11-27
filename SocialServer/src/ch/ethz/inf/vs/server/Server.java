@@ -17,6 +17,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import ch.ethz.inf.vs.android.glukas.project4.protocol.PublicHeader;
+
 public class Server implements Runnable {
 
 	private InetAddress hostAddress;
@@ -29,7 +31,9 @@ public class Server implements Runnable {
 	private Selector selector;
 
 	// The buffer into which we'll read data when it's available
-	private ByteBuffer readBuffer = ByteBuffer.allocate(50);
+	private ByteBuffer headerBuffer = ByteBuffer.allocate(PublicHeader.BYTES_LENGTH_HEADER);
+	//Max message size 1MB
+	private ByteBuffer messageBuffer = ByteBuffer.allocate(1024);
 	
 	//The worker to handle connections
 	private ConnectionWorker worker;
@@ -110,7 +114,8 @@ public class Server implements Runnable {
 		synchronized (this.changeRequests) {
 			// Deploy change request
 			this.changeRequests.add(new ChangeRequest(socket, ChangeRequest.CHANGEOPS, SelectionKey.OP_WRITE));
-
+			System.out.println("Added message with length " + m.getHeader().getLength() + " to write queue");
+			System.out.println("---Actual size " + data.length + " bytes");
 			// Add data to write to queue
 			synchronized (this.pendingData) {
 				List<ByteBuffer> queue = this.pendingData.get(socket);
@@ -130,13 +135,14 @@ public class Server implements Runnable {
 		SocketChannel socketChannel = (SocketChannel) key.channel();
 
 		// Clear out our read buffer so it's ready for new data
-		this.readBuffer.clear();
+		this.headerBuffer.clear();
+		this.messageBuffer.clear();
 
-		// Attempt to read off the channel
+		// Attempt to read the header off the channel
 		int numRead;
 		try {
-			numRead = socketChannel.read(this.readBuffer);
-			System.out.println(numRead + "bytes read!");
+			numRead = socketChannel.read(this.headerBuffer);
+			System.out.println(numRead + "bytes read! (Header)");
 		} catch (IOException e) {
 			// Connection got closed
 			System.out.println("One remote connection got closed!");
@@ -151,9 +157,41 @@ public class Server implements Runnable {
 			key.cancel();
 			return;
 		}
+		
+		//Now read the message
+		//Set the message Buffer limit to message size
+		headerBuffer.rewind();
+		int messageLength = headerBuffer.getInt();
+		System.out.println("MessageLength: " + messageLength + " bytes");
+		//Do not read more than the message size
+		this.messageBuffer.limit(messageLength - PublicHeader.BYTES_LENGTH_HEADER);
+		
+		try {
+			numRead = socketChannel.read(this.messageBuffer);
+			System.out.println(numRead + "bytes read! (Message)");
+		} catch (IOException e) {
+			// Connection got closed
+			System.out.println("One remote connection got closed!");
+			key.cancel();
+			socketChannel.close();
+			return;
+		}
 
+		if (numRead == -1) {
+			// Remote shut down connection cleanly
+			key.channel().close();
+			key.cancel();
+			return;
+		}
+		
+		//Combine header and message
+		byte[] packet = new byte[messageLength];
+		System.arraycopy(headerBuffer.array(), 0, packet, 0, PublicHeader.BYTES_LENGTH_HEADER);
+		System.arraycopy(messageBuffer.array(), 0, packet, PublicHeader.BYTES_LENGTH_HEADER, messageLength - PublicHeader.BYTES_LENGTH_HEADER);
+		
+		
 		// Hand the data off to our worker thread
-		this.worker.processData(this, socketChannel, this.readBuffer.array(), numRead); 
+		this.worker.processData(this, socketChannel, packet, numRead); 
 	}
 
 
@@ -167,9 +205,11 @@ public class Server implements Runnable {
 			// Write until there's not more data ...
 			while (!queue.isEmpty()) {
 				ByteBuffer buf = (ByteBuffer) queue.get(0);
+				System.out.println("Server writes " + buf.remaining() + " bytes");
 				socketChannel.write(buf);
 				if (buf.remaining() > 0) {
 					// ... or the socket's buffer fills up
+					System.out.println("Socket Buffer filled up...");
 					break;
 				}
 				queue.remove(0);

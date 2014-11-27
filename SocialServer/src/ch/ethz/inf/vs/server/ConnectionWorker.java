@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.server;
 
+import java.math.BigInteger;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -11,16 +12,15 @@ import ch.ethz.inf.vs.server.MessageBuffer;
 
 public class ConnectionWorker implements Runnable {
 	  private List<ServerEvent> queue = new LinkedList<ServerEvent>();
-	  private HashMap<UserId, SocketChannel> connectedUsers = new HashMap<UserId, SocketChannel>();
+	  private HashMap<BigInteger, SocketChannel> connectedUsers = new HashMap<BigInteger, SocketChannel>();
 	  private MessageBuffer cache = new MessageBuffer();
 	  
 	  public void processData(Server server, SocketChannel socket, byte[] data, int count) {
 		  //Create Message out of the byte array
 		  Message received = new Message(data);
-		  byte[] dataCopy = new byte[count];
-		  System.arraycopy(data, 0, dataCopy, 0, count);
+		  System.out.println("Received data has size: " + data.length + " bytes");
 		  System.out.println("Status: " + Integer.toHexString(received.getHeader().getConsistency()));
-		  String s = new String(dataCopy, StandardCharsets.UTF_8);
+		  String s = new String(received.getMessage(), StandardCharsets.UTF_8);
 
 		  System.out.println("Server read: " + s);
 
@@ -31,7 +31,7 @@ public class ConnectionWorker implements Runnable {
 	  }
 	  
 	  private boolean isConnected(UserId user){
-		  return connectedUsers.containsKey(user);
+		  return connectedUsers.containsKey(user.getId());
 	  }
 
 	  public void run() {
@@ -62,20 +62,23 @@ public class ConnectionWorker implements Runnable {
 	      	case 0x00:
 	      		//CONNECT
 	      		//save the socket in the connectedUsers HashMap
-	      		connectedUsers.put(sender, dataEvent.socket);
+	      		System.out.println("Connected User: " + sender.getId().toString());
+	      		connectedUsers.put(sender.getId(), dataEvent.socket);
 	      		break;
 	      	case 0x01:
 	      		//DISCONNECT
 	      		//remove the user from connectedUsers
-	      		connectedUsers.remove(sender);
+	      		System.out.println("Deconnect User: " + sender.getId().toString());
+	      		connectedUsers.remove(sender.getId());
 	      		break;
 	      	case 0x02:
 	      		//DATA
 	      		//Send the data to the user
 	      		//TODO For now we store all messages, late we can drop them if send was successful
+	      		System.out.println("DATA request from User: " + sender.getId().toString());
 	      		List<Message> data = cache.getMessagesSince(receiver, 0);
 	      		if(isConnected(sender)){
-	      			SocketChannel socket = connectedUsers.get(sender);
+	      			SocketChannel socket = connectedUsers.get(sender.getId());
 	      			//Send all messages
 	      			for(Message m : data){
 	      				dataEvent.server.send(socket, m);
@@ -85,9 +88,10 @@ public class ConnectionWorker implements Runnable {
 	      		break;
 	      	case 0x03:
 	      		//POST
+	      		System.out.println("POST request from User: " + sender.getId().toString());
 	      		if(isConnected(receiver)){
 	      			//User is online, forward Post
-	      			SocketChannel socket = connectedUsers.get(receiver);
+	      			SocketChannel socket = connectedUsers.get(receiver.getId());
 	      			dataEvent.server.send(socket, dataEvent.message);
 	      		} else {
 	      			//User not online, cache the message
@@ -97,12 +101,16 @@ public class ConnectionWorker implements Runnable {
 	      	case 0x04:
 	      		//SEND
 	      		//Forward message to connected User
+	      		System.out.println("SEND request from User: " + sender.getId().toString());
 	      		if(isConnected(receiver)){
+	      			System.out.println("---- User is connected");
 	      			//User is online, forward message
-	      			SocketChannel socket = connectedUsers.get(receiver);
+	      			SocketChannel socket = connectedUsers.get(receiver.getId());
+	      			System.out.println("---- send message to User " + receiver.getId());
 	      			dataEvent.server.send(socket, dataEvent.message);
 	      		} else {
 	      			//Do not cache the message?!
+	      			System.out.println("---- User is not connected");
 	      		}
 	      		break;
 	      	default:

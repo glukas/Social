@@ -36,7 +36,7 @@ public class Message implements Comparable<Message>, Comparator<Message> {
 		
 		this.header = new PublicHeader(ByteBuffer.wrap(bytes));
 		
-		this.message = Arrays.copyOfRange(bytes, 44, header.getLength()-1);
+		this.message = Arrays.copyOfRange(bytes, PublicHeader.BYTES_LENGTH_HEADER, header.getLength());
 	}
 	
 	//Used to create a dummy message, which only has a clock value

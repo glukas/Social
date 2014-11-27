@@ -8,10 +8,11 @@
                 <attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"/>
                 <attribute name="Rsrc-Main-Class" value="ch.ethz.inf.vs.test.TestClient"/>
                 <attribute name="Class-Path" value="."/>
-                <attribute name="Rsrc-Class-Path" value="./"/>
+                <attribute name="Rsrc-Class-Path" value="./ Social.jar"/>
             </manifest>
             <zipfileset src="jar-in-jar-loader.zip"/>
             <fileset dir="/Users/mathiasbirrer/git/Social/SocialServer/bin"/>
+            <zipfileset dir="/Users/mathiasbirrer/git/Social/SocialServer" includes="Social.jar"/>
         </jar>
     </target>
 </project>
