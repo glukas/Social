@@ -11,14 +11,13 @@ import ch.ethz.inf.vs.android.glukas.project4.UserDelegate;
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseAccess;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.DatabaseException;
-import ch.ethz.inf.vs.android.glukas.project4.exceptions.FailureReason;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.UnhandledFunctionnality;
 import ch.ethz.inf.vs.android.glukas.project4.networking.MessageRelay;
-import ch.ethz.inf.vs.android.glukas.project4.networking.MessageRelayDelegate;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.Message.MessageType;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.Message;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.parsing.JSONObjectFactory;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.parsing.MessageParser;
+import ch.ethz.inf.vs.android.glukas.project4.security.DBCredentialStorage;
 import ch.ethz.inf.vs.android.glukas.project4.security.SecureChannel;
 import ch.ethz.inf.vs.android.glukas.project4.security.SecureChannelDelegate;
 import ch.ethz.inf.vs.android.glukas.project4.security.NetworkMessage;
@@ -31,8 +30,7 @@ import ch.ethz.inf.vs.android.glukas.project4.security.NetworkMessage;
  * UserDelegate. On an other hand, it handles calls back from the network,
  * through implementing SecureChannelDelegate.
  */
-public class Protocol implements ProtocolDelegate, SecureChannelDelegate,
-		MessageRelayDelegate {
+public class Protocol implements ProtocolDelegate, SecureChannelDelegate {
 
 	////
 	// Life cycle
@@ -52,12 +50,11 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate,
 	}
 
 	private Protocol(Context context, DatabaseAccess db) {
-		// TODO : instantiate delegates (user, security layers)
-		// TODO : instantiate messages relays and channels 
 		database = db;
-		secureChannel.setDelegate(this);
-		messageRelay.setDelegate(this);
 		localUser = database.getUser();
+		secureChannel = new SecureChannel("winti.moo.com", 9000, new DBCredentialStorage(db));
+		secureChannel.setDelegate(this);
+		messageRelay = new MessageRelay(secureChannel);
 		wallAsked = new TreeSet<UserId>();
 	}
 
@@ -84,16 +81,12 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate,
 
 	@Override
 	public void connect() {
-		String msg = JSONObjectFactory.createJSONObject(MessageFactory.newTypeMessage(MessageType.CONNECT)).toString();
-		PublicHeader header = new PublicHeader(0, null, StatusByte.CONNECT.getByte(), 0, localUser.getId(), null);
-		messageRelay.connect(msg, header);
+		messageRelay.connect(localUser.getId());
 	}
 
 	@Override
 	public void disconnect() {
-		String msg = JSONObjectFactory.createJSONObject(MessageFactory.newTypeMessage(MessageType.DISCONNECT)).toString();
-		PublicHeader header = new PublicHeader(0, null, StatusByte.DISCONNECT.getByte(), 0, localUser.getId(), null);
-		messageRelay.disconnect(msg, header);
+		messageRelay.disconnect(localUser.getId());
 	}
 
 	@Override
@@ -235,7 +228,6 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate,
 		int msgId = database.getFriendMaxPostsId(localUser.getId());
 		Post post = new Post(msg, msgId);
 		database.putFriendPost(post, localUser.getId());
-		//TODO : implement acknowledgment 
 	}
 	
 	private void onAckPostReceived(Message msg) {
@@ -342,30 +334,5 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate,
 	private void onBroadcastReceived(Message msg) {
 		//User should not be targeted by these kind of messages
 		Log.d(getClass().toString(), unexpectedMsg+msg.toString());
-	}
-
-	////
-	// MessageRelayDelegate
-	////
-
-	@Override
-	public void onRegistrationSucceeded(UserId self, UserId other) {
-		userHandler.onConnectionSucceeded();
-	}
-
-	@Override
-	public void onRegistrationFailed(UserId self, UserId other,
-			FailureReason reason) {
-		userHandler.onConnectionFailed(reason);
-	}
-
-	@Override
-	public void onDeregistrationSucceeded() {
-		userHandler.onDisconnectionSucceeded();
-	}
-
-	@Override
-	public void onDeregistrationFailed(FailureReason reason) {
-		userHandler.onDisconnectionFailed(reason);
 	}
 }
