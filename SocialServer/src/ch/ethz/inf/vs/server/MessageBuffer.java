@@ -6,15 +6,17 @@ import java.util.List;
 
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
 
-public class MessageBufffer {
+public class MessageBuffer {
 	
 	//<Receipient, Messages>
 	HashMap<UserId, UserMessageQueue> buffer = new HashMap<UserId, UserMessageQueue>();
 	
 	public void addMessage(Message m){
 		if(buffer.containsKey(m.getHeader().getReceiver())){
+			//User already has a queue
 			buffer.get(m.getHeader().getReceiver()).addMessage(m);
 		} else {
+			//Create new queue
 			UserMessageQueue queue = new UserMessageQueue(m);
 			buffer.put(m.getHeader().getReceiver(), queue);
 		}

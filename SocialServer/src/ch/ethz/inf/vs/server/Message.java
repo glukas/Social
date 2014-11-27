@@ -12,7 +12,6 @@
  **/
 package ch.ethz.inf.vs.server;
 
-import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Comparator;
