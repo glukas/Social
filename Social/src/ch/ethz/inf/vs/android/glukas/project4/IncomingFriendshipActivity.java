@@ -72,7 +72,7 @@ public class IncomingFriendshipActivity extends Activity implements OnNdefPushCo
         request = new FriendshipRequest(msg);
         //TODO (Vincent?/Young?/Samuel?) replace with this device's user
         UserId dummyId = new UserId("0");
-        response = request.createAcceptingResponse(new User(dummyId, "Bob",  ZeroCredentialStorage.constantCredentials.getUserCredentials(dummyId)));
+        response = request.createAcceptingResponse(new User(dummyId, "Bob", new UserCredentials(dummyId)));
  
 		nfcAdapter = NfcAdapter.getDefaultAdapter(this);
 		//TODO better error handling

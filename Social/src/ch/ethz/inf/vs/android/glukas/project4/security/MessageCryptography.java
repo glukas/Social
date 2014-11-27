@@ -72,7 +72,7 @@ public class MessageCryptography {
 			
 		} catch (InvalidKeyException e) {
 			e.printStackTrace();
-			return null;
+			throw new RuntimeException("invalid key");
 		} catch (IllegalBlockSizeException e) {
 			e.printStackTrace();
 			return null;
@@ -95,7 +95,7 @@ public class MessageCryptography {
 		ByteBuffer messageBytes = ByteBuffer.wrap(message);
 		//extract public header to get sender & recipient
 		PublicHeader header = new PublicHeader(messageBytes);
-		SecretKey encryptionKey = keyStore.getBroadcastEncryptionKey(header.getReceiver());
+		//SecretKey encryptionKey = keyStore.getBroadcastEncryptionKey(header.getReceiver());
 		SecretKey authenticationKey = keyStore.getBroadcastAuthenticationKey(header.getReceiver());
 		
 		byte[] textBytes = null;
@@ -111,12 +111,13 @@ public class MessageCryptography {
 			}
 			
 			//Decrypt (the IV is the first block)
-			cipher.init(Cipher.DECRYPT_MODE, encryptionKey);
+			//cipher.init(Cipher.DECRYPT_MODE, encryptionKey);
 			textBytes = cipher.doFinal(message, headerAndMacLength, message.length-headerAndMacLength);
 			
 		} catch (InvalidKeyException e) {
 			e.printStackTrace();
-			return null;
+			throw new RuntimeException("invalid key");
+			//return null;
 		} catch (IllegalBlockSizeException e) {
 			e.printStackTrace();
 			return null;

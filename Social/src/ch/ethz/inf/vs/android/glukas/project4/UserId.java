@@ -1,6 +1,9 @@
 package ch.ethz.inf.vs.android.glukas.project4;
 
 import java.math.BigInteger;
+import java.security.SecureRandom;
+
+import ch.ethz.inf.vs.android.glukas.project4.security.CryptographyParameters;
 
 /**
  * Represents the identity of a peer
@@ -9,7 +12,15 @@ public class UserId {
 
 	private BigInteger id;
 	public static final int LENGTH = 16;
-
+	private static SecureRandom random = CryptographyParameters.getRandom();
+	
+	/**
+	 * Generate a fresh - random - user id
+	 */
+	public UserId() {
+		this(generateUserId());
+	}
+	
 	public UserId(String value) {
 		id = new BigInteger(value);
 	}
@@ -17,7 +28,7 @@ public class UserId {
 	public UserId(byte[] twosComplement) {
 		id = new BigInteger(twosComplement);
 	}
-
+	
 	public BigInteger getId(){
 		return id;
 	}
@@ -27,7 +38,7 @@ public class UserId {
 	}
 	
 	/**
-	 * Get a byte array representing this UserId
+	 * Get a fixed size byte array representing this UserId
 	 */
 	public byte[] getBytes() {
 		byte[] array = id.toByteArray();
@@ -46,5 +57,16 @@ public class UserId {
 			array = tmp;
 		} 
 		return array;
+	}
+	
+	//This can be used to generate user Ids.
+	private static byte[] getPseudorandom(int numberOfBytes) {
+		byte[] bytes = new byte[numberOfBytes];
+		random.nextBytes(bytes);
+		return bytes;
+	}
+	
+	private static byte[] generateUserId() {
+		return getPseudorandom(16);
 	}
 }

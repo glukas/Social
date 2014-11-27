@@ -10,10 +10,8 @@ import ch.ethz.inf.vs.android.glukas.project4.UserId;
  */
 public class ZeroCredentialStorage implements CredentialStorage {
 
-	public static final ZeroCredentialStorage constantCredentials = new ZeroCredentialStorage();
-	
-	private SecretKey enc = CryptographyParameters.getInstance().generateEncryptionKey();
-	private SecretKey auth = CryptographyParameters.getInstance().generateMACKey();
+	private final SecretKey enc = CryptographyParameters.getEncryptionKeyGenerator().generateKey();
+	private final SecretKey auth = CryptographyParameters.getAuthenticationKeyGenerator().generateKey();
 	
 	@Override
 	public SecretKey getBroadcastEncryptionKey(UserId user) {

@@ -31,7 +31,7 @@ public class MessageCryptographyTest3 extends TestCase {
 	}
 	
 	public void testDecOfEncIsSame() {
-		String [] texts = {"", "1", "123-abc-ABC", "ak3icj jeoo!!!-. asdrji312950söfvv  öö..,äüpüjjd iieodo     8873jjjtoiuh<<<<<<"};
+		String [] texts = {"a"};
 		for (String text : texts) {
 			correctnessTest(text);
 		}
@@ -39,11 +39,12 @@ public class MessageCryptographyTest3 extends TestCase {
 	
 	public void correctnessTest(String text) {
 		PublicHeader header = new PublicHeader(0, new byte[3], (byte) 0, 0, new UserId("0"), new UserId("1"));
-		//assertTrue(header.getbytes().length == PublicHeader.BYTES_LENGTH_HEADER);
-		//assertTrue(new PublicHeader(ByteBuffer.wrap(header.getbytes())).getbytes().length == PublicHeader.BYTES_LENGTH_HEADER);
-		//assertTrue(Arrays.equals(new PublicHeader(ByteBuffer.wrap(header.getbytes())).getbytes(), header.getbytes()));
+		assertTrue(header.getbytes().length == PublicHeader.BYTES_LENGTH_HEADER);
+		assertTrue(new PublicHeader(ByteBuffer.wrap(header.getbytes())).getbytes().length == PublicHeader.BYTES_LENGTH_HEADER);
+		assertTrue(Arrays.equals(new PublicHeader(ByteBuffer.wrap(header.getbytes())).getbytes(), header.getbytes()));
 		NetworkMessage message = new NetworkMessage(text, header);
 		byte[] crypted = crypto.encryptPost(message);
+		assertNotNull(crypted);
 		assertTrue(crypted.length >= PublicHeader.BYTES_LENGTH_HEADER);
 		
 		NetworkMessage decrypted = crypto.decryptPost(crypted);

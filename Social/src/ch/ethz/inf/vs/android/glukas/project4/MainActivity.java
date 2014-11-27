@@ -44,7 +44,7 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 			finish();
 			return;
 		}
-
+		
 		mProtocol = Protocol.getInstance(this, new DatabaseManager(this));
 		mProtocol.setDelegate(this);
 		mConnectButton = (Button)findViewById(R.id.connectButton);
@@ -112,7 +112,7 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 	private void createNextRequest() {
 		//TODO (Vincent?/Young?/Samuel?) replace with this device's user
 		UserId dummyId = new UserId("1");
-		nextRequest = new FriendshipRequest(new User(dummyId, "Alice", ZeroCredentialStorage.constantCredentials.getUserCredentials(dummyId)));
+		nextRequest = new FriendshipRequest(new User(dummyId, "Alice", new UserCredentials(dummyId)));
 		nfcAdapter.setNdefPushMessageCallback(nextRequest, this);
 		nfcAdapter.setOnNdefPushCompleteCallback(this, this);
 	}
