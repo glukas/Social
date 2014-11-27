@@ -31,7 +31,7 @@ public class MessageCryptographyTest3 extends TestCase {
 	}
 	
 	public void testDecOfEncIsSame() {
-		String [] texts = {"a"};
+		String [] texts = {"", "1", "abc", "srffksjdhfasjfhweaoisrnvywirusfdhj234r89f4woirsfväööü., jjja  a sdjjqo     oeood"};
 		for (String text : texts) {
 			correctnessTest(text);
 		}
@@ -60,6 +60,9 @@ public class MessageCryptographyTest3 extends TestCase {
 		assertNull(crypto.decryptPost(crypted));
 		
 		crypted = new byte[PublicHeader.BYTES_LENGTH_HEADER-1];
+		assertNull(crypto.decryptPost(crypted));
+		
+		crypted = new byte[PublicHeader.BYTES_LENGTH_HEADER+1];
 		assertNull(crypto.decryptPost(crypted));
 	}
 	
