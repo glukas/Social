@@ -3,7 +3,6 @@ package ch.ethz.inf.vs.android.glukas.project4.protocol;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-import android.content.Context;
 import android.util.Log;
 import ch.ethz.inf.vs.android.glukas.project4.Post;
 import ch.ethz.inf.vs.android.glukas.project4.BasicUser;
@@ -41,18 +40,18 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate {
 	/**
 	 * Get a instance of Protocol.
 	 */
-	public static Protocol getInstance(Context context, DatabaseAccess db) {
+	public static Protocol getInstance(DatabaseAccess db) {
 		if (instance == null) {
-			return new Protocol(context, db);
+			return new Protocol(db);
 		} else {
 			return instance;
 		}
 	}
 
-	private Protocol(Context context, DatabaseAccess db) {
+	private Protocol(DatabaseAccess db) {
 		database = db;
 		localUser = database.getUser();
-		secureChannel = new SecureChannel("winti.moo.com", 9000, new DBCredentialStorage(db));
+		secureChannel = new SecureChannel("winti.mooo.com", 9000, new DBCredentialStorage(db));
 		secureChannel.setDelegate(this);
 		messageRelay = new MessageRelay(secureChannel);
 		wallAsked = new TreeSet<UserId>();

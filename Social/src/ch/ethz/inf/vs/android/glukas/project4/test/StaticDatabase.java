@@ -10,7 +10,7 @@ import ch.ethz.inf.vs.android.glukas.project4.UserId;
 import ch.ethz.inf.vs.android.glukas.project4.Wall;
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseAccess;
 
-public class DatabaseTest implements DatabaseAccess {
+public class StaticDatabase implements DatabaseAccess {
 
 	@Override
 	public void putUser(User user) {

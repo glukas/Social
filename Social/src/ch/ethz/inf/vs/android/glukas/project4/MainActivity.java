@@ -45,7 +45,7 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 			return;
 		}
 		
-		mProtocol = Protocol.getInstance(this, new DatabaseManager(this));
+		mProtocol = Protocol.getInstance(new DatabaseManager(this));
 		mProtocol.setDelegate(this);
 		mConnectButton = (Button)findViewById(R.id.connectButton);
 

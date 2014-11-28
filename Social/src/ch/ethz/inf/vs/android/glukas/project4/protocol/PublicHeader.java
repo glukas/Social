@@ -121,7 +121,7 @@ public class PublicHeader {
 	 * Returns the header as byte array
 	 */
 	public byte[] getbytes() {
-		
+
 		ByteBuffer buf = ByteBuffer.allocate(PublicHeader.BYTES_LENGTH_HEADER);
 		
 		buf.putInt(length);
