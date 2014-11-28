@@ -30,15 +30,14 @@ public class AsyncServer {
 		//Start the handlers
 		setRequestHandling();
 		
-		//Start communicator
+		
+		//Start communicator, do this on separate thread because it's network task
 		requestHandler.post(new Runnable(){
 			@Override public void run(){
 				start();
+				setReceiveHandling();
 			}
 		});
-		
-		setReceiveHandling();
-		//start();
 	}
 	
 	private void start() {
