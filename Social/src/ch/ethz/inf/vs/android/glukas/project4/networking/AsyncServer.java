@@ -1,7 +1,6 @@
 package ch.ethz.inf.vs.android.glukas.project4.networking;
 
 import java.io.IOException;
-
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
@@ -74,13 +73,17 @@ public class AsyncServer {
 		receiveThread.start();
 	}
 	
-	private void postReceivedToDelegate(final byte[] message) {
+	private void postReceivedToDelegate(final byte[] message) {		
+		Log.i("DEBUG", "###"+"new message");
 		delegate.getCallbackHandler().post(new Runnable() {
 			@Override
 			public void run() {
 				delegate.onReceive(message);
 			}
 		});
+		Log.i("DEBUG", "###"+"post returned");
+		
+	//	delegate.onReceive(message);
 	}
 	
 	public void close() {

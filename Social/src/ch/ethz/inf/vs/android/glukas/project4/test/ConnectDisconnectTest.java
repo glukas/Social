@@ -12,52 +12,63 @@ import ch.ethz.inf.vs.android.glukas.project4.security.NetworkMessage;
 import ch.ethz.inf.vs.android.glukas.project4.security.SecureChannelDelegate;
 
 
-public class ConnectDisconnectTest extends AndroidTestCase implements SecureChannelDelegate {
-
-	Protocol protocol;
-	StaticSecureChannel channel;
-	DatabaseAccess db;
-	boolean isSet = false;
-	boolean wait = true;
-	
-	public synchronized void setSettings() {
-		//initialize objects if not already done
-		Log.i("DEBUG", Data.tag+"enter setSettings");
-		if (!isSet) {
-			db = new StaticDatabase();
-			Log.i("DEBUG", Data.tag+"enter1");
-			protocol = Protocol.getInstance(db);
-			Log.i("DEBUG", Data.tag+"enter2");
-			channel = new StaticSecureChannel("winti.mooo.com", 9000);
-			Log.i("DEBUG", Data.tag+"enter3");
-			channel.setDelegate(this);
-			Log.i("DEBUG", Data.tag+"enter4");
-			isSet = true;
-		}
-	}
+public class ConnectDisconnectTest extends AndroidTestCase {
 	
 	@Test
 	public void testConnect() {
-		setSettings();
-		Log.i("DEBUG", Data.tag+"setting set");
-		PublicHeader header = new PublicHeader(44, null, StatusByte.CONNECT.getByte(), 0, Data.dummySenderId, Data.serverId);
-		
-		Log.i("DEBUG", Data.tag+"header created");
-
-		channel.sendHeader(header);
-		while(wait)
-			Thread.yield();
+		NetworkingThread thread = new NetworkingThread();
+		thread.start();
+		try {
+			thread.join();
+		} catch (InterruptedException e) {
+			Log.i("DEBUG", Data.tag+"THREAD INTERRUPTED");
+		}
+		Log.i("DEBUG", Data.tag+"Finish test connect");
 	}
 	
 	@Test
 	public void testDisconnect() {
 		//setSettings();
 	}
+	
+	private class NetworkingThread extends Thread implements SecureChannelDelegate {
+		
+		private volatile boolean alive;
+		Protocol protocol;
+		StaticSecureChannel channel;
+		DatabaseAccess db;
+		boolean wait;
+		
+		public NetworkingThread(){
+			db = new StaticDatabase();
+			protocol = Protocol.getInstance(db);
+			channel.setDelegate(this);
+			alive = true;
+			wait = true;
+		}
+		
+		@Override
+		public void run() {
+			while (alive) {
+				sendConnect();
+				while(wait){
+					Thread.yield();
+				}
+			}
+		}
+		
+		private void sendConnect(){
+			PublicHeader header = new PublicHeader(44, null, StatusByte.CONNECT.getByte(), 0, Data.dummySenderId, Data.serverId);
+			channel.sendHeader(header);
+			Log.i("DEBUG", Data.tag+"header send");
+		}
 
-	@Override
-	public void onMessageReceived(NetworkMessage message) {
-		Log.d("DEBUG", Data.tag+"Message received : "+MessageParser.parseMessage(message.text, message.header, db).toString());
-		wait = false;
+		@Override
+		public void onMessageReceived(NetworkMessage message) {
+			Log.d("DEBUG", Data.tag+"Message received : "+MessageParser.parseMessage(message.text, message.header, db).toString());
+			wait = false;
+			alive = false;
+		}
 	}
 	
 }

@@ -1,11 +1,25 @@
 package ch.ethz.inf.vs.android.glukas.project4;
 
 import java.util.List;
+
+import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseAccess;
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseManager;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.FailureReason;
 import ch.ethz.inf.vs.android.glukas.project4.networking.FriendshipRequest;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.Protocol;
+import ch.ethz.inf.vs.android.glukas.project4.protocol.PublicHeader;
+import ch.ethz.inf.vs.android.glukas.project4.protocol.StatusByte;
+import ch.ethz.inf.vs.android.glukas.project4.protocol.parsing.MessageParser;
+import ch.ethz.inf.vs.android.glukas.project4.security.NetworkMessage;
+import ch.ethz.inf.vs.android.glukas.project4.security.SecureChannelDelegate;
 import ch.ethz.inf.vs.android.glukas.project4.security.ZeroCredentialStorage;
+
+//TODO TESTING
+import ch.ethz.inf.vs.android.glukas.project4.test.Data;
+import ch.ethz.inf.vs.android.glukas.project4.test.StaticDatabase;
+import ch.ethz.inf.vs.android.glukas.project4.test.StaticSecureChannel;
+
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -20,11 +34,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-public class MainActivity extends Activity implements OnNdefPushCompleteCallback, UserDelegate {
+public class MainActivity extends Activity implements OnNdefPushCompleteCallback, UserDelegate, SecureChannelDelegate {
 
 	private static final String tag = "MAIN_ACTIVITY";
 	private Button mConnectButton, mAddFriendButton, mViewWallButton;
-	private AlertDialog.Builder mAlertBuilder = new AlertDialog.Builder(this);
+	private AlertDialog.Builder mAlertBuilder;
 
 	NfcAdapter nfcAdapter;
 
@@ -32,6 +46,9 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 
 	Protocol mProtocol;
 
+	//TODO TESTING
+	StaticDatabase db;
+	StaticSecureChannel channel;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +61,8 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 			finish();
 			return;
 		}
+		
+		mAlertBuilder = new AlertDialog.Builder(this);
 		
 		mProtocol = Protocol.getInstance(new DatabaseManager(this));
 		mProtocol.setDelegate(this);
@@ -78,6 +97,16 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 		});
 
 		createNextRequest();
+		
+		//TODO TESTING
+		/*
+		channel = new StaticSecureChannel("winti.mooo.com", 9000);
+		db = new StaticDatabase();
+		channel.setDelegate(this);
+		PublicHeader header = new PublicHeader(44, null, StatusByte.CONNECT.getByte(), 0, Data.dummySenderId, Data.serverId);
+		channel.sendHeader(header);
+		Log.i("DEBUG", Data.tag+"header send");
+		*/
 	}
 
 
@@ -169,6 +198,13 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 	@Override
 	public void onFriendshipDeclined() {
 		// TODO Auto-generated method stub
+	}
+
+
+	@Override
+	public void onMessageReceived(NetworkMessage message) {
+		Log.d("DEBUG", Data.tag+"Message received : "+MessageParser.parseMessage(message.text, message.header, db).toString());
+
 	}
 
 }

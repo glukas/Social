@@ -13,17 +13,24 @@ public class StaticSecureChannel implements AsyncServerDelegate {
 
 	SecureChannelDelegate delegate;
 	AsyncServer asyncServer;
-	private final Handler asyncNetworkHandler;
+	private Handler asyncNetworkHandler;
+	private Runnable timeout;
 	
 	public StaticSecureChannel(String address, int port) {
 		this.asyncServer = new AsyncServer(address, port, this);
 		this.asyncNetworkHandler = new Handler();
-		
+		timeout = new Runnable(){
+			@Override
+			public void run(){
+				Log.i("DEBUG", Data.tag+"Timeout");
+			}
+		};
 	}
 	
 	public void sendHeader(PublicHeader header) {
 		Log.i("DEBUG", Data.tag+"onSendHeader");
 		asyncServer.sendMessage(header.getbytes());
+		this.asyncNetworkHandler.postDelayed(timeout, 2000);
 		Log.i("DEBUG", Data.tag+"onSendHeader return");
 	}
 	
