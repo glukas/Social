@@ -25,7 +25,19 @@ public class AsyncServer {
 		this.address = address;
 		this.port = port;
 		this.delegate = delegate;
-		start();
+		
+		//Start the handlers
+		setRequestHandling();
+		
+		//Start communicator
+		requestHandler.post(new Runnable(){
+			@Override public void run(){
+				start();
+			}
+		});
+		
+		setReceiveHandling();
+		//start();
 	}
 	
 	private void start() {
@@ -34,9 +46,6 @@ public class AsyncServer {
 		noConnection = false;
 		this.comm = new TCPCommunicator(address, port);
 		
-		//Start the handlers
-		setRequestHandling();
-		setReceiveHandling();
 	}
 	
 	private void setRequestHandling(){
@@ -44,6 +53,7 @@ public class AsyncServer {
 		requestThread.start();
 		requestHandler = new Handler(requestThread.getLooper());
 	}
+	
 	
 	private void setReceiveHandling(){
 		receiveThread = new Thread() {
