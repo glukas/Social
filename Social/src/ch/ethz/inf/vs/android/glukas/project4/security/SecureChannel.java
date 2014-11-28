@@ -94,7 +94,6 @@ public class SecureChannel implements AsyncServerDelegate {
 		// TODO Notify secureChannelDelegate or ignore?
 	}
 	
-	
 	//TODO: this should probably be on a higher level.
 	/**
 	 * Precondition: user was discovered by onPeersDiscovered
