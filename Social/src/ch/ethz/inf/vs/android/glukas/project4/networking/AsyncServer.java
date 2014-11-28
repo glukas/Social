@@ -33,10 +33,9 @@ public class AsyncServer {
 		requestHandler.post(new Runnable(){
 			@Override public void run(){
 				start();
+				setReceiveHandling();
 			}
 		});
-		
-		setReceiveHandling();
 		//start();
 	}
 	

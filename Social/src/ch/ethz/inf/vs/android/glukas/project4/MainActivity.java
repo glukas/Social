@@ -64,7 +64,7 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 		
 		mAlertBuilder = new AlertDialog.Builder(this);
 		
-		/*mProtocol = Protocol.getInstance(new DatabaseManager(this));
+		mProtocol = Protocol.getInstance(new DatabaseManager(this));
 		mProtocol.setDelegate(this);
 		mConnectButton = (Button)findViewById(R.id.connectButton);
 
@@ -96,15 +96,17 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 			}
 		});
 
-		createNextRequest();*/
+		createNextRequest();
 		
+		//TODO TESTING
+		/*
 		channel = new StaticSecureChannel("winti.mooo.com", 9000);
 		db = new StaticDatabase();
 		channel.setDelegate(this);
-		
 		PublicHeader header = new PublicHeader(44, null, StatusByte.CONNECT.getByte(), 0, Data.dummySenderId, Data.serverId);
 		channel.sendHeader(header);
 		Log.i("DEBUG", Data.tag+"header send");
+		*/
 	}
 
 
