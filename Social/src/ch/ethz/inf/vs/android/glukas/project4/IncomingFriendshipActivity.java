@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.android.glukas.project4;
 
+import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseManager;
 import ch.ethz.inf.vs.android.glukas.project4.networking.FriendshipRequest;
 import ch.ethz.inf.vs.android.glukas.project4.networking.FriendshipResponse;
 import ch.ethz.inf.vs.android.glukas.project4.security.ZeroCredentialStorage;
@@ -17,19 +18,22 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class IncomingFriendshipActivity extends Activity implements OnNdefPushCompleteCallback {
+public class IncomingFriendshipActivity extends Activity implements
+		OnNdefPushCompleteCallback {
 
 	TextView usernameTextView;
 	FriendshipRequest request;
 	FriendshipResponse response;
 	NfcAdapter nfcAdapter;
-	
+	DatabaseManager dbmanager;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_incoming_friendship);
+		dbmanager = new DatabaseManager(this);
 		this.usernameTextView = (TextView) findViewById(R.id.usernameTextView);
-		
+
 	}
 
 	@Override
@@ -50,59 +54,69 @@ public class IncomingFriendshipActivity extends Activity implements OnNdefPushCo
 		}
 		return super.onOptionsItemSelected(item);
 	}
-	
-    @Override
-    public void onNewIntent(Intent intent) {
-        // onResume gets called after this to handle the intent
-        setIntent(intent);
-    }
-	
+
+	@Override
+	public void onNewIntent(Intent intent) {
+		// onResume gets called after this to handle the intent
+		setIntent(intent);
+	}
+
 	@Override
 	protected void onResume() {
 		super.onResume();
-        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction())) {
-        	processIntent(getIntent());
-        }
+		if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction())) {
+			processIntent(getIntent());
+		}
 	}
-	
+
 	private void processIntent(Intent intent) {
-		Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
-        // only one message sent during the beam
-        NdefMessage msg = (NdefMessage) rawMsgs[0];
-        request = new FriendshipRequest(msg);
-        //TODO (Vincent?/Young?/Samuel?) replace with this device's user
-        UserId dummyId = new UserId("0");
-        response = request.createAcceptingResponse(new User(dummyId, "Bob", new UserCredentials(dummyId)));
- 
+		Parcelable[] rawMsgs = intent
+				.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
+		// only one message sent during the beam
+		NdefMessage msg = (NdefMessage) rawMsgs[0];
+		request = new FriendshipRequest(msg);
+		response = request.createAcceptingResponse(dbmanager.getUser());
 		nfcAdapter = NfcAdapter.getDefaultAdapter(this);
-		//TODO better error handling
-        if (nfcAdapter == null) {
-            Toast.makeText(this, "NFC is not available", Toast.LENGTH_LONG).show();
-            finish();
-            return;
-        }
-        
+
+		// TODO better error handling
+		if (nfcAdapter == null) {
+			Toast.makeText(this, "NFC is not available", Toast.LENGTH_LONG)
+					.show();
+			finish();
+			return;
+		}
+
 		nfcAdapter.setNdefPushMessageCallback(response, this);
 		nfcAdapter.setOnNdefPushCompleteCallback(this, this);
 
-        displayRequest(request);
+		saveFriend(request);
+		// displayRequest(request);
+	}
+
+	// Save friend in database
+	private void saveFriend(FriendshipRequest request) {
+
+		dbmanager.putFriend(request.getSender());
+
 	}
 
 	private void displayRequest(FriendshipRequest request) {
 		usernameTextView.setText(request.getSender().getUsername());
-    	Log.d(this.getClass().toString(), "Friend request " + request.getSender().getUsername() + " id : " + request.getSender().getId());
+		Log.d(this.getClass().toString(), "Friend request "
+				+ request.getSender().getUsername() + " id : "
+				+ request.getSender().getId());
 	}
 
 	@Override
 	public void onNdefPushComplete(NfcEvent event) {
-		//TODO (Lukas) we would actually have to make sure that the correct recipient was reached
+		// TODO (Lukas) we would actually have to make sure that the correct
+		// recipient was reached
 		Log.d(this.getClass().toString(), "successfully friended");
 	}
-	
+
 	/*
-	@Override
-	public void onClick(View v) {
-		//Ask user to invoke android beam (this can be done automatically since API version 21)
-	}*/
+	 * @Override public void onClick(View v) { //Ask user to invoke android beam
+	 * (this can be done automatically since API version 21) }
+	 */
 
 }

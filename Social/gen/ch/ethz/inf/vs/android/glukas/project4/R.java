@@ -25,16 +25,17 @@ public final class R {
         public static final int ic_launcher=0x7f020000;
     }
     public static final class id {
-        public static final int Button01=0x7f080008;
-        public static final int action_settings=0x7f080009;
+        public static final int Button01=0x7f080009;
+        public static final int NFCfriendButton=0x7f080004;
+        public static final int action_settings=0x7f08000a;
         public static final int connectButton=0x7f080003;
         public static final int connection_screen_info=0x7f080002;
         public static final int contactTextView=0x7f080000;
-        public static final int home_add_friend_button=0x7f080006;
-        public static final int home_friends_button=0x7f080004;
-        public static final int home_wall_button=0x7f080005;
+        public static final int home_add_friend_button=0x7f080007;
+        public static final int home_friends_button=0x7f080005;
+        public static final int home_wall_button=0x7f080006;
         public static final int usernameTextView=0x7f080001;
-        public static final int wall=0x7f080007;
+        public static final int wall=0x7f080008;
     }
     public static final class layout {
         public static final int activity_contact_detail=0x7f030000;
@@ -50,6 +51,7 @@ public final class R {
     public static final class string {
         public static final int acceptFriendship=0x7f050007;
         public static final int action_settings=0x7f050003;
+        public static final int add_NFCfriend=0x7f05000f;
         public static final int app_name=0x7f050000;
         public static final int connection_failed=0x7f050009;
         public static final int connection_screen_info=0x7f05000a;

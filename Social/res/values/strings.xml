@@ -16,4 +16,5 @@
 	<string name="home_add_friend_button">Add Friend</string>
 	<string name="home_post_button">Show Friends</string>
 	<string name="home_show_friends_button">View friends</string>
+	<string name="add_NFCfriend">Add friend via NFC</string>
 </resources>
