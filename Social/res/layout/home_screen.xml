@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/home_friends_button"
+    android:id="@+id/home_screen"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
@@ -20,6 +20,13 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:text="@string/home_add_friend_button" />
+      <Button
+        android:id="@+id/NFCfriendButton"
+        android:onClick="OnNFC_Click"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:text="@string/add_NFCfriend" />
 
     <LinearLayout
         android:id="@+id/wall"
@@ -34,7 +41,7 @@
     </LinearLayout>
 
     <Button
-        android:id="@+id/Button01"
+        android:id="@+id/home_view_friends_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
