@@ -74,7 +74,18 @@ public class MainActivity extends Activity implements
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.home_screen);
 
-		ActionBar actionBar = getActionBar();
+		
+		dbmanager = new DatabaseManager(this);
+
+		nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+		if (nfcAdapter == null) {
+			Toast.makeText(this, "NFC is not available", Toast.LENGTH_LONG)
+					.show();
+			finish();
+			return;
+		}
+		
+	/*	ActionBar actionBar = getActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
 		tab1 = actionBar.newTab().setText("1");
@@ -89,15 +100,7 @@ public class MainActivity extends Activity implements
 		actionBar.addTab(tab2);
 		actionBar.addTab(tab3);
 
-		dbmanager = new DatabaseManager(this);
 
-		nfcAdapter = NfcAdapter.getDefaultAdapter(this);
-		if (nfcAdapter == null) {
-			Toast.makeText(this, "NFC is not available", Toast.LENGTH_LONG)
-					.show();
-			finish();
-			return;
-		}
 
 		
 		
@@ -137,7 +140,7 @@ public class MainActivity extends Activity implements
 			}
 		});
 
-		createNextRequest();
+	 	*/
 
 		//TODO TESTING
 		/*
@@ -155,31 +158,7 @@ public class MainActivity extends Activity implements
 
 	}
 
-	private void showFriendRequest() {
-		mAlertBuilder.setTitle("Title");
-		mAlertBuilder.setMessage("Message");
 
-		// Set an EditText view to get user input
-		final EditText input = new EditText(this);
-		mAlertBuilder.setView(input);
-
-		mAlertBuilder.setPositiveButton("Ok",
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						String userName = input.getText().toString();
-						mProtocol.askFriendship(userName);
-					}
-				});
-
-		mAlertBuilder.setNegativeButton("Cancel",
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						dialog.cancel();
-					}
-				});
-
-		mAlertBuilder.show();
-	}
 
 	// This button will actually be another Activity later
 	public void OnNFC_Click(View view) {

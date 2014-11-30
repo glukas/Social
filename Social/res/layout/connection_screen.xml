@@ -22,15 +22,7 @@
         android:layout_marginTop="64dp"
         android:text="@string/server_connect" />
     
-        <Button
-        android:id="@+id/NFCfriendButton"
-        android:onClick="OnNFC_Click"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-  		android:layout_below="@+id/connection_screen_info"
-  		android:layout_marginTop="128dp"
-        android:text="@string/add_NFCfriend" />
+      
     
 
 </RelativeLayout>
