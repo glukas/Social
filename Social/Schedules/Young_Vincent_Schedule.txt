@@ -23,11 +23,11 @@ Week 24 - 30 November :
 	Implementation of the model 'everyone is always connected'
 
 	Young :
-		-Friendship with NFC mechanism
+		+Friendship with NFC mechanism (delayed)
 		+Check (write tests for) PublicHeader 'bytisation' and 'unbytisation'
 		+ByteBuffer constructor
-		-Posts creation
-		-postPost implementation
+		+Posts creation
+		+postPost implementation
 
 	
 	Vincent :
@@ -37,18 +37,28 @@ Week 24 - 30 November :
 		+onMessageReceived implementation
 		+Define ConsistencyByte
 		+Talk with Mathias for application on server
+		+test connect / disconnect to / from server
 
 Week 1 - 7 December
 
 	Testing of the model, the parsing
 
 	Young & Vincent :
-		-test connect, disconnect to server
-		-test creation of messages
+
+		-test make friend (NFC)
+
 		-test postPost
-		-test getWall
-		-test make friend
+		-test creation of messages
+
 		-test onMessageReceived
+		
+		-test getWall
+
+	Young :
+		-Friendship mechanism with NFC (Database check)
+
+	Vincent
+		
 
 Week 8 - 14 December
 

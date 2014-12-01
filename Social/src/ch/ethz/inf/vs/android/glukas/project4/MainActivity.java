@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.android.glukas.project4;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseAccess;
@@ -27,6 +28,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.app.ListFragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.nfc.NdefMessage;
@@ -40,17 +42,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends Activity implements
-		OnNdefPushCompleteCallback, UserDelegate, SecureChannelDelegate {
+		OnNdefPushCompleteCallback, SecureChannelDelegate {
 
 	private static final String tag = "MAIN_ACTIVITY";
-	private Button mAddFriendButton, mViewWallButton, mViewFriendsButton;
-	private AlertDialog.Builder mAlertBuilder;
 
 	NfcAdapter nfcAdapter;
 
@@ -64,11 +65,6 @@ public class MainActivity extends Activity implements
 	StaticDatabase db;
 	StaticSecureChannel channel;
 
-	ActionBar.Tab tab1, tab2, tab3;
-	Fragment fragmentTab1 = new FragmentTab1();
-	Fragment fragmentTab2 = new FragmentTab2();
-	Fragment fragmentTab3 = new FragmentTab3();
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -76,7 +72,14 @@ public class MainActivity extends Activity implements
 
 		
 		dbmanager = new DatabaseManager(this);
-
+		dbmanager.putUser(new User("Dummyname"));
+		if (dbmanager.getUser() == null) {
+			Log.d("User null", "User null");
+		}
+		else {
+			Log.d("User not null", "User not null");
+			
+		}
 		nfcAdapter = NfcAdapter.getDefaultAdapter(this);
 		if (nfcAdapter == null) {
 			Toast.makeText(this, "NFC is not available", Toast.LENGTH_LONG)
@@ -85,62 +88,23 @@ public class MainActivity extends Activity implements
 			return;
 		}
 		
-	/*	ActionBar actionBar = getActionBar();
+		ActionBar actionBar = getActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
-		tab1 = actionBar.newTab().setText("1");
-		tab2 = actionBar.newTab().setText("2");
-		tab3 = actionBar.newTab().setText("3");
+		ActionBar.Tab tab1 = actionBar.newTab().setText("My Wall");
+		ActionBar.Tab tab2 = actionBar.newTab().setText("View Friends");
+		ActionBar.Tab tab3 = actionBar.newTab().setText("Add Friend");
 
-		tab1.setTabListener(new MyTabListener(fragmentTab1));
-		tab2.setTabListener(new MyTabListener(fragmentTab2));
-		tab3.setTabListener(new MyTabListener(fragmentTab3));
+		tab1.setTabListener(new MyTabListener(new WallFragment()));
+		tab2.setTabListener(new MyTabListener(new FriendListFragment()));
+		tab3.setTabListener(new MyTabListener(new AddFriendFragment()));
 
 		actionBar.addTab(tab1);
 		actionBar.addTab(tab2);
 		actionBar.addTab(tab3);
 
-
-
-		
-		
-
-
-
-		mAlertBuilder = new AlertDialog.Builder(this);
-
-		mProtocol = Protocol.getInstance(new DatabaseManager(this));
-		mProtocol.setDelegate(this);
-
-		mAddFriendButton = (Button)findViewById(R.id.home_add_friend_button);
-		mAddFriendButton.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				// TODO: Implement adding friends by username.
-			}
-		});
-
-		mViewFriendsButton = (Button)findViewById(R.id.home_view_friends_button);
-
-		mViewFriendsButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View arg0) {
-				showFriendsList();
-			}
-		});
-
-		mViewWallButton = (Button)findViewById(R.id.home_wall_button);
-
-		mViewWallButton.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				showWall();
-			}
-		});
-
-	 	*/
+		//mProtocol = Protocol.getInstance(new DatabaseManager(this));
+		//mProtocol.setDelegate(this);
 
 		//TODO TESTING
 		/*
@@ -153,60 +117,15 @@ public class MainActivity extends Activity implements
 		 */
 	}
 
-	private void showWall() {
 
 
-	}
-
-
-
-	// This button will actually be another Activity later
-	public void OnNFC_Click(View view) {
-
-		createNextRequest();
-		waitforResponse();
-
-	}
-
-	public void waitforResponse() {
-		// TODO : Add timeout or do it async
-		boolean waiting = true;
-		while (waiting) {
-			if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent()
-					.getAction())) {
-				processIntent(getIntent());
-				waiting = false;
-			}
-		}
-	}
-
-	private void processIntent(Intent intent) {
-		Parcelable[] rawMsgs = intent
-				.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
-
-		// only one message sent during the beam
-		NdefMessage msg = (NdefMessage) rawMsgs[0];
-		FriendshipRequest response = new FriendshipRequest(msg);
-
-		saveFriend(response);
-	}
-
-	// Save friend in database
-	private void saveFriend(FriendshipRequest response) {
-
-		dbmanager.putFriend(response.getSender());
-
-
-	}
-
-	private void showFriendsList() {
-
-
-	}
 
 	private void createNextRequest() {
-
-		nextRequest = new FriendshipRequest(dbmanager.getUser());
+	
+		//nextRequest = new FriendshipRequest(dbmanager.getUser());
+	
+		nextRequest = new FriendshipRequest(new User("Alice"));
+		
 		nfcAdapter.setNdefPushMessageCallback(nextRequest, this);
 		nfcAdapter.setOnNdefPushCompleteCallback(this, this);
 	}
@@ -223,48 +142,6 @@ public class MainActivity extends Activity implements
 		createNextRequest();
 	}
 
-	@Override
-	public void onPostReceived(Post post) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void onConnectionFailed(FailureReason reason) {
-		Log.d(tag, "Connection Failed.");
-		Toast.makeText(this, R.string.connection_failed, Toast.LENGTH_LONG)
-				.show();
-	}
-
-	@Override
-	public void onConnectionSucceeded() {
-		setContentView(R.layout.home_screen);
-	}
-
-	@Override
-	public void onDisconnectionFailed(FailureReason reason) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void onDisconnectionSucceeded() {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void onPeersDiscoverySuccess(List<User> peers) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void onFriendshipAccepted() {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void onFriendshipDeclined() {
-		// TODO Auto-generated method stub
-	}
 
 	@Override
 	public void onMessageReceived(NetworkMessage message) {
@@ -275,32 +152,37 @@ public class MainActivity extends Activity implements
 
 	}
 
-	public class FragmentTab1 extends Fragment {
+	public class WallFragment extends Fragment {
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, 
 				Bundle savedInstanceState){
-			View view = inflater.inflate(R.layout.view_friends, container, false);
-			TextView textview = (TextView) view.findViewById(R.id.tabtextview);
-			textview.setText("TEst");
+			View view = inflater.inflate(R.layout.my_wall_tab, container, false);
 			return view;
 		}
 	}
 	
-	public class FragmentTab2 extends Fragment {
+	public class FriendListFragment extends ListFragment {
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, 
 				Bundle savedInstanceState){
-			View view = inflater.inflate(R.layout.view_friends, container, false);
-			TextView textview = (TextView) view.findViewById(R.id.tabtextview);
-			textview.setText("TEst");
+			View view = inflater.inflate(R.layout.friend_list_tab, container, false);
+			User myself = dbmanager.getUser();
+			
+			if (myself == null) {
+				Toast.makeText(getApplicationContext(), "dbmanager.getUser() returned null!", Toast.LENGTH_LONG).show();
+				return view;
+			}
+			
+			ArrayList<BasicUser> users = new ArrayList<BasicUser>(dbmanager.getFriendsList(myself.id));
+			ArrayAdapter<BasicUser> userAdapter = new ArrayAdapter<BasicUser>(getApplicationContext(), R.layout.friend_list_row, R.id.userName, users);
+			setListAdapter(userAdapter);
 			return view;
 		}
 	}
 	
-	public class FragmentTab3 extends Fragment {
+	public class AddFriendFragment extends Fragment {
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, 
 				Bundle savedInstanceState){
-			View view = inflater.inflate(R.layout.view_friends, container, false);
-			TextView textview = (TextView) view.findViewById(R.id.tabtextview);
-			textview.setText("TEst");
+			View view = inflater.inflate(R.layout.add_friend_tab, container, false);
+			createNextRequest();
 			return view;
 		}
 	}

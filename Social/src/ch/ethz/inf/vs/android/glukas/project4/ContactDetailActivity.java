@@ -1,5 +1,7 @@
 package ch.ethz.inf.vs.android.glukas.project4;
 
+import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseAccess;
+import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseManager;
 import ch.ethz.inf.vs.android.glukas.project4.networking.FriendshipRequest;
 import ch.ethz.inf.vs.android.glukas.project4.networking.FriendshipResponse;
 import android.app.Activity;
@@ -17,12 +19,13 @@ public class ContactDetailActivity extends Activity {
 
 	TextView contactTextView;
 	FriendshipResponse response;
-	
+	DatabaseAccess dbmanager;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_contact_detail);
 		this.contactTextView = (TextView) findViewById(R.id.contactTextView);
+		dbmanager = new DatabaseManager(this);
 	}
 
 	@Override
@@ -64,11 +67,18 @@ public class ContactDetailActivity extends Activity {
 	        NdefMessage msg = (NdefMessage) rawMsgs[0];
 	        response = new FriendshipResponse(msg);
 	        if (response.isMatching(FriendshipRequest.getCurrentRequest())) {
+	        	saveFriend(response);
 	        	displayRequest(response);
 	        } else {
 	        	displayFailure();
 	        }
 	        
+		}
+		// Save friend in database
+		private void saveFriend(FriendshipResponse response) {
+
+			dbmanager.putFriend(response.getSender());
+
 		}
 
 		private void displayFailure() {
