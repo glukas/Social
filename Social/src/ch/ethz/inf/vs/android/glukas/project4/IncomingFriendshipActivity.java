@@ -75,7 +75,9 @@ public class IncomingFriendshipActivity extends Activity implements
 		// only one message sent during the beam
 		NdefMessage msg = (NdefMessage) rawMsgs[0];
 		request = new FriendshipRequest(msg);
-		response = request.createAcceptingResponse(dbmanager.getUser());
+		//response = request.createAcceptingResponse(dbmanager.getUser());
+		response = request.createAcceptingResponse(new User("Bob"));
+		
 		nfcAdapter = NfcAdapter.getDefaultAdapter(this);
 
 		// TODO better error handling

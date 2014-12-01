@@ -73,6 +73,13 @@ public class MainActivity extends Activity implements
 		
 		dbmanager = new DatabaseManager(this);
 		dbmanager.putUser(new User("Dummyname"));
+		if (dbmanager.getUser() == null) {
+			Log.d("User null", "User null");
+		}
+		else {
+			Log.d("User not null", "User not null");
+			
+		}
 		nfcAdapter = NfcAdapter.getDefaultAdapter(this);
 		if (nfcAdapter == null) {
 			Toast.makeText(this, "NFC is not available", Toast.LENGTH_LONG)
@@ -110,15 +117,14 @@ public class MainActivity extends Activity implements
 		 */
 	}
 
-	// This button will actually be another Activity later
-	public void OnNFC_Click(View view) {
-		createNextRequest();
-		
-	}
+
 
 	private void createNextRequest() {
-
-		nextRequest = new FriendshipRequest(dbmanager.getUser());
+	
+		//nextRequest = new FriendshipRequest(dbmanager.getUser());
+	
+		nextRequest = new FriendshipRequest(new User("Alice"));
+		
 		nfcAdapter.setNdefPushMessageCallback(nextRequest, this);
 		nfcAdapter.setOnNdefPushCompleteCallback(this, this);
 	}
@@ -175,6 +181,7 @@ public class MainActivity extends Activity implements
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, 
 				Bundle savedInstanceState){
 			View view = inflater.inflate(R.layout.add_friend_tab, container, false);
+			createNextRequest();
 			return view;
 		}
 	}
