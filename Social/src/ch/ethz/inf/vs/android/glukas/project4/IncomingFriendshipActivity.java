@@ -90,7 +90,7 @@ public class IncomingFriendshipActivity extends Activity implements
 		nfcAdapter.setOnNdefPushCompleteCallback(this, this);
 
 		saveFriend(request);
-		// displayRequest(request);
+		 displayRequest(request);
 	}
 
 	// Save friend in database

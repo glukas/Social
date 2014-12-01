@@ -72,7 +72,7 @@ public class MainActivity extends Activity implements
 
 		
 		dbmanager = new DatabaseManager(this);
-
+		dbmanager.putUser(new User("Dummyname"));
 		nfcAdapter = NfcAdapter.getDefaultAdapter(this);
 		if (nfcAdapter == null) {
 			Toast.makeText(this, "NFC is not available", Toast.LENGTH_LONG)
@@ -113,37 +113,7 @@ public class MainActivity extends Activity implements
 	// This button will actually be another Activity later
 	public void OnNFC_Click(View view) {
 		createNextRequest();
-		waitforResponse();
-	}
-
-	public void waitforResponse() {
-		// TODO : Add timeout or  ->>> do it async 
-		boolean waiting = true;
-		while (waiting) {
-			if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent()
-					.getAction())) {
-				processIntent(getIntent());
-				waiting = false;
-			}
-		}
-	}
-
-	private void processIntent(Intent intent) {
-		Parcelable[] rawMsgs = intent
-				.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
-
-		// only one message sent during the beam
-		NdefMessage msg = (NdefMessage) rawMsgs[0];
-		FriendshipRequest response = new FriendshipRequest(msg);
-
-		saveFriend(response);
-	}
-
-	// Save friend in database
-	private void saveFriend(FriendshipRequest response) {
-
-		dbmanager.putFriend(response.getSender());
-
+		
 	}
 
 	private void createNextRequest() {
