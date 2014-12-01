@@ -18,3 +18,5 @@
 *.gz
 
 *.log
+.metadata
+.recommenders
