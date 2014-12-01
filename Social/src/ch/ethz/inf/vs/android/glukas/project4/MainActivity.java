@@ -48,8 +48,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainActivity extends Activity implements
-		OnNdefPushCompleteCallback, SecureChannelDelegate {
+public class MainActivity extends Activity implements OnNdefPushCompleteCallback, SecureChannelDelegate {
 
 	private static final String tag = "MAIN_ACTIVITY";
 
@@ -61,6 +60,13 @@ public class MainActivity extends Activity implements
 
 	DatabaseManager dbmanager;
 
+	// TODO Remove the section below
+
+	// Workaround for dbmanager not returning users:
+	private ArrayList<BasicUser> list = new ArrayList<BasicUser>();
+
+	// TODO Remove the section above
+
 	// TODO TESTING
 	StaticDatabase db;
 	StaticSecureChannel channel;
@@ -70,7 +76,6 @@ public class MainActivity extends Activity implements
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.home_screen);
 
-		
 		dbmanager = new DatabaseManager(this);
 		dbmanager.putUser(new User("Dummyname"));
 		if (dbmanager.getUser() == null) {
@@ -78,16 +83,30 @@ public class MainActivity extends Activity implements
 		}
 		else {
 			Log.d("User not null", "User not null");
-			
 		}
 		nfcAdapter = NfcAdapter.getDefaultAdapter(this);
 		if (nfcAdapter == null) {
 			Toast.makeText(this, "NFC is not available", Toast.LENGTH_LONG)
-					.show();
+			.show();
 			finish();
 			return;
 		}
-		
+
+		// TODO Remove the section below
+
+		// Workaround for dbmanager not returning users:
+		list.add(new User("Alice"));
+		list.add(new User("Bob"));
+		list.add(new User("Eve"));
+		list.add(new User("Benjamin"));
+		list.add(new User("Steve"));
+		list.add(new User("Carlos"));
+		list.add(new User("Sven"));
+		list.add(new User("Mathias"));
+		list.add(new User("Bradley"));
+
+		// TODO Remove the section above
+
 		ActionBar actionBar = getActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
@@ -121,11 +140,11 @@ public class MainActivity extends Activity implements
 
 
 	private void createNextRequest() {
-	
+
 		//nextRequest = new FriendshipRequest(dbmanager.getUser());
-	
+
 		nextRequest = new FriendshipRequest(new User("Alice"));
-		
+
 		nfcAdapter.setNdefPushMessageCallback(nextRequest, this);
 		nfcAdapter.setOnNdefPushCompleteCallback(this, this);
 	}
@@ -148,7 +167,7 @@ public class MainActivity extends Activity implements
 		Log.d("DEBUG", Data.tag
 				+ "Message received : "
 				+ MessageParser.parseMessage(message.text, message.header, db)
-						.toString());
+				.toString());
 
 	}
 
@@ -159,25 +178,27 @@ public class MainActivity extends Activity implements
 			return view;
 		}
 	}
-	
+
 	public class FriendListFragment extends ListFragment {
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, 
 				Bundle savedInstanceState){
 			View view = inflater.inflate(R.layout.friend_list_tab, container, false);
 			User myself = dbmanager.getUser();
-			
+
 			if (myself == null) {
-				Toast.makeText(getApplicationContext(), "dbmanager.getUser() returned null!", Toast.LENGTH_LONG).show();
+				Toast.makeText(getApplicationContext(), "dbmanager.getUser() returned null! Using dummy friends...", Toast.LENGTH_LONG).show();
+				ArrayAdapter<BasicUser> userAdapter = new ArrayAdapter<BasicUser>(getApplicationContext(), R.layout.friend_list_row, R.id.userName, list);
+				setListAdapter(userAdapter);
 				return view;
 			}
-			
+
 			ArrayList<BasicUser> users = new ArrayList<BasicUser>(dbmanager.getFriendsList(myself.id));
 			ArrayAdapter<BasicUser> userAdapter = new ArrayAdapter<BasicUser>(getApplicationContext(), R.layout.friend_list_row, R.id.userName, users);
 			setListAdapter(userAdapter);
 			return view;
 		}
 	}
-	
+
 	public class AddFriendFragment extends Fragment {
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, 
 				Bundle savedInstanceState){
@@ -186,22 +207,22 @@ public class MainActivity extends Activity implements
 			return view;
 		}
 	}
-	
+
 	public class MyTabListener implements ActionBar.TabListener {
 		Fragment fragment;
-		
+
 		public MyTabListener(Fragment fragment) {
 			this.fragment = fragment;
 		}
-		
-	    public void onTabSelected(Tab tab, FragmentTransaction ft) {
+
+		public void onTabSelected(Tab tab, FragmentTransaction ft) {
 			ft.replace(R.id.home_screen, fragment);
 		}
-		
+
 		public void onTabUnselected(Tab tab, FragmentTransaction ft) {
 			ft.remove(fragment);
 		}
-		
+
 		public void onTabReselected(Tab tab, FragmentTransaction ft) {
 			// nothing done here
 		}

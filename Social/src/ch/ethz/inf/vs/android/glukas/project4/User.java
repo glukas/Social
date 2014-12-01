@@ -48,4 +48,9 @@ public class User extends BasicUser {
 	public UserCredentials getCredentials() {
 		return credentials;
 	}
+	
+	@Override
+	public String toString() {
+		return username;
+	}
 }

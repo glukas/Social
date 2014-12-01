@@ -8,9 +8,7 @@
         android:id="@+id/userName"
         android:layout_width="fill_parent"
         android:layout_height="26dip"
-        android:ellipsize="marquee"
-        android:gravity="center_vertical"
         android:singleLine="true"
-        android:textSize="12sp" />
+        android:textSize="20sp" />
 
 </RelativeLayout>
