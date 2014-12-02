@@ -28,6 +28,9 @@ class Users {
 		byte[] encryption_key = user.getCredentials().broadcastEncryptionKey;
 		byte[] authentication_key = user.getCredentials().broadcastAuthenticationKey;
 		
+		// Set userId
+		Utility.userID = id;
+		
 		// Create content to insert.
 		ContentValues values = new ContentValues();
 		values.put(UsersEntry.USER_ID, Utility.toSQLiteId(id));
@@ -38,6 +41,8 @@ class Users {
 		// Insert content.
 		db.insert(UsersEntry.TABLE_NAME, null, values);
 	}
+	
+	
 	
 	// Get the user object from the database.
 	// Friends only have id!!
