@@ -67,7 +67,7 @@ class Users {
 		// SQL WHERE clause
 		String selection = UsersEntry.USER_ID + " == ?";
 		// Arguments for selection.
-		String[] selectionArgs = {Utility.toSQLiteId(id).toString()};
+		String[] selectionArgs = {Utility.toSQLiteId(id)};
 		
 		// Execute query.
 		Cursor cursor = db.query(UsersEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, null);
@@ -101,7 +101,7 @@ class Users {
 		//
 		String selection = FriendsEntry.USER_ID + " == ?";
 		//
-		String[] selectionArgs = {Utility.toSQLiteId(Utility.userID).toString()};
+		String[] selectionArgs = {Utility.toSQLiteId(Utility.userID)};
 		
 		// Execute query.
 		Cursor cursor = db.query(FriendsEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, null);
@@ -110,7 +110,7 @@ class Users {
 		
 //		if(cursor.moveToFirst()) {
 //			while(!cursor.isAfterLast()) {
-//				friends.add(new Friend(new UserId(cursor.getBlob(0))));
+//				friends.add(new Friend(new UserId(cursor.getString(0))));
 //				cursor.moveToNext();
 //			}
 //			cursor.close();

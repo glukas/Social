@@ -37,7 +37,7 @@ class Walls {
 		String selection = PostsEntry.WALL_ID + " == ?";
 		
 		// Arguments for selection.
-		String[] selectionArgs = {Utility.toSQLiteId(friendid).toString()};
+		String[] selectionArgs = {Utility.toSQLiteId(friendid)};
 		
 		// SQL ORDER BY clause.
 		String order = PostsEntry._ID + " DESC";
@@ -79,7 +79,7 @@ class Walls {
 		
 		// Arguments for selection. They must be the string representation
 		// of the byte array corresponding to the id.
-		String[] selectionArgs = {Utility.toSQLiteId(friendid).toString()};
+		String[] selectionArgs = {Utility.toSQLiteId(friendid)};
 		
 		// Execute delete.
 		db.delete(PostsEntry.TABLE_NAME, selection, selectionArgs);

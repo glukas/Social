@@ -101,7 +101,7 @@ class Posts {
 		String selection = PostsEntry._ID + " == ? AND" + PostsEntry.WALL_ID + " == ?";
 		
 		// Arguments for selection.
-		String[] selectionArgs = {Integer.toString(postid), Utility.toSQLiteId(friendid).toString()};
+		String[] selectionArgs = {Integer.toString(postid), Utility.toSQLiteId(friendid)};
 		
 		// Execute query.
 		Cursor cursor = db.query(PostsEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, null);
@@ -136,7 +136,7 @@ class Posts {
 		String selection = PostsEntry.WALL_ID + " == ? AND " + PostsEntry.DATE_TIME + " > ?";
 		
 		// Arguments for selection.
-		String[] selectionArgs = {Utility.toSQLiteId(friendid).toString(), Integer.toString(from)};
+		String[] selectionArgs = {Utility.toSQLiteId(friendid), Integer.toString(from)};
 		
 		// ORDER BY clause.
 		String order = PostsEntry._ID + " DESC";
@@ -176,9 +176,41 @@ class Posts {
 		String selection = PostsEntry._ID + " == ? AND" + PostsEntry.WALL_ID + " == ?";
 		
 		// Arguments for selection.
-		String[] selectionArgs = {Integer.toString(postid), Utility.toSQLiteId(friendid).toString()};
+		String[] selectionArgs = {Integer.toString(postid), Utility.toSQLiteId(friendid)};
 		
 		// Execute delete.
 		db.delete(PostsEntry.TABLE_NAME, selection, selectionArgs);
+	}
+	
+	// Get numberPosts older than postId
+	public static List<Post> getSomeLatestPosts(UserId id, int numberPosts, int postId, SQLiteDatabase db) {
+		// SQL SELECT clause.
+		String[] projection = null;
+		
+		// SQL WHERE clause.
+		String selection = PostsEntry._ID + " > ? AND" + PostsEntry.WALL_ID + " == ?";
+		
+		// Arguments for selection.
+		String[] selectionArgs = {Integer.toString(postId), Utility.toSQLiteId(id)};
+		
+		// SQL ORDER BY clause.
+		String orderBy = PostsEntry._ID + " DESC";
+		
+		// SQL LIMIT clause.
+		String limit = Integer.toString(numberPosts);
+		
+		// Execute query.
+		Cursor cursor = db.query(PostsEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, orderBy, limit);
+		
+		List<Post> older = new ArrayList<Post>();
+		if(cursor.moveToFirst()) {
+			while(!cursor.isAfterLast()) {
+				older.add(Utility.buildPost(cursor));
+				cursor.moveToNext();
+			}
+			return older;
+		}
+		else
+			return null;
 	}
 }

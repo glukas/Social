@@ -18,8 +18,8 @@ public final class DatabaseContract {
 	// Structure of table friends.
 	public static abstract class FriendsEntry implements BaseColumns {
 		public static final String TABLE_NAME = "friends";
-		public static final String USER_ID = "user_id";
-		public static final String FRIEND_ID = "friend_id";
+		public static final String USER_ID = "friend_id_1";
+		public static final String FRIEND_ID = "friend_id_2";
 	}
 	
 	// Structure of table users.

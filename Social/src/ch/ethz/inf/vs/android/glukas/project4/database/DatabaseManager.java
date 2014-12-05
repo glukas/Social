@@ -41,9 +41,9 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 		private static final String SQL_CREATE_FRIENDS = Utility.CREATE_TABLE + " " + FriendsEntry.TABLE_NAME + " (" 
 				+ FriendsEntry._ID + " " + Utility.INTEGER_TYPE + " PRIMARY KEY AUTOINCREMENT, "
 				// Index 0: user_id 
-				+ FriendsEntry.USER_ID + " " + Utility.BLOB_TYPE + ", "
+				+ FriendsEntry.USER_ID + " " + Utility.TEXT_TYPE + ", "
 				// Index 1: friend_id
-				+ FriendsEntry.FRIEND_ID + " " + Utility.BLOB_TYPE + ", "
+				+ FriendsEntry.FRIEND_ID + " " + Utility.TEXT_TYPE + ", "
 				// Foreign keys references
 				+ Utility.FOREIGN_KEY + "(" + FriendsEntry.USER_ID + ")" + " " + Utility.REFERENCES + " " + UsersEntry.TABLE_NAME + "(" + UsersEntry.USER_ID + ")"
 					+ " " + Utility.ON_DELETE + " " + Utility.CASCADE + ", "
@@ -59,7 +59,7 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 				// Index 0: _id
 				+ UsersEntry._ID + " " + Utility.INTEGER_TYPE + ", "//" AUTOINCREMENT, "
 				// Index 1: user_id
-				+ UsersEntry.USER_ID + " " + Utility.BLOB_TYPE + ", "
+				+ UsersEntry.USER_ID + " " + Utility.TEXT_TYPE + ", "
 				// Index 2: username
 				+ UsersEntry.USERNAME + " " + Utility.TEXT_TYPE + ", "
 				// Index 3: count
@@ -82,9 +82,9 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 				// Index 0: _id
 				+ PostsEntry._ID + " " + Utility.INTEGER_TYPE + ", "
 				// Index 1: poster_id
-				+ PostsEntry.POSTER_ID + " " + Utility.BLOB_TYPE + ", "
+				+ PostsEntry.POSTER_ID + " " + Utility.TEXT_TYPE + ", "
 				// Index 2: wall_id
-				+ PostsEntry.WALL_ID + " " + Utility.BLOB_TYPE + ", "
+				+ PostsEntry.WALL_ID + " " + Utility.TEXT_TYPE + ", "
 				// Index 3: datetime
 				+ PostsEntry.DATE_TIME + " " + Utility.TEXT_TYPE + ", "
 				// Index 4: text
@@ -232,24 +232,22 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 		Friends.updateFriendMaxPostsId(newMaxPostsId, id, this.getWritableDatabase());
 	}
 
-	// TODO: Get the friend user
+	// Get the friend user
 	@Override
 	public User getFriend(UserId id) {
-		return null;
+		return Friends.getFriend(id, this.getReadableDatabase());
 	}
 	
-	// TODO: set friend's list
+	// Set friend's of friends list
 	@Override
 	public void setFriendsList(UserId user, List<BasicUser> friends) {
-		// TODO Auto-generated method stub
-		
+		Friends.setFriendsList(user, friends, this.getWritableDatabase());
 	}
 
-	// only ids and usernames
+	// Get the list of friends of friend with id
 	@Override
 	public List<BasicUser> getFriendsList(UserId id) {
-		// TODO Auto-generated method stub
-		return null;
+		return Friends.getFriendsList(id, this.getReadableDatabase());
 	}
 	
 	
@@ -304,6 +302,13 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 		Posts.deleteFriendPost(postid, friendid, this.getWritableDatabase());
 	}
 	
+	// Get numberPosts older than postId
+	@Override
+	public List<Post> getSomeLatestPosts(UserId id, int numberPosts, int postId) {
+		return Posts.getSomeLatestPosts(id, numberPosts, postId, this.getReadableDatabase());
+	}
+
+	
 	/**
 	 * WALLS MANAGEMENT
 	 */
@@ -331,7 +336,4 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 	public void deleteFriendWall(UserId friendid) {
 		Walls.deleteFriendWall(friendid, this.getWritableDatabase());
 	}
-
-	
-
 }

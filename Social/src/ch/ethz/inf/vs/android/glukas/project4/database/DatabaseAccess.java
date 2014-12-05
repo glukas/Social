@@ -222,14 +222,13 @@ public interface DatabaseAccess {
 	 */
 	public void deleteFriendPost(int postid, UserId friendid);
 	
-	//TODO
 	/**
 	 * Get some latest posts
 	 * @param id, the id of the user
 	 * @param numberPosts, number of posts older posts wanted from postId
 	 * @return a list of posts older than postId of the user
 	 */
-	//public List<Post> getSomeLatestPosts(UserId id, int numberPosts, int postId);
+	public List<Post> getSomeLatestPosts(UserId id, int numberPosts, int postId);
 	
 	
 	////

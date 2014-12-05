@@ -35,10 +35,10 @@ class Utility {
 	
 	// Implementation constants.
 	// TODO: think about making them dynamic
-	public static final int MAX_BLOB_SIZE = 0;	// TODO: define # of bytes needed for a blob (images + keys + big text?)
-	public static final int MAX_DATABASE_SIZE = 0;	// TODO: define # of bytes needed for the DB
+	public static final int MAX_BLOB_SIZE = 0;	// TODO: define # of bytes needed for a blob (max 400kB?)
+	public static final int MAX_DATABASE_SIZE = 0;	// TODO: define max byte size the database can reach (dynamic?)
 	
-	public static UserId userID = new UserId("0");
+	public static UserId userID = new UserId("-1");
 	
 	/**
 	 * Transforms a byte[] representing an image into a bitmap.
@@ -66,12 +66,12 @@ class Utility {
 	 * @param userid the UserId object to be transformed
 	 * @return byte[] representation of the input
 	 */
-	public static final byte[] toSQLiteId(UserId userid) {
-		return userid.getId().toByteArray();
+	public static final String toSQLiteId(UserId userid) {
+		return userid.getId().toString();
 	}
 	
 	/** TODO
-	 * Java date format:
+	 * Java date format: 
 	 * @param sqlDate Date in SQLite String format
 	 * @return Java Date object
 	 */
