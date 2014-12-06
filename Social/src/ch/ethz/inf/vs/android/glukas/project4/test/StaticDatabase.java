@@ -202,4 +202,10 @@ public class StaticDatabase implements DatabaseAccess {
 		
 	}
 
+	@Override
+	public List<Post> getSomeLatestPosts(UserId id, int numberPosts, int postId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

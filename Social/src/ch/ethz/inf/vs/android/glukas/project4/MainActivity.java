@@ -19,13 +19,12 @@ import ch.ethz.inf.vs.android.glukas.project4.security.ZeroCredentialStorage;
 import ch.ethz.inf.vs.android.glukas.project4.test.Data;
 import ch.ethz.inf.vs.android.glukas.project4.test.StaticDatabase;
 import ch.ethz.inf.vs.android.glukas.project4.test.StaticSecureChannel;
-
-
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
-
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.app.ListFragment;
@@ -77,13 +76,17 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 		setContentView(R.layout.home_screen);
 
 		dbmanager = new DatabaseManager(this);
-		dbmanager.putUser(new User("Dummyname"));
+
 		if (dbmanager.getUser() == null) {
-			Log.d("User null", "User null");
+			Log.d(tag, "No user registered");
+			// Create registration dialog
+			RegistrationDialogFragment dialog = new RegistrationDialogFragment();
+			dialog.show(this.getFragmentManager(), "lol");
 		}
 		else {
-			Log.d("User not null", "User not null");
+			Log.d(tag, "User already registered");
 		}
+		
 		nfcAdapter = NfcAdapter.getDefaultAdapter(this);
 		if (nfcAdapter == null) {
 			Toast.makeText(this, "NFC is not available", Toast.LENGTH_LONG)
@@ -113,15 +116,24 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 		ActionBar.Tab tab1 = actionBar.newTab().setText("My Wall");
 		ActionBar.Tab tab2 = actionBar.newTab().setText("View Friends");
 		ActionBar.Tab tab3 = actionBar.newTab().setText("Add Friend");
-
+//		// TODO: remove this tab after testing phase
+//		ActionBar.Tab tab4 = actionBar.newTab().setText("DB state");
+//		// TODO: remove this tab after testing phase
+//		ActionBar.Tab tab5 = actionBar.newTab().setText("DB tester");
+		
 		tab1.setTabListener(new MyTabListener(new WallFragment()));
 		tab2.setTabListener(new MyTabListener(new FriendListFragment()));
 		tab3.setTabListener(new MyTabListener(new AddFriendFragment()));
+//		tab4.setTabListener(new MyTabListener(new ToDoFragment()));
+//		tab5.setTabListener(new MyTabListener(new ToDoFragment()));
+
 
 		actionBar.addTab(tab1);
 		actionBar.addTab(tab2);
 		actionBar.addTab(tab3);
-
+//		actionBar.addTab(tab4);
+//		actionBar.addTab(tab5);
+		
 		//mProtocol = Protocol.getInstance(new DatabaseManager(this));
 		//mProtocol.setDelegate(this);
 
@@ -192,9 +204,18 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 				return view;
 			}
 
-			ArrayList<BasicUser> users = new ArrayList<BasicUser>(dbmanager.getFriendsList(myself.id));
-			ArrayAdapter<BasicUser> userAdapter = new ArrayAdapter<BasicUser>(getApplicationContext(), R.layout.friend_list_row, R.id.userName, users);
-			setListAdapter(userAdapter);
+			List<BasicUser> myFriends = dbmanager.getFriendsList(myself.id);
+			if(myFriends == null) {
+				Toast.makeText(getApplicationContext(), "dbmanager.getFriendsList() returned null! Using dummy friends...", Toast.LENGTH_LONG).show();
+				ArrayAdapter<BasicUser> userAdapter = new ArrayAdapter<BasicUser>(getApplicationContext(), R.layout.friend_list_row, R.id.userName, list);
+				setListAdapter(userAdapter);
+				return view;
+			}
+			else {
+				ArrayList<BasicUser> users = new ArrayList<BasicUser>();
+				ArrayAdapter<BasicUser> userAdapter = new ArrayAdapter<BasicUser>(getApplicationContext(), R.layout.friend_list_row, R.id.userName, users);
+				setListAdapter(userAdapter);
+			}
 			return view;
 		}
 	}
@@ -203,6 +224,15 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, 
 				Bundle savedInstanceState){
 			View view = inflater.inflate(R.layout.add_friend_tab, container, false);
+			createNextRequest();
+			return view;
+		}
+	}
+	
+	public class ToDoFragment extends Fragment {
+		public View onCreateView(LayoutInflater inflater, ViewGroup container, 
+				Bundle savedInstanceState){
+			View view = inflater.inflate(R.layout.todo_tab, container, false);
 			createNextRequest();
 			return view;
 		}
@@ -226,6 +256,52 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 		public void onTabReselected(Tab tab, FragmentTransaction ft) {
 			// nothing done here
 		}
+	}
+	
+	// Fragment layout for the registration dialog
+	public class RegistrationDialogFragment extends DialogFragment {
+
+		 @Override
+	    public AlertDialog onCreateDialog(Bundle savedInstanceState) {
+	        // Use the Builder class for convenient dialog construction
+	        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+	        
+	        // Get the layout inflater
+	        LayoutInflater inflater = getActivity().getLayoutInflater();
+
+	        // Inflate and set the layout for the dialog
+	        // Pass null as the parent view because its going in the dialog layout
+//	        builder.setView(inflater.inflate(R.layout.dialog_registration, null));
+	        final EditText input = new EditText(getActivity());
+	        builder.setView(input);
+	        
+	        // Set dialog title
+	        builder.setTitle(R.string.registration_title);
+	        
+	        // Set positive button
+	        builder.setPositiveButton(R.string.register_button, new DialogInterface.OnClickListener() {
+	                   public void onClick(DialogInterface dialog, int id) {
+	                       // Retrieve data from textboxes, create new User and call putUser
+	                	   String username = input.getEditableText().toString(); // TODO: check for null
+	                	   Toast.makeText(getActivity(), username + " was succesfully registered", Toast.LENGTH_LONG).show();
+	                	   // Create new user object
+	                	   User user = new User(username);
+	                	   // Insert user in the database
+	                	   dbmanager.putUser(user);
+	                   }
+	               });
+	        
+	        // Set negative button
+	        builder.setNegativeButton(R.string.cancel_button, new DialogInterface.OnClickListener() {
+	                   public void onClick(DialogInterface dialog, int id) {
+	                       // TODO: User cancelled registration dialog, what should be done?
+	                   }
+	               });
+	        
+	        // Create the AlertDialog object and return it
+	        return builder.create();
+	    }
+
 	}
 
 }

@@ -18,4 +18,8 @@
 	<string name="home_show_friends_button">View friends</string>
 	<string name="add_NFCfriend">Add friend via NFC</string>
 	<string name="no_friends">No friends found in friendlist</string>
+	<string name="registration_title">Registration</string>
+	<string name="register_button">Register</string>
+	<string name="cancel_button">Cancel</string>
+	
 </resources>
