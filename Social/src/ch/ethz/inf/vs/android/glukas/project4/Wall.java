@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.android.glukas.project4;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -10,17 +11,27 @@ import java.util.List;
 public class Wall {
 	
 	// List of all posts contained in the wall.
-	public List<Post> posts;
+	private List<Post> posts;
 
-	// Get Post with the specified id.
-	public void getPostatId(int id) {	
-		
+	// Constructor
+	public Wall() {
+		posts = new ArrayList<Post>();
+	}
+	
+	// Get post count.
+	public int postCount() {
+		return posts.size();
+	}
+	
+	// Getters.
+	public List<Post> getPosts() {
+		return posts;
+	}
+	
+	// Setters.
+	public void addPost(Post newPost) {
+		posts.add(newPost);
 	}
 
-	// Get all Posts in the Wall from a certain starting id.
-	public void getAllPostsfromId(int id) {
-		
-	}
-
-
+	
 }

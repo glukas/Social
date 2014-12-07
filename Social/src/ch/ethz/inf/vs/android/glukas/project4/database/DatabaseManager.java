@@ -17,6 +17,7 @@ import android.content.Context;
 import android.database.SQLException;
 import android.database.sqlite.*;
 import android.util.Log;
+import android.util.Pair;
 
 /**
  * Provides the interface with the database.
@@ -335,5 +336,35 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 	@Override
 	public void deleteFriendWall(UserId friendid) {
 		Walls.deleteFriendWall(friendid, this.getWritableDatabase());
+	}
+	
+	/**
+	 *  TESTING
+	 */
+	
+	// Inserts static test data in the DB
+	public void initializeTest() {
+		User user = new User("Alice");
+		this.putUser(user);
+		Post post = new Post(1, user.getId(), "Hello World!", null, null);
+		this.putUserPost(post);
+		post = new Post(2, user.getId(), "Amazing app!!", null, null);
+		this.putUserPost(post);
+	}
+	
+	// return a list of all user in the DB
+	public List<BasicUser> getAllUser() {
+//		String selection = 
+		return null;
+	}
+	
+	// return a list of all friendship tuples (username, username) in the DB
+	public List<Pair<String,String>> getAllFriendship() {
+		return null;
+	}
+	
+	// return a list of all post in the DB
+	public List<Post> getAllPost() {
+		return null;
 	}
 }

@@ -77,10 +77,13 @@ class Posts {
 		ContentValues values = new ContentValues();
 		values.put(PostsEntry._ID, id);
 		values.put(PostsEntry.POSTER_ID, Utility.toSQLiteId(poster));
-		values.put(PostsEntry.TEXT, text);
-		values.put(PostsEntry.IMAGE, Utility.toByteArray(image));
+		if(text != null)
+			values.put(PostsEntry.TEXT, text);
+		if(image != null)
+			values.put(PostsEntry.IMAGE, Utility.toByteArray(image));
 		values.put(PostsEntry.WALL_ID, Utility.toSQLiteId(friendid));
-		values.put(PostsEntry.DATE_TIME, Utility.toSQLiteDate(datetime));
+		if(datetime != null)
+			values.put(PostsEntry.DATE_TIME, Utility.toSQLiteDate(datetime));
 		
 		// Insert content.
 		db.insert(PostsEntry.TABLE_NAME, null, values);

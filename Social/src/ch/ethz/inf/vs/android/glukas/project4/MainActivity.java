@@ -62,7 +62,9 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 	// TODO Remove the section below
 
 	// Workaround for dbmanager not returning users:
-	private ArrayList<BasicUser> list = new ArrayList<BasicUser>();
+	private ArrayList<BasicUser> userList = new ArrayList<BasicUser>();
+	// Workaround for dbmanager not returning posts:
+	private ArrayList<Post> postList = new ArrayList<Post>();
 
 	// TODO Remove the section above
 
@@ -76,6 +78,9 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 		setContentView(R.layout.home_screen);
 
 		dbmanager = new DatabaseManager(this);
+		
+		// Insert static test data
+		dbmanager.initializeTest();
 
 		if (dbmanager.getUser() == null) {
 			Log.d(tag, "No user registered");
@@ -87,27 +92,30 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 			Log.d(tag, "User already registered");
 		}
 		
-		nfcAdapter = NfcAdapter.getDefaultAdapter(this);
-		if (nfcAdapter == null) {
-			Toast.makeText(this, "NFC is not available", Toast.LENGTH_LONG)
-			.show();
-			finish();
-			return;
-		}
+//		nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+//		if (nfcAdapter == null) {
+//			Toast.makeText(this, "NFC is not available", Toast.LENGTH_LONG)
+//			.show();
+//			finish();
+//			return;
+//		}
 
 		// TODO Remove the section below
 
 		// Workaround for dbmanager not returning users:
-		list.add(new User("Alice"));
-		list.add(new User("Bob"));
-		list.add(new User("Eve"));
-		list.add(new User("Benjamin"));
-		list.add(new User("Steve"));
-		list.add(new User("Carlos"));
-		list.add(new User("Sven"));
-		list.add(new User("Mathias"));
-		list.add(new User("Bradley"));
-
+		userList.add(new User("Alice"));
+		userList.add(new User("Bob"));
+		userList.add(new User("Eve"));
+		userList.add(new User("Benjamin"));
+		userList.add(new User("Steve"));
+		userList.add(new User("Carlos"));
+		userList.add(new User("Sven"));
+		userList.add(new User("Mathias"));
+		userList.add(new User("Bradley"));
+		
+		
+		// Workaround for dbmanager not returning posts:
+//		post
 		// TODO Remove the section above
 
 		ActionBar actionBar = getActionBar();
@@ -157,8 +165,8 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 
 		nextRequest = new FriendshipRequest(new User("Alice"));
 
-		nfcAdapter.setNdefPushMessageCallback(nextRequest, this);
-		nfcAdapter.setOnNdefPushCompleteCallback(this, this);
+//		nfcAdapter.setNdefPushMessageCallback(nextRequest, this);
+//		nfcAdapter.setOnNdefPushCompleteCallback(this, this);
 	}
 
 	@Override
@@ -183,10 +191,31 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 
 	}
 
-	public class WallFragment extends Fragment {
+	public class WallFragment extends ListFragment {
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, 
 				Bundle savedInstanceState){
 			View view = inflater.inflate(R.layout.my_wall_tab, container, false);
+			Wall myWall = dbmanager.getUserWall();
+			User myself = dbmanager.getUser();
+
+			if (myself == null) {
+				Toast.makeText(getApplicationContext(), "dbmanager.getUser() returned null!", Toast.LENGTH_LONG).show();
+				return view;
+			}
+			
+			if(myWall == null) {
+				Toast.makeText(getApplicationContext(), "dbmanager.getUserWall() returned null! Using dummy posts...", Toast.LENGTH_LONG).show();
+				ArrayAdapter<Post> postAdapter = new ArrayAdapter<Post>(getApplicationContext(), R.layout.my_wall_list_row, R.id.post, postList);
+				setListAdapter(postAdapter);
+				return view;
+			}
+			else {
+				Toast.makeText(getApplicationContext(), "dbmanager.getUserWall() returned something!", Toast.LENGTH_LONG).show();
+				List<Post> posts = myWall.getPosts();
+				ArrayAdapter<Post> userAdapter = new ArrayAdapter<Post>(getApplicationContext(), R.layout.my_wall_list_row, R.id.post, posts);
+				setListAdapter(userAdapter);
+			}
+			
 			return view;
 		}
 	}
@@ -199,15 +228,15 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 
 			if (myself == null) {
 				Toast.makeText(getApplicationContext(), "dbmanager.getUser() returned null! Using dummy friends...", Toast.LENGTH_LONG).show();
-				ArrayAdapter<BasicUser> userAdapter = new ArrayAdapter<BasicUser>(getApplicationContext(), R.layout.friend_list_row, R.id.userName, list);
+				ArrayAdapter<BasicUser> userAdapter = new ArrayAdapter<BasicUser>(getApplicationContext(), R.layout.friend_list_row, R.id.userName, userList);
 				setListAdapter(userAdapter);
 				return view;
 			}
 
 			List<BasicUser> myFriends = dbmanager.getFriendsList(myself.id);
 			if(myFriends == null) {
-				Toast.makeText(getApplicationContext(), "dbmanager.getFriendsList() returned null! Using dummy friends...", Toast.LENGTH_LONG).show();
-				ArrayAdapter<BasicUser> userAdapter = new ArrayAdapter<BasicUser>(getApplicationContext(), R.layout.friend_list_row, R.id.userName, list);
+				Toast.makeText(getApplicationContext(), "dbmanager.getFriendsList() still doesn't work (Alessio)! Using dummy friends...", Toast.LENGTH_LONG).show();
+				ArrayAdapter<BasicUser> userAdapter = new ArrayAdapter<BasicUser>(getApplicationContext(), R.layout.friend_list_row, R.id.userName, userList);
 				setListAdapter(userAdapter);
 				return view;
 			}

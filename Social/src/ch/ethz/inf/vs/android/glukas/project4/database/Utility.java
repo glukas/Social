@@ -102,9 +102,17 @@ class Utility {
 		// Get text.
 		String text = cursor.getString(2);
 		// Get image.
-		Bitmap image = Utility.toBitmap(cursor.getBlob(3));
+		Bitmap image;
+		if(cursor.getBlob(3) != null)
+			image = Utility.toBitmap(cursor.getBlob(3));
+		else
+			image = null;
 		// Get datetime.
-		Date datetime = Utility.toJavaDate(cursor.getString(4));
+		Date datetime;
+		if(cursor.getString(4) != null)
+			datetime = Utility.toJavaDate(cursor.getString(4));
+		else
+			datetime = null;
 		// Build and return post.
 		return new Post(id, poster_id, text, image, datetime);
 	}

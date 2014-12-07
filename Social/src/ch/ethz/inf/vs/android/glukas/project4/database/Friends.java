@@ -223,15 +223,19 @@ class Friends {
 		// add new
 	}
 	
-	// Get the friends of friends list
+	// FIXME: Get the friends of friends list
 	public static List<BasicUser> getFriendsList(UserId id, SQLiteDatabase db) {
 		//
-		String query = "SELECT " + UsersEntry.USERNAME + ", " + FriendsEntry.FRIEND_ID + " FROM " + UsersEntry.TABLE_NAME + " INNER JOIN " + FriendsEntry.TABLE_NAME
-						+ " ON " + FriendsEntry.USER_ID + " == ?";
+//		String query = "SELECT " + UsersEntry.USERNAME + ", " + FriendsEntry.FRIEND_ID + " FROM " + UsersEntry.TABLE_NAME + " INNER JOIN " + FriendsEntry.TABLE_NAME
+//						+ " ON " + FriendsEntry.USER_ID + " == ?";
+//		String query = "SELECT * FROM " + UsersEntry.TABLE_NAME + " u INNER JOIN " + FriendsEntry.TABLE_NAME
+//				+ " f ON f." + FriendsEntry.USER_ID + " == ?";
+		String query = "SELECT * FROM " + FriendsEntry.TABLE_NAME
+				+ " WHERE " + FriendsEntry.USER_ID + " == ?";
 		//
-		String[] selectionArgs = {Utility.toSQLiteId(id)};
+		String[] selectionArgs = {};
 		
-		Cursor cursor = db.rawQuery(query, selectionArgs);
+		Cursor cursor = db.query(FriendsEntry.TABLE_NAME, null, null, selectionArgs, null, null, null); //db.rawQuery(query, selectionArgs);
 		
 		List<BasicUser> friends = new ArrayList<BasicUser>();
 		if(cursor.moveToFirst()) {

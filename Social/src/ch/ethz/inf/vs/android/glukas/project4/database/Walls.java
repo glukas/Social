@@ -52,7 +52,7 @@ class Walls {
 		if(cursor.moveToFirst()) {
 			while(!cursor.isAfterLast()) {
 				// Add post to wall.
-				wall.posts.add(Utility.buildPost(cursor));
+				wall.addPost(Utility.buildPost(cursor));
 				cursor.moveToNext();
 			}
 			// Close cursor

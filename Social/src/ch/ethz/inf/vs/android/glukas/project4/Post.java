@@ -36,6 +36,7 @@ public class Post {
 	 */
 	public Post(int id, UserId Poster, String text, Bitmap image, Date datetime) {
 		this.id = id;
+		this.poster = Poster;
 		this.text = text;
 		if (image == null) {
 			type = PostType.TEXT;
