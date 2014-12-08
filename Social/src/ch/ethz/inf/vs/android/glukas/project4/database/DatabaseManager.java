@@ -346,7 +346,7 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 	public void initializeTest() {
 		User user = new User("Alice");
 		this.putUser(user);
-		Post post = new Post(1, user.getId(), "Hello World!", null, null);
+		Post post = new Post(1, user.getId(), "Hello World!", null, new Date());
 		this.putUserPost(post);
 		post = new Post(2, user.getId(), "Amazing app!!", null, null);
 		this.putUserPost(post);
@@ -354,7 +354,15 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 	
 	// return a list of all user in the DB
 	public List<BasicUser> getAllUser() {
-//		String selection = 
+		String projection = null;
+		
+		String selection = null;
+		
+		String[] selectionArgs = {};
+		
+		String orderBy = UsersEntry.USERNAME + " DESC";
+		
+		SQLiteDatabase db = this.getReadableDatabase();
 		return null;
 	}
 	
