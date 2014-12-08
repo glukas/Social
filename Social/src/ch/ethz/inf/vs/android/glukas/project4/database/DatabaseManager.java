@@ -1,10 +1,13 @@
 package ch.ethz.inf.vs.android.glukas.project4.database;
 
+import java.io.InputStream;
+import java.net.URL;
 import java.util.Date;
 import java.util.List;
 
 import ch.ethz.inf.vs.android.glukas.project4.BasicUser;
 import ch.ethz.inf.vs.android.glukas.project4.Post;
+import ch.ethz.inf.vs.android.glukas.project4.R;
 import ch.ethz.inf.vs.android.glukas.project4.User;
 import ch.ethz.inf.vs.android.glukas.project4.UserCredentials;
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
@@ -13,9 +16,12 @@ import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseContract.FriendsE
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseContract.PostsEntry;
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseContract.UsersEntry;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.DatabaseException;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.SQLException;
 import android.database.sqlite.*;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.util.Pair;
 
@@ -29,77 +35,77 @@ import android.util.Pair;
 public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 
 	private static final String TAG = "----DATABASE----";
-	
+
 	// DB Metadata
 	private static final String DATABASE_NAME = "SocialDB";
 	private static final int DATABASE_VERSION = 1;
 
 	// DDL
-		/**
-		 * String containing SQL code to create table friends.
-		 * TODO: add integrity checks
-		 */
-		private static final String SQL_CREATE_FRIENDS = Utility.CREATE_TABLE + " " + FriendsEntry.TABLE_NAME + " (" 
-				+ FriendsEntry._ID + " " + Utility.INTEGER_TYPE + " PRIMARY KEY AUTOINCREMENT, "
-				// Index 0: user_id 
-				+ FriendsEntry.USER_ID + " " + Utility.TEXT_TYPE + ", "
-				// Index 1: friend_id
-				+ FriendsEntry.FRIEND_ID + " " + Utility.TEXT_TYPE + ", "
-				// Foreign keys references
-				+ Utility.FOREIGN_KEY + "(" + FriendsEntry.USER_ID + ")" + " " + Utility.REFERENCES + " " + UsersEntry.TABLE_NAME + "(" + UsersEntry.USER_ID + ")"
-					+ " " + Utility.ON_DELETE + " " + Utility.CASCADE + ", "
-				+ Utility.FOREIGN_KEY + "(" + FriendsEntry.FRIEND_ID + ")" + " " + Utility.REFERENCES + " " + UsersEntry.TABLE_NAME + "(" + UsersEntry.USER_ID + ")"
-					+ " " + Utility.ON_DELETE + " " + Utility.CASCADE
-				+ ");";
-		
-		/**
-		 * String containing SQL code to create table users.
-		 * TODO: add integrity checks and remaining columns
-		 */
-		private static final String SQL_CREATE_USERS = Utility.CREATE_TABLE + " " + UsersEntry.TABLE_NAME + " (" 
-				// Index 0: _id
-				+ UsersEntry._ID + " " + Utility.INTEGER_TYPE + ", "//" AUTOINCREMENT, "
-				// Index 1: user_id
-				+ UsersEntry.USER_ID + " " + Utility.TEXT_TYPE + ", "
-				// Index 2: username
-				+ UsersEntry.USERNAME + " " + Utility.TEXT_TYPE + ", "
-				// Index 3: count
-				+ UsersEntry.COUNT + " " + Utility.INTEGER_TYPE + ", "
-				// Index 4: max
-				+ UsersEntry.MAX + " " + Utility.INTEGER_TYPE + ", "
-				// Index 5: broadcast_enc_key
-				+ UsersEntry.BROADCAST_ENC_KEY + " " + Utility.BLOB_TYPE + ", "
-				// Index 6: broadcast_auth_key
-				+ UsersEntry.BROADCAST_AUTH_KEY + " " + Utility.BLOB_TYPE + ", "
-				// Primary key
-				+ Utility.PRIMARY_KEY + " (" + UsersEntry.USER_ID + ")"
-				+ ");";
-		
-		/**
-		 * String containing SQL code to create table posts.
-		 * TODO: add integrity checks
-		 */
-		private static final String SQL_CREATE_POSTS = Utility.CREATE_TABLE + " " + PostsEntry.TABLE_NAME + " (" 
-				// Index 0: _id
-				+ PostsEntry._ID + " " + Utility.INTEGER_TYPE + ", "
-				// Index 1: poster_id
-				+ PostsEntry.POSTER_ID + " " + Utility.TEXT_TYPE + ", "
-				// Index 2: wall_id
-				+ PostsEntry.WALL_ID + " " + Utility.TEXT_TYPE + ", "
-				// Index 3: datetime
-				+ PostsEntry.DATE_TIME + " " + Utility.TEXT_TYPE + ", "
-				// Index 4: text
-				+ PostsEntry.TEXT + " " + Utility.TEXT_TYPE + ", "
-				// Index 5: image
-				+ PostsEntry.IMAGE + " " + Utility.BLOB_TYPE + ", "
-				// Primary key
-				+ Utility.PRIMARY_KEY + " (" + PostsEntry._ID + ", " + PostsEntry.WALL_ID + "), "
-				// Foreign key references
-				+ Utility.FOREIGN_KEY + " (" + PostsEntry.POSTER_ID + ")" + " " + Utility.REFERENCES + " " + UsersEntry.TABLE_NAME + "(" + UsersEntry.USER_ID + ") " 
-					 + Utility.ON_DELETE + " " + Utility.SET_NULL + ", "
-				+ Utility.FOREIGN_KEY + " (" + PostsEntry.WALL_ID + ")" + " " + Utility.REFERENCES + " " + UsersEntry.TABLE_NAME + "(" + UsersEntry.USER_ID + ") "
-					+ Utility.ON_DELETE + " " + Utility.CASCADE
-				+ ");";
+	/**
+	 * String containing SQL code to create table friends.
+	 * TODO: add integrity checks
+	 */
+	private static final String SQL_CREATE_FRIENDS = Utility.CREATE_TABLE + " " + FriendsEntry.TABLE_NAME + " (" 
+			+ FriendsEntry._ID + " " + Utility.INTEGER_TYPE + " PRIMARY KEY AUTOINCREMENT, "
+			// Index 0: user_id 
+			+ FriendsEntry.USER_ID + " " + Utility.TEXT_TYPE + ", "
+			// Index 1: friend_id
+			+ FriendsEntry.FRIEND_ID + " " + Utility.TEXT_TYPE + ", "
+			// Foreign keys references
+			+ Utility.FOREIGN_KEY + "(" + FriendsEntry.USER_ID + ")" + " " + Utility.REFERENCES + " " + UsersEntry.TABLE_NAME + "(" + UsersEntry.USER_ID + ")"
+			+ " " + Utility.ON_DELETE + " " + Utility.CASCADE + ", "
+			+ Utility.FOREIGN_KEY + "(" + FriendsEntry.FRIEND_ID + ")" + " " + Utility.REFERENCES + " " + UsersEntry.TABLE_NAME + "(" + UsersEntry.USER_ID + ")"
+			+ " " + Utility.ON_DELETE + " " + Utility.CASCADE
+			+ ");";
+
+	/**
+	 * String containing SQL code to create table users.
+	 * TODO: add integrity checks and remaining columns
+	 */
+	private static final String SQL_CREATE_USERS = Utility.CREATE_TABLE + " " + UsersEntry.TABLE_NAME + " (" 
+			// Index 0: _id
+			+ UsersEntry._ID + " " + Utility.INTEGER_TYPE + ", "//" AUTOINCREMENT, "
+			// Index 1: user_id
+			+ UsersEntry.USER_ID + " " + Utility.TEXT_TYPE + ", "
+			// Index 2: username
+			+ UsersEntry.USERNAME + " " + Utility.TEXT_TYPE + ", "
+			// Index 3: count
+			+ UsersEntry.COUNT + " " + Utility.INTEGER_TYPE + ", "
+			// Index 4: max
+			+ UsersEntry.MAX + " " + Utility.INTEGER_TYPE + ", "
+			// Index 5: broadcast_enc_key
+			+ UsersEntry.BROADCAST_ENC_KEY + " " + Utility.BLOB_TYPE + ", "
+			// Index 6: broadcast_auth_key
+			+ UsersEntry.BROADCAST_AUTH_KEY + " " + Utility.BLOB_TYPE + ", "
+			// Primary key
+			+ Utility.PRIMARY_KEY + " (" + UsersEntry.USER_ID + ")"
+			+ ");";
+
+	/**
+	 * String containing SQL code to create table posts.
+	 * TODO: add integrity checks
+	 */
+	private static final String SQL_CREATE_POSTS = Utility.CREATE_TABLE + " " + PostsEntry.TABLE_NAME + " (" 
+			// Index 0: _id
+			+ PostsEntry._ID + " " + Utility.INTEGER_TYPE + ", "
+			// Index 1: poster_id
+			+ PostsEntry.POSTER_ID + " " + Utility.TEXT_TYPE + ", "
+			// Index 2: wall_id
+			+ PostsEntry.WALL_ID + " " + Utility.TEXT_TYPE + ", "
+			// Index 3: datetime
+			+ PostsEntry.DATE_TIME + " " + Utility.TEXT_TYPE + ", "
+			// Index 4: text
+			+ PostsEntry.TEXT + " " + Utility.TEXT_TYPE + ", "
+			// Index 5: image
+			+ PostsEntry.IMAGE + " " + Utility.BLOB_TYPE + ", "
+			// Primary key
+			+ Utility.PRIMARY_KEY + " (" + PostsEntry._ID + ", " + PostsEntry.WALL_ID + "), "
+			// Foreign key references
+			+ Utility.FOREIGN_KEY + " (" + PostsEntry.POSTER_ID + ")" + " " + Utility.REFERENCES + " " + UsersEntry.TABLE_NAME + "(" + UsersEntry.USER_ID + ") " 
+			+ Utility.ON_DELETE + " " + Utility.SET_NULL + ", "
+			+ Utility.FOREIGN_KEY + " (" + PostsEntry.WALL_ID + ")" + " " + Utility.REFERENCES + " " + UsersEntry.TABLE_NAME + "(" + UsersEntry.USER_ID + ") "
+			+ Utility.ON_DELETE + " " + Utility.CASCADE
+			+ ");";
 
 	// CREATION
 	public DatabaseManager(Context context) {
@@ -134,7 +140,7 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 	public void putUser(User user) {
 		Users.putUser(user, this.getWritableDatabase());
 	}
-	
+
 	@Override
 	// Get the user object from the database.
 	public User getUser() {
@@ -146,13 +152,13 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 	public int getUserPostsCount() {
 		return Users.getUserPostsCount(this.getReadableDatabase());
 	}
-	
+
 	// Get the upper bound of the number of posts in the user's wall.
 	@Override
 	public int getUserMaxPostsId() {
-		 return Users.getUserMaxPostsId(this.getReadableDatabase());
+		return Users.getUserMaxPostsId(this.getReadableDatabase());
 	}
-	
+
 	// Change the user's posts count.
 	@Override
 	public void setUserPostsCount(int newCount) {
@@ -164,13 +170,13 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 	public void setUserMaxPostsId(int newMaxPostsId) {
 		Users.updateUserMaxPostsId(newMaxPostsId, this.getWritableDatabase());
 	}
-	
+
 	// Get the user's list of friends.
 	@Override
 	public List<User> getUserFriendsList() {
 		return Users.getUserFriends(this.getReadableDatabase());
 	}
-	
+
 	/**
 	 * Credentials (Keys)
 	 */
@@ -181,7 +187,7 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 	public UserCredentials getUserCredentials(UserId id) {
 		return Users.getUserCredentials(id, this.getReadableDatabase());
 	}
-	
+
 	/**
 	 * FRIENDS MANAGEMENT
 	 */
@@ -190,31 +196,31 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 	public int getFriendPostsCount(UserId id) {
 		return Friends.getFriendPostsCount(id, this.getReadableDatabase());
 	}
-	
+
 	// Get the upper bound over the partial order of actual posts for the friend.
 	@Override
 	public int getFriendMaxPostsId(UserId id) {
 		return Friends.getFriendMaxPostsId(id, this.getReadableDatabase());
 	}
-	
+
 	// Get an user name from an user id
 	@Override
 	public String getFriendUsername(UserId id) {
 		return Friends.getFriendUsername(id, this.getReadableDatabase());
 	}
-	
+
 	// Get an user id from an user name (cannot ensures uniqueness)
 	@Override
 	public List<UserId> getFriendId(String username) {
 		return Friends.getFriendId(username, this.getReadableDatabase());
 	}
-	
+
 	// Add a friend in the List of Friends of the user
 	@Override
 	public void putFriend(User friend) {
 		Friends.putFriend(friend, this.getWritableDatabase());
 	}
-	
+
 	// Remove friend from the List of friends & everything associated with him/her
 	@Override
 	public void deleteFriend(UserId id) {
@@ -238,7 +244,7 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 	public User getFriend(UserId id) {
 		return Friends.getFriend(id, this.getReadableDatabase());
 	}
-	
+
 	// Set friend's of friends list
 	@Override
 	public void setFriendsList(UserId user, List<BasicUser> friends) {
@@ -250,8 +256,8 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 	public List<BasicUser> getFriendsList(UserId id) {
 		return Friends.getFriendsList(id, this.getReadableDatabase());
 	}
-	
-	
+
+
 	/**
 	 * POSTS MANAGEMENT
 	 */
@@ -260,7 +266,7 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 	public void putUserPost(Post post) {
 		Posts.putUserPost(post, this.getWritableDatabase());
 	}
-	
+
 	// Get all the Posts in a Wall starting from id -> id or time?
 	@Override
 	public List<Post> getAllUserPostsFrom(int from) {
@@ -272,7 +278,7 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 	public void deleteUserPost(int postid) {
 		Posts.deleteUserPost(postid, this.getWritableDatabase());
 	}
-	
+
 	// Get a certain post from the user's wall.
 	@Override
 	public Post getUserPost(int postid) {
@@ -302,67 +308,71 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 	public void deleteFriendPost(int postid, UserId friendid) {
 		Posts.deleteFriendPost(postid, friendid, this.getWritableDatabase());
 	}
-	
+
 	// Get numberPosts older than postId
 	@Override
 	public List<Post> getSomeLatestPosts(UserId id, int numberPosts, int postId) {
 		return Posts.getSomeLatestPosts(id, numberPosts, postId, this.getReadableDatabase());
 	}
 
-	
+
 	/**
 	 * WALLS MANAGEMENT
 	 */
-	
+
 	// Get the whole wall of the user.
 	@Override
 	public Wall getUserWall() {
 		return Walls.getUserWall(this.getReadableDatabase());
 	}
-	
+
 	// Delete user's wall.
 	@Override
 	public void deleteUserWall() {
 		Walls.deleteUserWall(this.getWritableDatabase());
 	}
-	
+
 	// Get the whole Wall of a certain friend
 	@Override
 	public Wall getFriendWall(UserId friendid) {
 		return Walls.getFriendWall(friendid, this.getReadableDatabase());
 	}
-	
+
 	// Delete the whole saved Wall of a certain friend
 	@Override
 	public void deleteFriendWall(UserId friendid) {
 		Walls.deleteFriendWall(friendid, this.getWritableDatabase());
 	}
-	
+
 	/**
 	 *  TESTING
 	 */
-	
+
 	// Inserts static test data in the DB
-	public void initializeTest() {
+	public void initializeTest(Context context) {
 		User user = new User("Alice");
 		this.putUser(user);
 		Post post = new Post(1, user.getId(), "Hello World!", null, null);
 		this.putUserPost(post);
 		post = new Post(2, user.getId(), "Amazing app!!", null, null);
 		this.putUserPost(post);
+		Bitmap icon = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher);
+		icon = Bitmap.createScaledBitmap(icon, 500, 500, false);
+		post = new Post(3, user.getId(), "Testing image.. and now with a much longer text to see how it breaks onto the next line and stuff..", icon, null);
+		this.putUserPost(post);
 	}
-	
+
 	// return a list of all user in the DB
 	public List<BasicUser> getAllUser() {
-//		String selection = 
+		//		String selection = 
 		return null;
 	}
-	
+
 	// return a list of all friendship tuples (username, username) in the DB
 	public List<Pair<String,String>> getAllFriendship() {
 		return null;
 	}
-	
+
 	// return a list of all post in the DB
 	public List<Post> getAllPost() {
 		return null;
