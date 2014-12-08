@@ -80,7 +80,7 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 		dbmanager = new DatabaseManager(this);
 		
 		// Insert static test data
-		dbmanager.initializeTest();
+		dbmanager.initializeTest(getApplicationContext());
 
 		if (dbmanager.getUser() == null) {
 			Log.d(tag, "No user registered");
@@ -205,14 +205,14 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 			
 			if(myWall == null) {
 				Toast.makeText(getApplicationContext(), "dbmanager.getUserWall() returned null! Using dummy posts...", Toast.LENGTH_LONG).show();
-				ArrayAdapter<Post> postAdapter = new ArrayAdapter<Post>(getApplicationContext(), R.layout.my_wall_list_row, R.id.post, postList);
+				WallPostAdapter postAdapter = new WallPostAdapter(getApplicationContext(), postList);
 				setListAdapter(postAdapter);
 				return view;
 			}
 			else {
 				Toast.makeText(getApplicationContext(), "dbmanager.getUserWall() returned something!", Toast.LENGTH_LONG).show();
 				List<Post> posts = myWall.getPosts();
-				ArrayAdapter<Post> userAdapter = new ArrayAdapter<Post>(getApplicationContext(), R.layout.my_wall_list_row, R.id.post, posts);
+				WallPostAdapter userAdapter = new WallPostAdapter(getApplicationContext(), posts);
 				setListAdapter(userAdapter);
 			}
 			
