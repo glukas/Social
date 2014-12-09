@@ -83,7 +83,10 @@ public class SecureChannel implements AsyncServerDelegate {
 		NetworkMessage decrypted = crypto.decryptPost(message);
 		if (decrypted != null) {//For now, ignore all corrupted messages
 			//forward to delegate
-			this.secureChannelDelegate.onMessageReceived(decrypted);
+			if (this.secureChannelDelegate != null) {
+				this.secureChannelDelegate.onMessageReceived(decrypted);
+				Log.d(this.getClass().toString(), "received message, but delegate is null");
+			}
 		} else {
 			Log.e(this.getClass().toString(), "received invalid message");
 		}
