@@ -137,8 +137,7 @@ public class MessageCryptography {
 			e.printStackTrace();
 		}
 		
-		byte[] textByteClean = textBytes;
-		return new NetworkMessage(textByteClean, header);
+		return new NetworkMessage(textBytes, header);
 	}
 	
 }

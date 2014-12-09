@@ -53,7 +53,7 @@ public class MessageCryptographyTest3 extends TestCase {
 		assertTrue(decrypted.header.getbytes().length == PublicHeader.BYTES_LENGTH_HEADER);
 		
 		assertTrue(Arrays.equals(header.getbytes(),decrypted.header.getbytes()));
-		assertEquals(text, decrypted.text);
+		assertEquals(text, decrypted.getText());
 	}
 	
 	public void testAuthFailsGracefullyForTooShortMessages() {
