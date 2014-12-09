@@ -89,7 +89,7 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 			dialog.show(this.getFragmentManager(), "lol");
 		}
 		else {
-			Log.d(tag, "User already registered");
+			Log.d(tag, "User " + dbmanager.getUser().username +" already registered");
 		}
 		
 //		nfcAdapter = NfcAdapter.getDefaultAdapter(this);

@@ -75,7 +75,7 @@ public class IncomingFriendshipActivity extends Activity implements
 		// only one message sent during the beam
 		NdefMessage msg = (NdefMessage) rawMsgs[0];
 		request = new FriendshipRequest(msg);
-		//response = request.createAcceptingResponse(dbmanager.getUser());
+		//response = request.createAcceptingResponse(dbmanager.getUser());//TODO
 		response = request.createAcceptingResponse(new User("Bob"));
 		
 		nfcAdapter = NfcAdapter.getDefaultAdapter(this);
@@ -91,8 +91,7 @@ public class IncomingFriendshipActivity extends Activity implements
 		nfcAdapter.setNdefPushMessageCallback(response, this);
 		nfcAdapter.setOnNdefPushCompleteCallback(this, this);
 
-		saveFriend(request);
-		 displayRequest(request);
+		displayRequest(request);
 	}
 
 	// Save friend in database
@@ -111,8 +110,11 @@ public class IncomingFriendshipActivity extends Activity implements
 
 	@Override
 	public void onNdefPushComplete(NfcEvent event) {
-		// TODO (Lukas) we would actually have to make sure that the correct
-		// recipient was reached
+		// TODO (Lukas) we would actually have to make sure that the correct recipient was reached
+		
+		//NOTE: we only save the friend once someone (hopefully the same person) received the reply.
+		//This means that the request was accepted. (by doing an exchange in the other direction)
+		saveFriend(request);
 		Log.d(this.getClass().toString(), "successfully friended");
 	}
 
