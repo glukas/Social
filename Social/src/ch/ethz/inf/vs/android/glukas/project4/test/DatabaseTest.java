@@ -8,12 +8,13 @@ import ch.ethz.inf.vs.android.glukas.project4.User;
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseAccess;
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseManager;
 import android.test.AndroidTestCase;
+import android.test.InstrumentationTestCase;
 
-public class DatabaseTest extends AndroidTestCase {
+public class DatabaseTest extends InstrumentationTestCase{
 	
 	@Test
 	public void testUserInsertion() {
-		DatabaseAccess db = new DatabaseManager(null);	// FIXME: context can't be null!! -> sqlError
+		DatabaseAccess db = new DatabaseManager(getInstrumentation().getContext());
 		String username = "MeIAndMySelf";
 		User user = new User(username);
 		db.putUser(user);
