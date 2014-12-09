@@ -175,7 +175,7 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate {
 	@Override
 	public void onMessageReceived(NetworkMessage message) {
 		//react to an incoming message
-		Message msg = MessageParser.parseMessage(message.text, message.header, database);
+		Message msg = MessageParser.parseMessage(message.getText(), message.header, database);
 		
 		MessageType type = msg.getRequestType();
 	

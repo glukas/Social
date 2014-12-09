@@ -186,7 +186,7 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 	public void onMessageReceived(NetworkMessage message) {
 		Log.d("DEBUG", Data.tag
 				+ "Message received : "
-				+ MessageParser.parseMessage(message.text, message.header, db)
+				+ MessageParser.parseMessage(message.getText(), message.header, db)
 				.toString());
 
 	}

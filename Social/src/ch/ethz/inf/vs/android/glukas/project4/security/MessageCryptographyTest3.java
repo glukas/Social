@@ -43,7 +43,7 @@ public class MessageCryptographyTest3 extends TestCase {
 		assertTrue(header.getbytes().length == PublicHeader.BYTES_LENGTH_HEADER);
 		assertTrue(new PublicHeader(ByteBuffer.wrap(header.getbytes())).getbytes().length == PublicHeader.BYTES_LENGTH_HEADER);
 		assertTrue(Arrays.equals(new PublicHeader(ByteBuffer.wrap(header.getbytes())).getbytes(), header.getbytes()));
-		NetworkMessage message = new NetworkMessage(text, header);
+		NetworkMessage message = new NetworkMessage(text.getBytes(), header);
 		byte[] crypted = crypto.encryptPost(message);
 		assertNotNull(crypted);
 		assertTrue(crypted.length >= PublicHeader.BYTES_LENGTH_HEADER);
@@ -74,7 +74,7 @@ public class MessageCryptographyTest3 extends TestCase {
 		String text = "abc-def-ghi-890";
 		
 		PublicHeader header = new PublicHeader(0, new byte[3], StatusByte.POST.getByte(), 0, new UserId("-10"), new UserId("-11"));
-		NetworkMessage message = new NetworkMessage(text, header);
+		NetworkMessage message = new NetworkMessage(text.getBytes(), header);
 		byte[] crypted = crypto.encryptPost(message);
 		crypted[PublicHeader.BYTES_LENGTH_HEADER] = 1;
 		assertNull(crypto.decryptPost(crypted));

@@ -28,10 +28,10 @@ public class MessageCryptography {
 	private final Cipher cipher;
 	private final SecureRandom random;
 
-	MessageCryptography(CredentialStorage keyStorage, Mac mac, Cipher cipher, SecureRandom random) {
+	MessageCryptography(CredentialStorage keyStorage, Mac mac, Cipher symmetricCipher, SecureRandom random) {
 		this.keyStore = keyStorage;
 		this.mac = mac;
-		this.cipher = cipher;
+		this.cipher = symmetricCipher;
 		this.random = random;
 	}
 	
@@ -46,7 +46,7 @@ public class MessageCryptography {
 			SecretKey encryptionKey = keyStore.getBroadcastEncryptionKey(message.header.getReceiver());
 			cipher.init(Cipher.ENCRYPT_MODE, encryptionKey, ivSpec);
 			
-			byte[] messageBytes = message.text.getBytes();
+			byte[] messageBytes = message.text;
 			byte [] cryptedBytes = cipher.doFinal(messageBytes);
 			
 			//public header
@@ -72,7 +72,7 @@ public class MessageCryptography {
 			
 		} catch (InvalidKeyException e) {
 			e.printStackTrace();
-			throw new RuntimeException("invalid key");
+			throw new RuntimeException("invalid key");//TODO proper handling of errors?
 		} catch (IllegalBlockSizeException e) {
 			e.printStackTrace();
 			return null;
@@ -95,7 +95,7 @@ public class MessageCryptography {
 		PublicHeader header = new PublicHeader(messageBytes);
 		
 		if (header.isServerStatusMessage()) {//Status messages are not authenticated or encrypted
-			return new NetworkMessage("", header);
+			return new NetworkMessage(new byte[0], header);
 		}
 		
 		int headerAndMacLength = PublicHeader.BYTES_LENGTH_HEADER+mac.getMacLength();
@@ -138,9 +138,7 @@ public class MessageCryptography {
 		}
 		
 		byte[] textByteClean = textBytes;
-		String text = new String(textByteClean);
-		
-		return new NetworkMessage(text, header);
+		return new NetworkMessage(textByteClean, header);
 	}
 	
 }
