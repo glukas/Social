@@ -2,14 +2,12 @@ package ch.ethz.inf.vs.android.glukas.project4;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseAccess;
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseManager;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.FailureReason;
 import ch.ethz.inf.vs.android.glukas.project4.networking.FriendshipRequest;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.Protocol;
-import ch.ethz.inf.vs.android.glukas.project4.protocol.PublicHeader;
-import ch.ethz.inf.vs.android.glukas.project4.protocol.StatusByte;
+import ch.ethz.inf.vs.android.glukas.project4.protocol.ProtocolDelegate;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.parsing.MessageParser;
 import ch.ethz.inf.vs.android.glukas.project4.security.NetworkMessage;
 import ch.ethz.inf.vs.android.glukas.project4.security.SecureChannelDelegate;
@@ -19,6 +17,7 @@ import ch.ethz.inf.vs.android.glukas.project4.security.ZeroCredentialStorage;
 import ch.ethz.inf.vs.android.glukas.project4.test.Data;
 import ch.ethz.inf.vs.android.glukas.project4.test.StaticDatabase;
 import ch.ethz.inf.vs.android.glukas.project4.test.StaticSecureChannel;
+import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.Activity;
@@ -47,7 +46,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainActivity extends Activity implements OnNdefPushCompleteCallback, SecureChannelDelegate {
+@SuppressLint("ValidFragment")
+public class MainActivity extends Activity implements OnNdefPushCompleteCallback, SecureChannelDelegate, UserDelegate {
 
 	private static final String tag = "MAIN_ACTIVITY";
 
@@ -55,8 +55,9 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 
 	FriendshipRequest nextRequest;
 
-	Protocol mProtocol;
+	ProtocolDelegate mProtocol;
 
+	//TODO Once testing is done, change DatabaseManager to DatabaseAccess
 	DatabaseManager dbmanager;
 
 	// TODO Remove the section below
@@ -79,10 +80,14 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 
 		dbmanager = new DatabaseManager(this);
 		
+		//Protocol instantiation
+		mProtocol = Protocol.getInstance(dbmanager);
+		mProtocol.setDelegate(this);
+		
 		// Insert static test data
 		dbmanager.initializeTest(getApplicationContext());
 
-		if (dbmanager.getUser() == null) {
+		if(mProtocol.getUser() == null) {
 			Log.d(tag, "No user registered");
 			// Create registration dialog
 			RegistrationDialogFragment dialog = new RegistrationDialogFragment();
@@ -195,8 +200,8 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, 
 				Bundle savedInstanceState){
 			View view = inflater.inflate(R.layout.my_wall_tab, container, false);
-			Wall myWall = dbmanager.getUserWall();
-			User myself = dbmanager.getUser();
+			Wall myWall = mProtocol.getUserWall();
+			User myself = mProtocol.getUser();
 
 			if (myself == null) {
 				Toast.makeText(getApplicationContext(), "dbmanager.getUser() returned null!", Toast.LENGTH_LONG).show();
@@ -224,7 +229,7 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, 
 				Bundle savedInstanceState){
 			View view = inflater.inflate(R.layout.friend_list_tab, container, false);
-			User myself = dbmanager.getUser();
+			User myself = mProtocol.getUser();
 
 			if (myself == null) {
 				Toast.makeText(getApplicationContext(), "dbmanager.getUser() returned null! Using dummy friends...", Toast.LENGTH_LONG).show();
@@ -233,7 +238,7 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 				return view;
 			}
 
-			List<BasicUser> myFriends = dbmanager.getFriendsList(myself.id);
+			List<BasicUser> myFriends = mProtocol.getFriendsList(myself.id);
 			if(myFriends == null) {
 				Toast.makeText(getApplicationContext(), "dbmanager.getFriendsList() still doesn't work (Alessio)! Using dummy friends...", Toast.LENGTH_LONG).show();
 				ArrayAdapter<BasicUser> userAdapter = new ArrayAdapter<BasicUser>(getApplicationContext(), R.layout.friend_list_row, R.id.userName, userList);
@@ -333,4 +338,45 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 
 	}
 
+	@Override
+	public void onPostReceived(Post post) {
+		// TODO Also a List<Post> received?
+		// TODO Discuss if this method can be non-blocking (Samuel) or if it has to be called asynch (Vincent)
+		// or if the lower components already calls the method asynch (Lukas - Mathias)
+	}
+
+	@Override
+	public void onConnectionFailed(FailureReason reason) {
+		// TODO @Samuel, from Vincent Is it of any use for you?	
+	}
+
+	@Override
+	public void onConnectionSucceeded() {
+		// TODO @Samuel, from Vincent Is it of any use for you?
+	}
+
+	@Override
+	public void onDisconnectionFailed(FailureReason reason) {
+		// TODO @Samuel, from Vincent Is it of any use for you?
+	}
+	
+	@Override
+	public void onDisconnectionSucceeded() {
+		// TODO @Samuel, from Vincent Is it of any use for you?
+	}
+	
+	@Override
+	public void onPeersDiscoverySuccess(List<User> peers) {
+		// TODO NOT USED NOW (remote friendship mechanism)
+	}
+
+	@Override
+	public void onFriendshipAccepted() {
+		// TODO NOT USED NOW (remote friendship mechanism)
+	}
+
+	@Override
+	public void onFriendshipDeclined() {
+		// TODO NOT USED NOW (remote friendship mechanism)
+	}
 }

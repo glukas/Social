@@ -6,8 +6,10 @@ import java.util.TreeSet;
 import android.util.Log;
 import ch.ethz.inf.vs.android.glukas.project4.Post;
 import ch.ethz.inf.vs.android.glukas.project4.BasicUser;
+import ch.ethz.inf.vs.android.glukas.project4.User;
 import ch.ethz.inf.vs.android.glukas.project4.UserDelegate;
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
+import ch.ethz.inf.vs.android.glukas.project4.Wall;
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseAccess;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.DatabaseException;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.UnhandledFunctionnality;
@@ -54,7 +56,6 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate {
 		secureChannel = new SecureChannel("winti.mooo.com", 9000, new DBCredentialStorage(db));
 		secureChannel.setDelegate(this);
 		messageRelay = new MessageRelay(secureChannel);
-		wallAsked = new TreeSet<UserId>();
 	}
 
 	////
@@ -69,7 +70,6 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate {
 
 	//caching
 	private BasicUser localUser;
-	private volatile Set<UserId> wallAsked;
 	
 	//exceptional behaviors
 	private final String unexpectedMsg = "Unexpected message arrived : ";
@@ -77,6 +77,31 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate {
 	////
 	// ProtocolDelegate
 	////
+	
+	@Override
+	public int getMaxPostId(UserId userId) {
+		return database.getFriendMaxPostsId(userId);
+	}
+	
+	@Override
+	public List<BasicUser> getFriendsList(UserId userId) {
+		return database.getFriendsList(userId);
+	}
+	
+	@Override
+	public Wall getUserWall() {
+		return database.getUserWall();
+	}
+	
+	@Override
+	public User getUser() {
+		return database.getUser();
+	}
+
+	@Override
+	public void putUser(User user) {
+		database.putUser(user);
+	}
 
 	@Override
 	public void connect() {
@@ -90,21 +115,11 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate {
 
 	@Override
 	public void postPost(Post post) throws DatabaseException {
-		// The order matters !
-		//database.putUserPost(post);
-		//int msgId = post.getId();
-		// TODO : methods actually added in DBAccess, just has to use them
-		// int maxNumPosts = DatabaseManager.getNumPosts();
-		// database.setUserMaxId(msgId);
-		// database.setUserNumPosts(maxNumPosts);
-		
 		database.putUserPost(post);
 		int msgId = post.getId();
 		int maxNumPosts = database.getUserPostsCount()+1;
 		database.setUserMaxPostsId(msgId);
 		database.setUserPostsCount(maxNumPosts);
-		
-		
 	}
 
 	@Override
@@ -120,7 +135,6 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate {
 		Message msg = MessageFactory.newTypeMessage(MessageType.GET_STATE);
 		PublicHeader header = new PublicHeader(0, null, StatusByte.DATA.getByte(), 0, localUser.getId(), userId);
 		secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg, 0).toString(), header));
-		wallAsked.add(userId);
 	}
 	
 	@Override
@@ -131,16 +145,16 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate {
 	
 	@Override
 	public void getSomeUserPosts(UserId userId, int numberPosts, int postId) {
-		//List<Post> listPosts = database.getSomeUserPosts(userId, numberPosts, postId);
-		List<Post> listPosts = null;
+		//retrieve posts already in the database
+		List<Post> listPosts = database.getSomeLatestPosts(userId, numberPosts, postId);
 		for (Post p : listPosts){
 			userHandler.onPostReceived(p);
 		}
 		
+		//ask for update
 		Message msg = MessageFactory.newTypeMessage(MessageType.GET_STATE);
 		PublicHeader header = new PublicHeader(0, null, StatusByte.DATA.getByte(), 0, localUser.getId(), userId);
 		secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg, 0).toString(), header));
-		wallAsked.add(userId);
 	}
 
 	@Override
@@ -269,34 +283,35 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate {
 	
 	private void onSendStateReceived(Message msg) {
 		//Someone send his / her state, so retrieve data from the message
-		UserId userId = msg.getSender().getId();
-		int maxNumMsgs = msg.getNumM();
+		UserId friendId = msg.getSender().getId();
+		int numMsgs = msg.getNumM();
 		int maxPostId = msg.getId();
 		
-		//check if local user was waiting on this wall
-		boolean isWaitingOnWall = wallAsked.contains(userId);
-		if (isWaitingOnWall) {
-			//ask to have posts that local user doesn't have in database
-			int oldMaxPostId = database.getFriendMaxPostsId(userId);
+		//ask to have posts that local user doesn't have in database
+		int oldMaxPostId = database.getFriendMaxPostsId(friendId);
+		int oldNumMsgs = database.getFriendPostsCount(friendId);
+		if (oldNumMsgs < numMsgs) {
 			Message msgToSend = MessageFactory.newGetPostsMessage(oldMaxPostId, localUser, msg.getSender());
-			PublicHeader header = new PublicHeader(0, null, StatusByte.SEND.getByte(), 0, localUser.getId(), userId);
+			PublicHeader header = new PublicHeader(0, null, StatusByte.SEND.getByte(), 0, localUser.getId(), friendId);
 			NetworkMessage networkMessage = new NetworkMessage(JSONObjectFactory.createJSONObject(msgToSend).toString(), header);
 			secureChannel.sendMessage(networkMessage);
 		}
 		
-		//And stores informations into the database
-		database.setFriendMaxPostsId(maxNumMsgs, userId);
-		database.setFriendPostsCount(maxPostId, userId);
+		//update database
+		database.setFriendMaxPostsId(maxPostId, friendId);
+		database.setFriendPostsCount(numMsgs, friendId);
 	}
 	
 	private void onGetStateReceived(Message msg) {
 		//Someone wants user state, so retrieve data from database
 		int maxPostId = database.getFriendMaxPostsId(localUser.getId());
 		int maxNumMsgs = database.getFriendMaxPostsId(localUser.getId());
+		
 		//create message encapsulating all informations
 		BasicUser userToSend = msg.getSender();
 		String msgToSend = JSONObjectFactory.createJSONObject(MessageFactory.newSendStateMessage(localUser, userToSend, maxPostId, maxNumMsgs)).toString();
 		PublicHeader header = new PublicHeader(0, null, StatusByte.SEND.getByte(), 0, localUser.getId(), userToSend.getId());
+		
 		//send reply
 		secureChannel.sendMessage(new NetworkMessage(msgToSend, header));
 	}

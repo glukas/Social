@@ -1,8 +1,13 @@
 package ch.ethz.inf.vs.android.glukas.project4.protocol;
 
+import java.util.List;
+
+import ch.ethz.inf.vs.android.glukas.project4.BasicUser;
 import ch.ethz.inf.vs.android.glukas.project4.Post;
+import ch.ethz.inf.vs.android.glukas.project4.User;
 import ch.ethz.inf.vs.android.glukas.project4.UserDelegate;
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
+import ch.ethz.inf.vs.android.glukas.project4.Wall;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.DatabaseException;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.NetworkException;
 
@@ -79,4 +84,33 @@ public interface ProtocolDelegate {
 	 * Search for accessible persons over all user's friends
 	 */
 	public void discoverFriends();
+	
+	/**
+	 * Get the local user
+	 */
+	public User getUser();
+	
+	/**
+	 * Set the local user
+	 */
+	public void putUser(User user);
+	
+	/**
+	 * Get the wall of the local user
+	 */
+	public Wall getUserWall();
+	
+	/**
+	 * Get the list of friends of a particular user
+	 * @param userId
+	 * @return
+	 */
+	public List<BasicUser> getFriendsList(UserId userId);
+	
+	/**
+	 * Get the max id of a wall
+	 * @param userId
+	 * @return
+	 */
+	public int getMaxPostId(UserId userId);
 }

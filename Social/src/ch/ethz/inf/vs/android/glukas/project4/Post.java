@@ -27,6 +27,7 @@ public class Post {
 	private PostType type;
 	
 	/**
+	 * Database and user interface point of view.
 	 * Create new Post. This constructor is used by the database to retrieve some already stored
 	 * posts, not for creating new Posts.
 	 * @param id
@@ -47,6 +48,12 @@ public class Post {
 		this.datetime = datetime;
 	}
 	
+	/**
+	 * Network point of view
+	 * Create a new Post
+	 * @param msg
+	 * @param id
+	 */
 	public Post(Message msg, int id) {
 		MessageType type = msg.getRequestType();
 		if (type.equals(MessageType.POST_PICTURE)) {
