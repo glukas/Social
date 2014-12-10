@@ -62,6 +62,15 @@ Week 1 - 7 December
 
 Week 8 - 14 December
 
+	Testing of the model, the parsing
+
+	Young :
+		-parse bitmap pictures to / from byte array
+
+	Vincent :
+		-post messages
+		-get wall / send wall
+		-cache user on server
 	
 
 	
