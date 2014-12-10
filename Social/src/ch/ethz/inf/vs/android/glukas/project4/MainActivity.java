@@ -1,6 +1,7 @@
 package ch.ethz.inf.vs.android.glukas.project4;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseAccess;
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseManager;
@@ -57,6 +58,8 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 
 	ProtocolDelegate mProtocol;
 
+	WallPostAdapter userWallAdapter;
+	
 	//TODO Once testing is done, change DatabaseManager to DatabaseAccess
 	DatabaseManager dbmanager;
 
@@ -65,7 +68,7 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 	// Workaround for dbmanager not returning users:
 	private ArrayList<BasicUser> userList = new ArrayList<BasicUser>();
 	// Workaround for dbmanager not returning posts:
-	private ArrayList<Post> postList = new ArrayList<Post>();
+	private List<Post> postList = Arrays.asList(new Post(4, new UserId(), "Hello World!", null, null), new Post(0, new UserId(), "Amazing app!!", null, null) );
 
 	// TODO Remove the section above
 
@@ -73,6 +76,8 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 	StaticDatabase db;
 	StaticSecureChannel channel;
 
+	
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -84,8 +89,11 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 		mProtocol = Protocol.getInstance(dbmanager);
 		mProtocol.setDelegate(this);
 		
+		//List<Post> posts = new ArrayList<Post>();
+		userWallAdapter = new WallPostAdapter(getApplicationContext(), postList);
+		
 		// Insert static test data
-		dbmanager.initializeTest(getApplicationContext());
+		//dbmanager.initializeTest(getApplicationContext());
 
 		if(mProtocol.getUser() == null) {
 			Log.d(tag, "No user registered");
@@ -180,6 +188,14 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 	}
 
 	@Override
+	protected void onResume() {
+		super.onResume();
+		//tests insertion of posts into wall
+		int index = new UserId().getId().shortValue();
+		this.userWallAdapter.add(new Post(index, new UserId(), String.format("post with id : %d", index), null, null));
+	}
+	
+	@Override
 	public void onNdefPushComplete(NfcEvent event) {
 		Log.d(this.getClass().toString(), "onNdefPushComplete");
 		FriendshipRequest.setCurrentRequest(nextRequest);
@@ -200,7 +216,7 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, 
 				Bundle savedInstanceState){
 			View view = inflater.inflate(R.layout.my_wall_tab, container, false);
-			Wall myWall = mProtocol.getUserWall();
+			/*Wall myWall = mProtocol.getUserWall();
 			User myself = mProtocol.getUser();
 
 			if (myself == null) {
@@ -210,16 +226,15 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 			
 			if(myWall == null) {
 				Toast.makeText(getApplicationContext(), "dbmanager.getUserWall() returned null! Using dummy posts...", Toast.LENGTH_LONG).show();
-				WallPostAdapter postAdapter = new WallPostAdapter(getApplicationContext(), postList);
-				setListAdapter(postAdapter);
+				userWallAdapter = new WallPostAdapter(getApplicationContext(), postList);
+				setListAdapter(userWallAdapter);
 				return view;
 			}
 			else {
 				Toast.makeText(getApplicationContext(), "dbmanager.getUserWall() returned something!", Toast.LENGTH_LONG).show();
-				List<Post> posts = myWall.getPosts();
-				WallPostAdapter userAdapter = new WallPostAdapter(getApplicationContext(), posts);
-				setListAdapter(userAdapter);
-			}
+			    setListAdapter(userWallAdapter);
+			}*/
+			setListAdapter(userWallAdapter);
 			
 			return view;
 		}
@@ -340,9 +355,11 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 
 	@Override
 	public void onPostReceived(Post post) {
-		// TODO Also a List<Post> received?
 		// TODO Discuss if this method can be non-blocking (Samuel) or if it has to be called asynch (Vincent)
 		// or if the lower components already calls the method asynch (Lukas - Mathias)
+		
+		//TODO only add if it belongs to this users wall		
+		this.userWallAdapter.add(post);
 	}
 
 	@Override
