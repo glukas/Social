@@ -165,8 +165,13 @@ class Posts implements PostsInterface{
 	
 	// Get numberPosts older than postId
 	public List<Post> getSomeLatestPosts(UserId id, int numberPosts, int postId, SQLiteDatabase db) {
-		// SQL SELECT clause.
-		String[] projection = null;
+		// Columns to project.
+		String[] projection = {	POSTS_ENTRY._ID.getStr(),
+								POSTS_ENTRY.POSTER_ID.getStr(), 
+								POSTS_ENTRY.WALL_ID.getStr(),
+								POSTS_ENTRY.TEXT.getStr(),
+								POSTS_ENTRY.IMAGE.getStr(),
+								POSTS_ENTRY.DATE_TIME.getStr(),};
 		
 		// SQL WHERE clause.
 		String selection = PostsEntry._ID + " <= ? AND " + PostsEntry.WALL_ID + " == ?";

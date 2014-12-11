@@ -34,6 +34,8 @@ public class DatabaseTest extends AndroidTestCase{
 		Post post1 = new Post(12, Data.dummyReceiverId, Data.dummySenderId, "I'm a message", null, new Date());
 		db.putFriendPost(post1, Data.dummySenderId);
 		Post post2 = db.getFriendPost(12, Data.dummyReceiverId);
+		assertEquals(post1, post2);
+		assertEquals(post1.getText(), post2.getText());
 		//Log.d("TEST DATABASE", Data.tag+" Post 2 id : "+post2.getId()+ ", PostId : "+post2.getPoster()+ ", OwnerWallId : "+post2.getWallOwner()+", content : "+post2.getText());
 	}
 	
@@ -57,8 +59,9 @@ public class DatabaseTest extends AndroidTestCase{
 		assertTrue(listPost.size() == 4);
 		int i = 0;
 		for (Post p : listPost){
-			//assertEquals(listPostInsert.get(i), p);
-			Log.d("", "###"+p.getText()+" "+p.getId()+ " "+p.getWallOwner());
+			assertEquals(listPostInsert.get(3-i), p);
+			assertEquals(listPostInsert.get(3-i).getText(), p.getText());
+			//Log.d("", "###"+p.getText()+" "+p.getId()+ " "+p.getWallOwner());
 			i++;
 		}
 	}
