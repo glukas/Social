@@ -1,7 +1,10 @@
 package ch.ethz.inf.vs.android.glukas.project4.test;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
 import org.junit.Test;
 import ch.ethz.inf.vs.android.glukas.project4.Post;
 import ch.ethz.inf.vs.android.glukas.project4.User;
@@ -19,13 +22,10 @@ public class DatabaseTest extends AndroidTestCase{
 		String username = "MeIAndMySelf";
 		User user = new User(username);
 		db.putUser(user);
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-		}
 		User user2 = db.getUser();
 		boolean response = user.getUsername().equals(user2.getUsername());
-		assertTrue(response);
+		boolean response2 = user.getId().equals(user2.getId());
+		assertTrue(response && response2);
 	}
 	
 	@Test
@@ -34,7 +34,33 @@ public class DatabaseTest extends AndroidTestCase{
 		Post post1 = new Post(12, Data.dummyReceiverId, Data.dummySenderId, "I'm a message", null, new Date());
 		db.putFriendPost(post1, Data.dummySenderId);
 		Post post2 = db.getFriendPost(12, Data.dummyReceiverId);
-		Log.d("TEST DATABASE", Data.tag+" Post 2 id : "+post2.getId()+ ", PostId : "+post2.getPoster()+ ", OwnerWallId : "+post2.getWallOwner()+", content : "+post2.getText());
+		//Log.d("TEST DATABASE", Data.tag+" Post 2 id : "+post2.getId()+ ", PostId : "+post2.getPoster()+ ", OwnerWallId : "+post2.getWallOwner()+", content : "+post2.getText());
+	}
+	
+	@Test
+	public void testGetSomePosts() {
+		DatabaseAccess db = new DatabaseManager(getTestContext());
+		List<Post> listPostInsert = new ArrayList<Post>();
+		Post post1 = new Post(1, Data.dummyReceiverId, Data.dummySenderId, "I'm a message1", null, new Date());
+		Post post2 = new Post(2, Data.dummyReceiverId, Data.dummySenderId, "I'm a message2", null, new Date());
+		Post post3 = new Post(3, Data.dummyReceiverId, Data.dummySenderId, "I'm a message3", null, new Date());
+		Post post4 = new Post(4, Data.dummyReceiverId, Data.dummySenderId, "I'm a message4", null, new Date());
+		listPostInsert.add(post1);
+		listPostInsert.add(post2);
+		listPostInsert.add(post3);
+		listPostInsert.add(post4);
+		db.putFriendPost(post1, Data.dummySenderId);
+		db.putFriendPost(post2, Data.dummySenderId);
+		db.putFriendPost(post3, Data.dummySenderId);
+		db.putFriendPost(post4, Data.dummySenderId);
+		List<Post> listPost = db.getSomeLatestPosts(Data.dummySenderId, 4, 4);
+		assertTrue(listPost.size() == 4);
+		int i = 0;
+		for (Post p : listPost){
+			//assertEquals(listPostInsert.get(i), p);
+			Log.d("", "###"+p.getText()+" "+p.getId()+ " "+p.getWallOwner());
+			i++;
+		}
 	}
 	
 	/*@Test

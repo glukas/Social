@@ -169,7 +169,7 @@ class Posts implements PostsInterface{
 		String[] projection = null;
 		
 		// SQL WHERE clause.
-		String selection = PostsEntry._ID + " > ? AND" + PostsEntry.WALL_ID + " == ?";
+		String selection = PostsEntry._ID + " <= ? AND " + PostsEntry.WALL_ID + " == ?";
 		
 		// Arguments for selection.
 		String[] selectionArgs = {Integer.toString(postId), Utility.toSQLiteId(id)};
