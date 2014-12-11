@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.android.glukas.project4;
 
+import java.util.Comparator;
 import java.util.Date;
 
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.UnknowRequestType;
@@ -11,7 +12,7 @@ import android.graphics.Bitmap;
  * This class represents a post of the user on a wall
  */
 
-public class Post {
+public class Post implements Comparable<Post> {
 
 	private String text;
 	// It would be nice if we can manage to have multiple images per post. But maybe it make things to 
@@ -110,5 +111,30 @@ public class Post {
 	public enum PostType{
 		PICTURE,
 		TEXT;
+	}
+	
+	/**
+	 * returns positive if this post has a lower id, and negative if this post has a higher id
+	 * poster ids decide ties
+	 */
+	@Override
+	public int compareTo(Post another) {
+		if (this.id < another.id) {
+			return 1;
+		} else if (this.id > another.id) {
+			return -1;
+		} else {
+			return this.poster.getId().compareTo(another.poster.getId());
+		}
+	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return (other instanceof Post && this.compareTo((Post) other) == 0);
+	}
+	
+	@Override
+	public int hashCode() {
+		return this.id ^ poster.getId().intValue();
 	}
 }

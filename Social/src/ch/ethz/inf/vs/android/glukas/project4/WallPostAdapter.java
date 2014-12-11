@@ -2,29 +2,28 @@ package ch.ethz.inf.vs.android.glukas.project4;
 
 import java.util.List;
 
+import ch.ethz.glukas.orderedset.RandomizedBST;
+import ch.ethz.glukas.orderedset.RankedTree;
 import ch.ethz.inf.vs.android.glukas.project4.Post.PostType;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class WallPostAdapter extends ArrayAdapter<Post> {
-	
-	private final Context mContext;
+public class WallPostAdapter extends SortedSetAdapter<Post> {
 
 	public WallPostAdapter(Context context, List<Post> objects) {
-		super(context, 0, objects);
-		mContext = context;
+		super(context, objects);
 	}
 
 	@SuppressLint("InflateParams") 
-	@Override
 	public View getView (int position, View convertView, ViewGroup parent) {
 		LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
@@ -48,4 +47,5 @@ public class WallPostAdapter extends ArrayAdapter<Post> {
 
 		return rowView;
 	}
+	
 }
