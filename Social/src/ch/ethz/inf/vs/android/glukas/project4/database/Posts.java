@@ -29,13 +29,33 @@ class Posts {
 	 */
 	public static void putUserPost(Post post, SQLiteDatabase db) {
 		// Avoid code duplication by calling this function.
-		putFriendPost(post, Utility.userID, db);
+		// Get data.
+		int id = post.getId();
+		UserId poster = post.getPoster();
+		String text = post.getText();
+		Bitmap image = post.getImage();
+		Date datetime = post.getDateTime();
+		
+		// Create content to insert.
+		ContentValues values = new ContentValues();
+		values.put(PostsEntry._ID, id);
+		values.put(PostsEntry.POSTER_ID, Utility.toSQLiteId(poster));
+		if(text != null)
+			values.put(PostsEntry.TEXT, text);
+		if(image != null)
+			values.put(PostsEntry.IMAGE, Utility.toByteArray(image));
+		values.put(PostsEntry.WALL_ID, Utility.toSQLiteId(Utility.userId));
+		if(datetime != null)
+			values.put(PostsEntry.DATE_TIME, Utility.toSQLiteDate(datetime));
+		
+		// Insert content.
+		db.insert(PostsEntry.TABLE_NAME, null, values);
 	}
 	
 	// Get all the Posts in a Wall with from as least id
 	public static List<Post> getAllUserPostsFrom(int from, SQLiteDatabase db) {
 		// Avoid code duplication by calling this function.
-		return getAllFriendPostsFrom(Utility.userID, from, db);
+		return getAllFriendPostsFrom(Utility.userId, from, db);
 	}
 	
 	/**
@@ -44,7 +64,7 @@ class Posts {
 	 * @param db SQLliteDatabase to query
 	 */
 	public static void deleteUserPost(int postid, SQLiteDatabase db) {
-		deleteFriendPost(postid, Utility.userID, db);
+		deleteFriendPost(postid, Utility.userId, db);
 	}
 	
 	/**
@@ -56,7 +76,7 @@ class Posts {
 	 */
 	public static Post getUserPost(int postid, SQLiteDatabase db) {
 		// Avoid code duplication by calling this function.
-		return getFriendPost(postid, Utility.userID, db);
+		return getFriendPost(postid, Utility.userId, db);
 	}
 
 	/**

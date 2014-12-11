@@ -15,11 +15,15 @@ public final class DatabaseContract {
 		
 	}
 	
-	// Structure of table friends.
-	public static abstract class FriendsEntry implements BaseColumns {
-		public static final String TABLE_NAME = "friends";
-		public static final String USER_ID = "friend_id_1";
-		public static final String FRIEND_ID = "friend_id_2";
+//	// Structure of table friends.
+//	public static abstract class FriendsEntry implements BaseColumns {
+//		public static final String TABLE_NAME = "friends";
+//		public static final String USER_ID = "friend_id_1";
+//		public static final String FRIEND_ID = "friend_id_2";
+//	}
+	// Structure of table userid
+	public static abstract class UserIdEntry implements BaseColumns {
+		public static final String THIS_USER_ID = "this_user_id";
 	}
 	
 	// Structure of table users.
@@ -27,6 +31,8 @@ public final class DatabaseContract {
 		public static final String TABLE_NAME = "users";
 		public static final String USER_ID = "user_id";
 		public static final String USERNAME = "username";
+		// Distinguishes the user itself from its friends
+		public static final String IS_FRIEND = "is_friend";
 		public static final String COUNT = "count";
 		public static final String MAX = "max";
 //		public static final String AGE = "age";

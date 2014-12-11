@@ -1,13 +1,19 @@
 package ch.ethz.inf.vs.android.glukas.project4.database;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
+import java.text.*;
 
 import ch.ethz.inf.vs.android.glukas.project4.Post;
 import ch.ethz.inf.vs.android.glukas.project4.User;
 import ch.ethz.inf.vs.android.glukas.project4.UserCredentials;
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
 import ch.ethz.inf.vs.android.glukas.project4.Wall;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -38,7 +44,9 @@ class Utility {
 	public static final int MAX_BLOB_SIZE = 0;	// TODO: define # of bytes needed for a blob (max 400kB?)
 	public static final int MAX_DATABASE_SIZE = 0;	// TODO: define max byte size the database can reach (dynamic?)
 	
-	public static UserId userID = new UserId("-1");
+	public static UserId userId;
+	
+	private static SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy MM dd HH:mm:ss");
 	
 	/**
 	 * Transforms a byte[] representing an image into a bitmap.
@@ -70,22 +78,31 @@ class Utility {
 		return userid.getId().toString();
 	}
 	
-	/** TODO
+	/**
 	 * Java date format: 
 	 * @param sqlDate Date in SQLite String format
 	 * @return Java Date object
 	 */
 	public static final Date toJavaDate(String sqlDate) {
-		return null;
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		try {
+			return format.parse(sqlDate);
+		}
+		catch(ParseException e) {
+			return null;
+		}
 	}
 	
-	/** TODO
-	 * SQL date format: 
+	/** FIXME: general use of Calendar instead of Date?
+	 * SQL string date format: YYYY-MM-DD HH:MM:SS
 	 * @param javaDate
 	 * @return
 	 */
 	public static final String toSQLiteDate(Date javaDate) {
-		return null;
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTimeZone(TimeZone.getTimeZone("CET"));
+		calendar.setTime(javaDate);
+		return dateFormatter.format(calendar.getTime());
 	}
 	
 	/**

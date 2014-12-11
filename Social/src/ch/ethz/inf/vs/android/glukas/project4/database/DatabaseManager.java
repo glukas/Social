@@ -12,12 +12,14 @@ import ch.ethz.inf.vs.android.glukas.project4.User;
 import ch.ethz.inf.vs.android.glukas.project4.UserCredentials;
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
 import ch.ethz.inf.vs.android.glukas.project4.Wall;
-import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseContract.FriendsEntry;
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseContract.PostsEntry;
+import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseContract.UserIdEntry;
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseContract.UsersEntry;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.DatabaseException;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.*;
 import android.graphics.Bitmap;
@@ -41,22 +43,6 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 	private static final int DATABASE_VERSION = 1;
 
 	// DDL
-	/**
-	 * String containing SQL code to create table friends.
-	 * TODO: add integrity checks
-	 */
-	private static final String SQL_CREATE_FRIENDS = Utility.CREATE_TABLE + " " + FriendsEntry.TABLE_NAME + " (" 
-			+ FriendsEntry._ID + " " + Utility.INTEGER_TYPE + " PRIMARY KEY AUTOINCREMENT, "
-			// Index 0: user_id 
-			+ FriendsEntry.USER_ID + " " + Utility.TEXT_TYPE + ", "
-			// Index 1: friend_id
-			+ FriendsEntry.FRIEND_ID + " " + Utility.TEXT_TYPE + ", "
-			// Foreign keys references
-			+ Utility.FOREIGN_KEY + "(" + FriendsEntry.USER_ID + ")" + " " + Utility.REFERENCES + " " + UsersEntry.TABLE_NAME + "(" + UsersEntry.USER_ID + ")"
-			+ " " + Utility.ON_DELETE + " " + Utility.CASCADE + ", "
-			+ Utility.FOREIGN_KEY + "(" + FriendsEntry.FRIEND_ID + ")" + " " + Utility.REFERENCES + " " + UsersEntry.TABLE_NAME + "(" + UsersEntry.USER_ID + ")"
-			+ " " + Utility.ON_DELETE + " " + Utility.CASCADE
-			+ ");";
 
 	/**
 	 * String containing SQL code to create table users.
@@ -64,18 +50,20 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 	 */
 	private static final String SQL_CREATE_USERS = Utility.CREATE_TABLE + " " + UsersEntry.TABLE_NAME + " (" 
 			// Index 0: _id
-			+ UsersEntry._ID + " " + Utility.INTEGER_TYPE + ", "//" AUTOINCREMENT, "
+			+ UsersEntry._ID + " " + Utility.INTEGER_TYPE + ", "
 			// Index 1: user_id
 			+ UsersEntry.USER_ID + " " + Utility.TEXT_TYPE + ", "
 			// Index 2: username
 			+ UsersEntry.USERNAME + " " + Utility.TEXT_TYPE + ", "
-			// Index 3: count
+			// Index 3: is_friend
+			+ UsersEntry.IS_FRIEND + " " + Utility.INTEGER_TYPE + ", "
+			// Index 4: count
 			+ UsersEntry.COUNT + " " + Utility.INTEGER_TYPE + ", "
-			// Index 4: max
+			// Index 5: max
 			+ UsersEntry.MAX + " " + Utility.INTEGER_TYPE + ", "
-			// Index 5: broadcast_enc_key
+			// Index 6: broadcast_enc_key
 			+ UsersEntry.BROADCAST_ENC_KEY + " " + Utility.BLOB_TYPE + ", "
-			// Index 6: broadcast_auth_key
+			// Index 7: broadcast_auth_key
 			+ UsersEntry.BROADCAST_AUTH_KEY + " " + Utility.BLOB_TYPE + ", "
 			// Primary key
 			+ Utility.PRIMARY_KEY + " (" + UsersEntry.USER_ID + ")"
@@ -118,7 +106,6 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 		// Create tables.
 		try {
 			db.execSQL(SQL_CREATE_USERS);
-			db.execSQL(SQL_CREATE_FRIENDS);
 			db.execSQL(SQL_CREATE_POSTS);
 		} catch (SQLException e) {
 			Log.e(TAG, "Failed creating tables");
@@ -129,6 +116,10 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		// TODO: decide if needed and define upgrade policy in case it is
+	}
+	
+	public void setStaticUserId(UserId userId) {
+		Utility.userId = userId;
 	}
 
 	/**
@@ -365,7 +356,7 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 	// return a list of all user in the DB
 	public List<BasicUser> getAllUser() {
 
-		String projection = null;
+		String[] projection = {};
 		
 		String selection = null;
 		
@@ -374,7 +365,16 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 		String orderBy = UsersEntry.USERNAME + " DESC";
 		
 		SQLiteDatabase db = this.getReadableDatabase();
-
+		
+		Cursor cursor = db.query(UsersEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, orderBy);
+		
+		if(cursor.moveToFirst()) {
+			while(!cursor.isAfterLast()) {
+				// TODO: implement checks for basic users
+				
+			}
+		}
+		
 		return null;
 	}
 
