@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.android.glukas.project4.database;
 
+import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseContract.PostsEntry;
 import android.provider.BaseColumns;
 
 public class Definitions {
@@ -9,7 +10,7 @@ public class Definitions {
 	 */
 	public enum SELECTIONS {
 		
-		POST_BY_ID_AND_WALL( POSTS_ENTRY._ID.getStr() + " == ? AND " + POSTS_ENTRY.POSTER_ID.getStr() + " == ?");
+		POST_BY_ID_AND_WALL( PostsEntry._ID + " == ? AND " + PostsEntry.POSTER_ID + " == ?");
 		
 		private String command;
 		
@@ -94,93 +95,6 @@ public class Definitions {
 		
 		public String getCommand() {
 			return command;
-		}
-	}
-	
-	/**
-	 * Enumerate all fields in table friends
-	 */
-	public enum FRIENDS_ENTRY {
-		
-		TABLE_NAME("friends"),
-		_ID(BaseColumns._ID),
-		USER_ID("friend_id_1"),
-		FRIEND_ID("friend_id_2");
-		
-		private String entry;
-		
-		FRIENDS_ENTRY(String s) {
-			entry = s;
-		}
-		
-		public String getStr() {
-			return entry;
-		}
-	}
-	
-	/**
-	 * Enumerate all fields in table users
-	 */
-	public enum USERS_ENTRY {
-		
-		TABLE_NAME("users"),
-		_ID(BaseColumns._ID),
-		USER_ID("user_id"),
-		USERNAME("username"),
-		COUNT("count"),
-		MAX("max"),
-		BROADCAST_ENC_KEY("broadcast_enc_key"),
-		BROADCAST_AUTH_KEY("broadcast_auth_key");
-		
-		private String entry;
-		
-		USERS_ENTRY(String s) {
-			entry = s;
-		}
-		
-		public String getStr() {
-			return entry;
-		}
-	}
-	
-	/**
-	 * Enumerate all fields in table posts
-	 */
-	public enum POSTS_ENTRY {
-		
-		TABLE_NAME("posts"),
-		_ID(BaseColumns._ID),
-		WALL_ID("wall_id"),
-		TEXT("text"),
-		IMAGE("image"),
-		DATE_TIME("date_time"),
-		POSTER_ID("poster_id");
-		
-		private String entry;
-		
-		POSTS_ENTRY(String s) {
-			entry = s;
-		}
-		
-		public String getStr() {
-			return entry;
-		}
-	}
-	
-	public enum APP_OWNER_ENTRY {
-		
-		TABLE_NAME("appowner"),
-		_ID(BaseColumns._ID),
-		USER_ID("user_id");
-		
-		private String entry;
-		
-		APP_OWNER_ENTRY(String s) {
-			entry = s;
-		}
-		
-		public String getStr() {
-			return entry;
 		}
 	}
 }

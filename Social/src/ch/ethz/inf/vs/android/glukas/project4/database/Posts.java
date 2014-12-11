@@ -10,7 +10,6 @@ import android.graphics.Bitmap;
 import ch.ethz.inf.vs.android.glukas.project4.Post;
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseContract.PostsEntry;
-import ch.ethz.inf.vs.android.glukas.project4.database.Definitions.POSTS_ENTRY;
 
 /**
  * Helper class that implements all functionalities of table Posts.
@@ -60,19 +59,19 @@ class Posts implements PostsInterface{
 		
 		// Create content to insert.
 		ContentValues values = new ContentValues();
-		values.put(POSTS_ENTRY._ID.getStr(), id);
-		values.put(POSTS_ENTRY.POSTER_ID.getStr(), Utility.toSQLiteId(poster));
-		values.put(POSTS_ENTRY.WALL_ID.getStr(), Utility.toSQLiteId(friendid));
+		values.put(PostsEntry._ID, id);
+		values.put(PostsEntry.POSTER_ID, Utility.toSQLiteId(poster));
+		values.put(PostsEntry.WALL_ID, Utility.toSQLiteId(friendid));
 		if(text != null)
-			values.put(POSTS_ENTRY.TEXT.getStr(), text);
+			values.put(PostsEntry.TEXT, text);
 		if(image != null)
-			values.put(POSTS_ENTRY.IMAGE.getStr(), Utility.toByteArray(image));
+			values.put(PostsEntry.IMAGE, Utility.toByteArray(image));
 		
 		if(datetime != null)
-			values.put(POSTS_ENTRY.DATE_TIME.getStr(), Utility.toSQLiteDate(datetime));
+			values.put(PostsEntry.DATE_TIME, Utility.toSQLiteDate(datetime));
 		
 		// Insert content.
-		db.insert(POSTS_ENTRY.TABLE_NAME.getStr(), null, values);
+		db.insert(PostsEntry.TABLE_NAME, null, values);
 	}
 	
 	////
@@ -94,12 +93,12 @@ class Posts implements PostsInterface{
 	@Override
 	public Post getFriendPost(int postid, UserId friendid, SQLiteDatabase db) {
 		// Columns to project.
-		String[] projection = {	POSTS_ENTRY._ID.getStr(),
-								POSTS_ENTRY.POSTER_ID.getStr(), 
-								POSTS_ENTRY.WALL_ID.getStr(),
-								POSTS_ENTRY.TEXT.getStr(),
-								POSTS_ENTRY.IMAGE.getStr(),
-								POSTS_ENTRY.DATE_TIME.getStr(),};
+		String[] projection = {	PostsEntry._ID,
+								PostsEntry.POSTER_ID, 
+								PostsEntry.WALL_ID,
+								PostsEntry.TEXT,
+								PostsEntry.IMAGE,
+								PostsEntry.DATE_TIME};
 		
 		// SQL WHERE clause.
 		String selection = Definitions.SELECTIONS.POST_BY_ID_AND_WALL.getCommand();
@@ -108,7 +107,7 @@ class Posts implements PostsInterface{
 		String[] selectionArgs = {Integer.toString(postid), Utility.toSQLiteId(friendid)};
 		
 		// Execute query.
-		Cursor cursor = db.query(POSTS_ENTRY.TABLE_NAME.getStr(), projection, selection, selectionArgs, null, null, null);
+		Cursor cursor = db.query(PostsEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, null);
 
 		// Create Post object to return.
 		if(cursor.moveToFirst()) {
@@ -166,12 +165,12 @@ class Posts implements PostsInterface{
 	// Get numberPosts older than postId
 	public List<Post> getSomeLatestPosts(UserId id, int numberPosts, int postId, SQLiteDatabase db) {
 		// Columns to project.
-		String[] projection = {	POSTS_ENTRY._ID.getStr(),
-								POSTS_ENTRY.POSTER_ID.getStr(), 
-								POSTS_ENTRY.WALL_ID.getStr(),
-								POSTS_ENTRY.TEXT.getStr(),
-								POSTS_ENTRY.IMAGE.getStr(),
-								POSTS_ENTRY.DATE_TIME.getStr(),};
+		String[] projection = {	PostsEntry._ID,
+								PostsEntry.POSTER_ID, 
+								PostsEntry.WALL_ID,
+								PostsEntry.TEXT,
+								PostsEntry.IMAGE,
+								PostsEntry.DATE_TIME};
 		
 		// SQL WHERE clause.
 		String selection = PostsEntry._ID + " <= ? AND " + PostsEntry.WALL_ID + " == ?";
