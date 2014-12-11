@@ -32,6 +32,8 @@ import android.app.FragmentTransaction;
 import android.app.ListFragment;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
 import android.nfc.NfcAdapter.OnNdefPushCompleteCallback;
@@ -66,19 +68,13 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 	DatabaseManager dbmanager;
 
 	// TODO Remove the section below
-
 	// Workaround for dbmanager not returning users:
 	private List<BasicUser> userList = Arrays.asList((BasicUser)new User("Alice"), new User("Bob"), new User("Carol"), new User("David"));
 	// Workaround for dbmanager not returning posts:
 	private List<Post> postList = Arrays.asList(new Post(4, new UserId(), "Hello World!", null, null), new Post(0, new UserId(), "Amazing app!!", null, null) );
-
 	// TODO Remove the section above
 
-	// TODO TESTING
-	StaticDatabase db;
-	StaticSecureChannel channel;
-
-	
+	private FriendListAdapter friendListAdapter;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -111,7 +107,11 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 		wallFragment.setListAdapter(userWallAdapter);
 		
 		tab1.setTabListener(new MyTabListener(wallFragment));
-		tab2.setTabListener(new MyTabListener(new FriendListFragment()));
+		
+		friendListAdapter = new FriendListAdapter(this, userList);
+		FriendListFragment friendListFragment = new FriendListFragment();
+		friendListFragment.setListAdapter(friendListAdapter);
+		tab2.setTabListener(new MyTabListener(friendListFragment));
 		//tab3.setTabListener(new MyTabListener(new AddFriendFragment()));
 //		tab4.setTabListener(new MyTabListener(new ToDoFragment()));
 //		tab5.setTabListener(new MyTabListener(new ToDoFragment()));
@@ -178,6 +178,11 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 		int index = new UserId().getId().shortValue();
 		//this.mProtocol.postPost(new Post(index, new UserId(), String.format("post with id : %d", index), null, null));
 		this.userWallAdapter.add(new Post(index, new UserId(), String.format("post with id : %d", index), null, null));
+		
+		Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);
+		icon = Bitmap.createScaledBitmap(icon, 500, 500, false);
+		Post imagePost = new Post(index, new User("Alice").getId(), "Testing image.. and now with a much longer text to see how it breaks onto the next line and stuff.. %id : " + index, icon, null);
+		this.userWallAdapter.add(imagePost);
 	}
 
 	private void checkUserRegistered() {
@@ -205,45 +210,20 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 	public class FriendListFragment extends ListFragment {
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
 			View view = inflater.inflate(R.layout.friend_list_tab, container, false);
-			User myself = mProtocol.getUser();
-
-			if (myself == null) {
-				Toast.makeText(getApplicationContext(), "dbmanager.getUser() returned null! Using dummy friends...", Toast.LENGTH_LONG).show();
-				ArrayAdapter<BasicUser> userAdapter = new ArrayAdapter<BasicUser>(getApplicationContext(), R.layout.friend_list_row, R.id.userName, userList);
-				setListAdapter(userAdapter);
-				return view;
-			}
-
-			List<BasicUser> myFriends = mProtocol.getFriendsList(myself.id);
-			if(myFriends == null) {
-				Toast.makeText(getApplicationContext(), "dbmanager.getFriendsList() still doesn't work (Alessio)! Using dummy friends...", Toast.LENGTH_LONG).show();
-				ArrayAdapter<BasicUser> userAdapter = new ArrayAdapter<BasicUser>(getApplicationContext(), R.layout.friend_list_row, R.id.userName, userList);
-				setListAdapter(userAdapter);
-				return view;
-			}
-			else {
-				ArrayList<BasicUser> users = new ArrayList<BasicUser>();
-				ArrayAdapter<BasicUser> userAdapter = new ArrayAdapter<BasicUser>(getApplicationContext(), R.layout.friend_list_row, R.id.userName, users);
-				setListAdapter(userAdapter);
-			}
 			return view;
 		}
 	}
 
 	public class AddFriendFragment extends Fragment {
-		public View onCreateView(LayoutInflater inflater, ViewGroup container, 
-				Bundle savedInstanceState){
+		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
 			View view = inflater.inflate(R.layout.add_friend_tab, container, false);
-			createNextRequest();
 			return view;
 		}
 	}
 	
 	public class ToDoFragment extends Fragment {
-		public View onCreateView(LayoutInflater inflater, ViewGroup container, 
-				Bundle savedInstanceState){
+		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
 			View view = inflater.inflate(R.layout.todo_tab, container, false);
-			createNextRequest();
 			return view;
 		}
 	}
@@ -304,9 +284,10 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 	////
 	//RegistrationDialogFragmentDelegate
 	////
-
+	
 	@Override
-	public void userRegistered(String username) {
+	public void onUserRegistered(String username) {
 		this.dbmanager.putUser(new User(username));
 	}
+	
 }

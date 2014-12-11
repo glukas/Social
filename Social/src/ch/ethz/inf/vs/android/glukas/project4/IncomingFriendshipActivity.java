@@ -6,6 +6,7 @@ import ch.ethz.inf.vs.android.glukas.project4.networking.FriendshipRequest;
 import ch.ethz.inf.vs.android.glukas.project4.networking.FriendshipResponse;
 import ch.ethz.inf.vs.android.glukas.project4.security.ZeroCredentialStorage;
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
@@ -131,7 +132,7 @@ OnNdefPushCompleteCallback, RegistrationDialogFragmentDelegate {
 	////
 
 	@Override
-	public void userRegistered(String username) {
+	public void onUserRegistered(String username) {
 		this.dbmanager.putUser(new User(username));
 		prepareResponse();
 	}

@@ -21,7 +21,6 @@ public class WallPostAdapter extends SortedSetAdapter<Post> {
 		super(context, objects);
 	}
 
-	@SuppressLint("InflateParams") 
 	public View getView (int position, View convertView, ViewGroup parent) {
 		LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
@@ -29,14 +28,15 @@ public class WallPostAdapter extends SortedSetAdapter<Post> {
 
 		View rowView = null;
 		// Inflate the views from XML
+		//TODO reuse convertView when possible
 		if (currentPost.getType() == PostType.PICTURE) {
-			rowView = inflater.inflate(R.layout.my_wall_list_row_picture, null);
+			rowView = inflater.inflate(R.layout.my_wall_list_row_picture, parent, false);
 			
 			// Load the image and set it on the ImageView
 			ImageView imageView = (ImageView) rowView.findViewById(R.id.image);
 			imageView.setImageDrawable(new BitmapDrawable(null, currentPost.getImage()));
 		} else {
-			rowView = inflater.inflate(R.layout.my_wall_list_row_text, null);
+			rowView = inflater.inflate(R.layout.my_wall_list_row_text, parent, false);
 		}
 
 		// Set the text on the TextView
