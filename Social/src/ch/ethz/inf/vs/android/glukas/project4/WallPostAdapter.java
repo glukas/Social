@@ -2,8 +2,6 @@ package ch.ethz.inf.vs.android.glukas.project4;
 
 import java.util.List;
 
-import ch.ethz.glukas.orderedset.RandomizedBST;
-import ch.ethz.glukas.orderedset.RankedTree;
 import ch.ethz.inf.vs.android.glukas.project4.Post.PostType;
 
 import android.annotation.SuppressLint;

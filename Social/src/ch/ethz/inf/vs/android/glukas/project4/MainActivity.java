@@ -3,6 +3,8 @@ package ch.ethz.inf.vs.android.glukas.project4;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import ch.ethz.inf.vs.android.glukas.project4.RegistrationDialogFragment.RegistrationDialogFragmentDelegate;
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseAccess;
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseManager;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.FailureReason;
@@ -48,7 +50,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 @SuppressLint("ValidFragment")
-public class MainActivity extends Activity implements OnNdefPushCompleteCallback, SecureChannelDelegate, UserDelegate {
+public class MainActivity extends Activity implements OnNdefPushCompleteCallback, UserDelegate, RegistrationDialogFragmentDelegate {
 
 	private static final String tag = "MAIN_ACTIVITY";
 
@@ -66,7 +68,7 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 	// TODO Remove the section below
 
 	// Workaround for dbmanager not returning users:
-	private ArrayList<BasicUser> userList = new ArrayList<BasicUser>();
+	private List<BasicUser> userList = Arrays.asList((BasicUser)new User("Alice"), new User("Bob"), new User("Carol"), new User("David"));
 	// Workaround for dbmanager not returning posts:
 	private List<Post> postList = Arrays.asList(new Post(4, new UserId(), "Hello World!", null, null), new Post(0, new UserId(), "Amazing app!!", null, null) );
 
@@ -89,98 +91,76 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 		mProtocol = Protocol.getInstance(dbmanager);
 		mProtocol.setDelegate(this);
 		
-		//List<Post> posts = new ArrayList<Post>();
-		userWallAdapter = new WallPostAdapter(getApplicationContext(), postList);
+		setUpNFCExchange();
 		
-		// Insert static test data
-		//dbmanager.initializeTest(getApplicationContext());
-
-		if(mProtocol.getUser() == null) {
-			Log.d(tag, "No user registered");
-			// Create registration dialog
-			RegistrationDialogFragment dialog = new RegistrationDialogFragment();
-			dialog.show(this.getFragmentManager(), "lol");
-		}
-		else {
-			Log.d(tag, "User " + dbmanager.getUser().username +" already registered");
-		}
+		//set up views
 		
-//		nfcAdapter = NfcAdapter.getDefaultAdapter(this);
-//		if (nfcAdapter == null) {
-//			Toast.makeText(this, "NFC is not available", Toast.LENGTH_LONG)
-//			.show();
-//			finish();
-//			return;
-//		}
-
-		// TODO Remove the section below
-
-		// Workaround for dbmanager not returning users:
-		userList.add(new User("Alice"));
-		userList.add(new User("Bob"));
-		userList.add(new User("Eve"));
-		userList.add(new User("Benjamin"));
-		userList.add(new User("Steve"));
-		userList.add(new User("Carlos"));
-		userList.add(new User("Sven"));
-		userList.add(new User("Mathias"));
-		userList.add(new User("Bradley"));
-		
-		
-		// Workaround for dbmanager not returning posts:
-//		post
-		// TODO Remove the section above
-
 		ActionBar actionBar = getActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
 		ActionBar.Tab tab1 = actionBar.newTab().setText("My Wall");
 		ActionBar.Tab tab2 = actionBar.newTab().setText("View Friends");
-		ActionBar.Tab tab3 = actionBar.newTab().setText("Add Friend");
+		//ActionBar.Tab tab3 = actionBar.newTab().setText("Add Friend");
 //		// TODO: remove this tab after testing phase
 //		ActionBar.Tab tab4 = actionBar.newTab().setText("DB state");
 //		// TODO: remove this tab after testing phase
 //		ActionBar.Tab tab5 = actionBar.newTab().setText("DB tester");
 		
-		tab1.setTabListener(new MyTabListener(new WallFragment()));
+		userWallAdapter = new WallPostAdapter(getApplicationContext(), postList);
+		WallFragment wallFragment = new WallFragment();
+		wallFragment.setListAdapter(userWallAdapter);
+		
+		tab1.setTabListener(new MyTabListener(wallFragment));
 		tab2.setTabListener(new MyTabListener(new FriendListFragment()));
-		tab3.setTabListener(new MyTabListener(new AddFriendFragment()));
+		//tab3.setTabListener(new MyTabListener(new AddFriendFragment()));
 //		tab4.setTabListener(new MyTabListener(new ToDoFragment()));
 //		tab5.setTabListener(new MyTabListener(new ToDoFragment()));
 
 
 		actionBar.addTab(tab1);
 		actionBar.addTab(tab2);
-		actionBar.addTab(tab3);
+		//actionBar.addTab(tab3);
 //		actionBar.addTab(tab4);
 //		actionBar.addTab(tab5);
 		
-		//mProtocol = Protocol.getInstance(new DatabaseManager(this));
-		//mProtocol.setDelegate(this);
-
-		//TODO TESTING
-		/*
-		channel = new StaticSecureChannel("winti.mooo.com", 9000);
-		db = new StaticDatabase();
-		channel.setDelegate(this);
-		PublicHeader header = new PublicHeader(44, null, StatusByte.CONNECT.getByte(), 0, Data.dummySenderId, Data.serverId);
-		channel.sendHeader(header);
-		Log.i("DEBUG", Data.tag+"header send");
-		 */
 	}
+	
+	////
+	//NFC (Friendship Request)
+	////
 
-
-
+	private void setUpNFCExchange() {
+		nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+		if (nfcAdapter == null) {
+			Toast.makeText(this, "NFC is not available", Toast.LENGTH_LONG)
+			.show();
+			finish();
+			return;
+		}
+		createNextRequest();
+	}
 
 	private void createNextRequest() {
-
-		//nextRequest = new FriendshipRequest(dbmanager.getUser());
-
-		nextRequest = new FriendshipRequest(new User("Alice"));
-
-//		nfcAdapter.setNdefPushMessageCallback(nextRequest, this);
-//		nfcAdapter.setOnNdefPushCompleteCallback(this, this);
+		nextRequest = new FriendshipRequest(dbmanager.getUser());
+		
+		nfcAdapter.setNdefPushMessageCallback(nextRequest, this);
+		nfcAdapter.setOnNdefPushCompleteCallback(this, this);
 	}
+	
+	////
+	//OnNdefPushCompleteCallback
+	////
+	
+	@Override
+	public void onNdefPushComplete(NfcEvent event) {
+		Log.d(this.getClass().toString(), "onNdefPushComplete");
+		FriendshipRequest.setCurrentRequest(nextRequest);
+		createNextRequest();
+	}
+	
+	////
+	//LIFECYCLE
+	////
 
 	@Override
 	protected void onPause() {
@@ -190,59 +170,40 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 	@Override
 	protected void onResume() {
 		super.onResume();
+		
+		checkUserRegistered();
+		
+		//TESTING
 		//tests insertion of posts into wall
 		int index = new UserId().getId().shortValue();
+		//this.mProtocol.postPost(new Post(index, new UserId(), String.format("post with id : %d", index), null, null));
 		this.userWallAdapter.add(new Post(index, new UserId(), String.format("post with id : %d", index), null, null));
 	}
-	
-	@Override
-	public void onNdefPushComplete(NfcEvent event) {
-		Log.d(this.getClass().toString(), "onNdefPushComplete");
-		FriendshipRequest.setCurrentRequest(nextRequest);
-		createNextRequest();
+
+	private void checkUserRegistered() {
+		if(mProtocol.getUser() == null) {
+			Log.d(tag, "No user registered");
+			// Create registration dialog
+			RegistrationDialogFragment dialog = new RegistrationDialogFragment(this);
+			dialog.show(this.getFragmentManager(), "lol");
+		} else {
+			Log.d(tag, "User " + dbmanager.getUser().username +" already registered");
+		}
 	}
 
-
-	@Override
-	public void onMessageReceived(NetworkMessage message) {
-		Log.d("DEBUG", Data.tag
-				+ "Message received : "
-				+ MessageParser.parseMessage(message.getText(), message.header, db)
-				.toString());
-
-	}
+	////
+	//Fragment
+	///
 
 	public class WallFragment extends ListFragment {
-		public View onCreateView(LayoutInflater inflater, ViewGroup container, 
-				Bundle savedInstanceState){
+		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
 			View view = inflater.inflate(R.layout.my_wall_tab, container, false);
-			/*Wall myWall = mProtocol.getUserWall();
-			User myself = mProtocol.getUser();
-
-			if (myself == null) {
-				Toast.makeText(getApplicationContext(), "dbmanager.getUser() returned null!", Toast.LENGTH_LONG).show();
-				return view;
-			}
-			
-			if(myWall == null) {
-				Toast.makeText(getApplicationContext(), "dbmanager.getUserWall() returned null! Using dummy posts...", Toast.LENGTH_LONG).show();
-				userWallAdapter = new WallPostAdapter(getApplicationContext(), postList);
-				setListAdapter(userWallAdapter);
-				return view;
-			}
-			else {
-				Toast.makeText(getApplicationContext(), "dbmanager.getUserWall() returned something!", Toast.LENGTH_LONG).show();
-			    setListAdapter(userWallAdapter);
-			}*/
-			setListAdapter(userWallAdapter);
-			
 			return view;
 		}
 	}
 
 	public class FriendListFragment extends ListFragment {
-		public View onCreateView(LayoutInflater inflater, ViewGroup container, 
-				Bundle savedInstanceState){
+		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
 			View view = inflater.inflate(R.layout.friend_list_tab, container, false);
 			User myself = mProtocol.getUser();
 
@@ -307,51 +268,9 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 		}
 	}
 	
-	// Fragment layout for the registration dialog
-	public class RegistrationDialogFragment extends DialogFragment {
-
-		 @Override
-	    public AlertDialog onCreateDialog(Bundle savedInstanceState) {
-	        // Use the Builder class for convenient dialog construction
-	        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-	        
-	        // Get the layout inflater
-	        LayoutInflater inflater = getActivity().getLayoutInflater();
-
-	        // Inflate and set the layout for the dialog
-	        // Pass null as the parent view because its going in the dialog layout
-//	        builder.setView(inflater.inflate(R.layout.dialog_registration, null));
-	        final EditText input = new EditText(getActivity());
-	        builder.setView(input);
-	        
-	        // Set dialog title
-	        builder.setTitle(R.string.registration_title);
-	        
-	        // Set positive button
-	        builder.setPositiveButton(R.string.register_button, new DialogInterface.OnClickListener() {
-	                   public void onClick(DialogInterface dialog, int id) {
-	                       // Retrieve data from textboxes, create new User and call putUser
-	                	   String username = input.getEditableText().toString(); // TODO: check for null
-	                	   Toast.makeText(getActivity(), username + " was succesfully registered", Toast.LENGTH_LONG).show();
-	                	   // Create new user object
-	                	   User user = new User(username);
-	                	   // Insert user in the database
-	                	   dbmanager.putUser(user);
-	                   }
-	               });
-	        
-	        // Set negative button
-	        builder.setNegativeButton(R.string.cancel_button, new DialogInterface.OnClickListener() {
-	                   public void onClick(DialogInterface dialog, int id) {
-	                       // TODO: User cancelled registration dialog, what should be done?
-	                   }
-	               });
-	        
-	        // Create the AlertDialog object and return it
-	        return builder.create();
-	    }
-
-	}
+	////
+	//UserDelegate
+	////
 
 	@Override
 	public void onPostReceived(Post post) {
@@ -380,5 +299,14 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 	@Override
 	public void onFriendshipDeclined() {
 		// TODO NOT USED NOW (remote friendship mechanism)
+	}
+	
+	////
+	//RegistrationDialogFragmentDelegate
+	////
+
+	@Override
+	public void userRegistered(String username) {
+		this.dbmanager.putUser(new User(username));
 	}
 }

@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.android.glukas.project4;
 
+import ch.ethz.inf.vs.android.glukas.project4.RegistrationDialogFragment.RegistrationDialogFragmentDelegate;
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseManager;
 import ch.ethz.inf.vs.android.glukas.project4.networking.FriendshipRequest;
 import ch.ethz.inf.vs.android.glukas.project4.networking.FriendshipResponse;
@@ -19,7 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class IncomingFriendshipActivity extends Activity implements
-		OnNdefPushCompleteCallback {
+OnNdefPushCompleteCallback, RegistrationDialogFragmentDelegate {
 
 	TextView usernameTextView;
 	FriendshipRequest request;
@@ -27,13 +28,32 @@ public class IncomingFriendshipActivity extends Activity implements
 	NfcAdapter nfcAdapter;
 	DatabaseManager dbmanager;
 
+	////
+	//LIFECYCLE
+	////
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_incoming_friendship);
 		dbmanager = new DatabaseManager(this);
 		this.usernameTextView = (TextView) findViewById(R.id.usernameTextView);
+	}
 
+
+	@Override
+	public void onNewIntent(Intent intent) {
+		// onResume gets called after this to handle the intent
+		setIntent(intent);
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		checkUserRegistered();//This could be the very first activity started
+		if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction())) {
+			processIntent(getIntent());
+		}
 	}
 
 	@Override
@@ -55,17 +75,11 @@ public class IncomingFriendshipActivity extends Activity implements
 		return super.onOptionsItemSelected(item);
 	}
 
-	@Override
-	public void onNewIntent(Intent intent) {
-		// onResume gets called after this to handle the intent
-		setIntent(intent);
-	}
-
-	@Override
-	protected void onResume() {
-		super.onResume();
-		if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction())) {
-			processIntent(getIntent());
+	private void checkUserRegistered() {
+		if(dbmanager.getUser() == null) {
+			// Create registration dialog
+			RegistrationDialogFragment dialog = new RegistrationDialogFragment(this);
+			dialog.show(this.getFragmentManager(), this.getClass().toString());
 		}
 	}
 
@@ -75,15 +89,12 @@ public class IncomingFriendshipActivity extends Activity implements
 		// only one message sent during the beam
 		NdefMessage msg = (NdefMessage) rawMsgs[0];
 		request = new FriendshipRequest(msg);
-		//response = request.createAcceptingResponse(dbmanager.getUser());//TODO
-		response = request.createAcceptingResponse(new User("Bob"));
-		
+
 		nfcAdapter = NfcAdapter.getDefaultAdapter(this);
 
 		// TODO better error handling
 		if (nfcAdapter == null) {
-			Toast.makeText(this, "NFC is not available", Toast.LENGTH_LONG)
-					.show();
+			Toast.makeText(this, "NFC is not available", Toast.LENGTH_LONG).show();
 			finish();
 			return;
 		}
@@ -92,6 +103,9 @@ public class IncomingFriendshipActivity extends Activity implements
 		nfcAdapter.setOnNdefPushCompleteCallback(this, this);
 
 		displayRequest(request);
+		if (dbmanager.getUser() != null) {
+			prepareResponse();
+		}
 	}
 
 	// Save friend in database
@@ -108,10 +122,29 @@ public class IncomingFriendshipActivity extends Activity implements
 				+ request.getSender().getId());
 	}
 
+	private void prepareResponse() {
+		response = request.createAcceptingResponse(dbmanager.getUser());
+	}
+
+	////
+	//RegistrationDialogFragmentDelegate
+	////
+
+	@Override
+	public void userRegistered(String username) {
+		this.dbmanager.putUser(new User(username));
+		prepareResponse();
+	}
+
+	////
+	//OnNdefPushCompleteCallback
+	////
+
 	@Override
 	public void onNdefPushComplete(NfcEvent event) {
-		// TODO (Lukas) we would actually have to make sure that the correct recipient was reached
-		
+		// Note: we would actually have to make sure that the correct recipient was reached
+		//       we just know SOME recipient got the response
+
 		//NOTE: we only save the friend once someone (hopefully the same person) received the reply.
 		//This means that the request was accepted. (by doing an exchange in the other direction)
 		saveFriend(request);
