@@ -1,12 +1,8 @@
 package ch.ethz.inf.vs.android.glukas.project4.test;
 
 import java.lang.reflect.Method;
-import java.math.BigInteger;
 import java.util.Date;
-import java.util.List;
-
 import org.junit.Test;
-
 import ch.ethz.inf.vs.android.glukas.project4.Post;
 import ch.ethz.inf.vs.android.glukas.project4.User;
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseAccess;
