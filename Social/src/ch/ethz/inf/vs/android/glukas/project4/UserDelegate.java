@@ -21,20 +21,5 @@ public interface UserDelegate {
 	 */
 	public void onConnectionFailed(FailureReason reason);
 	
-	/**
-	 * Peers in the local bluetooth network have been discovered
-	 * @param peers
-	 */
-	public void onPeersDiscoverySuccess(List<User> peers);
-	
-	/**
-	 * The friendship demand has been accepted
-	 */
-	public void onFriendshipAccepted();
-	
-	/**
-	 * The friendship demand has been declined
-	 */
-	public void onFriendshipDeclined();
 }
  
