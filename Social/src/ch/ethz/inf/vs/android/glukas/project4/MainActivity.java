@@ -68,7 +68,7 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 	// Workaround for dbmanager not returning users:
 	private ArrayList<BasicUser> userList = new ArrayList<BasicUser>();
 	// Workaround for dbmanager not returning posts:
-	private List<Post> postList = Arrays.asList(new Post(4, new UserId(), "Hello World!", null, null), new Post(0, new UserId(), "Amazing app!!", null, null) );
+	private List<Post> postList = Arrays.asList(new Post(4, new UserId(), new UserId(), "Hello World!", null, null), new Post(0, new UserId(), new UserId(), "Amazing app!!", null, null) );
 
 	// TODO Remove the section above
 
@@ -192,7 +192,7 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 		super.onResume();
 		//tests insertion of posts into wall
 		int index = new UserId().getId().shortValue();
-		this.userWallAdapter.add(new Post(index, new UserId(), String.format("post with id : %d", index), null, null));
+		this.userWallAdapter.add(new Post(index, new UserId(), new UserId(), String.format("post with id : %d", index), null, null));
 	}
 	
 	@Override

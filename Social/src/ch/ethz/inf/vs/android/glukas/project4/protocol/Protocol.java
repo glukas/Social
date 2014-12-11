@@ -118,6 +118,7 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 		int maxNumPosts = database.getUserPostsCount()+1;
 		database.setUserMaxPostsId(msgId);
 		database.setUserPostsCount(maxNumPosts);
+		userHandler.onPostReceived(post);
 	}
 
 	@Override

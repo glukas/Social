@@ -1,8 +1,6 @@
 package ch.ethz.inf.vs.android.glukas.project4;
 
-import java.util.Comparator;
 import java.util.Date;
-
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.UnknowRequestType;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.Message;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.Message.MessageType;
@@ -25,6 +23,8 @@ public class Post implements Comparable<Post> {
 	private Date datetime;
 	// Id of the user that posted the message
 	private UserId poster;
+	// Id of the user that owns the wall where the post is
+	private UserId wallOwner;
 	private PostType type;
 	
 	/**
@@ -36,8 +36,9 @@ public class Post implements Comparable<Post> {
 	 * @param image
 	 * @param datetime
 	 */
-	public Post(int id, UserId Poster, String text, Bitmap image, Date datetime) {
+	public Post(int id, UserId Poster, UserId wallOwner, String text, Bitmap image, Date datetime) {
 		this.id = id;
+		this.wallOwner = wallOwner;
 		this.poster = Poster;
 		this.text = text;
 		if (image == null) {
@@ -99,6 +100,10 @@ public class Post implements Comparable<Post> {
 	
 	public  UserId getPoster() {
 		return this.poster;
+	}
+	
+	public UserId getWallOwner() {
+		return this.wallOwner;
 	}
 	
 	public PostType getType() {
