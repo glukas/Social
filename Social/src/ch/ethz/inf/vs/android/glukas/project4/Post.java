@@ -135,7 +135,7 @@ public class Post implements Comparable<Post> {
 	
 	@Override
 	public boolean equals(Object other) {
-		return (other instanceof Post && this.compareTo((Post) other) == 0);
+		return (other instanceof Post) && (this.compareTo((Post) other) == 0);
 	}
 	
 	@Override
