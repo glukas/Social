@@ -194,9 +194,9 @@ class Posts implements PostsInterface{
 				older.add(Utility.buildPost(cursor));
 				cursor.moveToNext();
 			}
-			return older;
 		}
-		else
-			return null;
+		cursor.close();
+		return older;
+
 	}
 }

@@ -114,20 +114,22 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 
 	@Override
 	public void postPost(Post post) throws DatabaseException {
-		if (post.getWallOwner().equals(localUser.getId())) {
+		//if (post.getWallOwner().equals(localUser.getId())) {
 			database.putUserPost(post);
 			/*int msgId = post.getId();
 			int maxNumPosts = database.getUserPostsCount()+1;
 			database.setUserMaxPostsId(msgId);
 			database.setUserPostsCount(maxNumPosts);*/
 			userHandler.onPostReceived(post);
-		} else {
-			database.putFriendPost(post, post.getWallOwner());
+		/*
+		  } else {
+			database.putFriendPost(post, post.getWallOwner());*/
 			/*Message msg = MessageFactory.newPostMessage(post, localUser, database.getFriend(post.getWallOwner()), false);
 			PublicHeader header = new PublicHeader(0, null, StatusByte.POST.getByte(), post.getId(), localUser.getId(), post.getWallOwner());
 			secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg).toString(), header));*/
-			userHandler.onPostReceived(post);
-		}
+		//	userHandler.onPostReceived(post);
+	//	}
+	
 
 	}
 
@@ -162,9 +164,9 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 		}
 		
 		//ask for update
-		Message msg = MessageFactory.newTypeMessage(MessageType.GET_STATE);
-		PublicHeader header = new PublicHeader(0, null, StatusByte.DATA.getByte(), 0, localUser.getId(), userId);
-		secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg, 0).toString(), header));
+		//Message msg = MessageFactory.newTypeMessage(MessageType.GET_STATE);
+		//PublicHeader header = new PublicHeader(0, null, StatusByte.DATA.getByte(), 0, localUser.getId(), userId);
+		//secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg, 0).toString(), header));
 	}
 
 	@Override
