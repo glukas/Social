@@ -81,14 +81,18 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 		
 		// Insert static test data
 		dbmanager.initializeTest(getApplicationContext());
+		
+		User user = dbmanager.getUser();
 
-		if (dbmanager.getUser() == null) {
+		if (user == null) {
 			Log.d(tag, "No user registered");
 			// Create registration dialog
 			RegistrationDialogFragment dialog = new RegistrationDialogFragment();
-			dialog.show(this.getFragmentManager(), "lol");
+			dialog.show(this.getFragmentManager(), "registering");
 		}
 		else {
+			// TODO: Store user id in Utility
+			dbmanager.setStaticUserId(user.getId());
 			Log.d(tag, "User already registered");
 		}
 		
