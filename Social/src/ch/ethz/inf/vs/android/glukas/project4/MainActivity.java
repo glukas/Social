@@ -7,7 +7,7 @@ import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseManager;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.FailureReason;
 import ch.ethz.inf.vs.android.glukas.project4.networking.FriendshipRequest;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.Protocol;
-import ch.ethz.inf.vs.android.glukas.project4.protocol.ProtocolDelegate;
+import ch.ethz.inf.vs.android.glukas.project4.protocol.ProtocolInterface;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.parsing.MessageParser;
 import ch.ethz.inf.vs.android.glukas.project4.security.NetworkMessage;
 import ch.ethz.inf.vs.android.glukas.project4.security.SecureChannelDelegate;
@@ -55,7 +55,7 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 
 	FriendshipRequest nextRequest;
 
-	ProtocolDelegate mProtocol;
+	ProtocolInterface mProtocol;
 
 	//TODO Once testing is done, change DatabaseManager to DatabaseAccess
 	DatabaseManager dbmanager;
@@ -348,21 +348,6 @@ public class MainActivity extends Activity implements OnNdefPushCompleteCallback
 	@Override
 	public void onConnectionFailed(FailureReason reason) {
 		// TODO @Samuel, from Vincent Is it of any use for you?	
-	}
-
-	@Override
-	public void onConnectionSucceeded() {
-		// TODO @Samuel, from Vincent Is it of any use for you?
-	}
-
-	@Override
-	public void onDisconnectionFailed(FailureReason reason) {
-		// TODO @Samuel, from Vincent Is it of any use for you?
-	}
-	
-	@Override
-	public void onDisconnectionSucceeded() {
-		// TODO @Samuel, from Vincent Is it of any use for you?
 	}
 	
 	@Override

@@ -1,8 +1,6 @@
 package ch.ethz.inf.vs.android.glukas.project4.protocol;
 
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 import android.util.Log;
 import ch.ethz.inf.vs.android.glukas.project4.Post;
 import ch.ethz.inf.vs.android.glukas.project4.BasicUser;
@@ -31,7 +29,7 @@ import ch.ethz.inf.vs.android.glukas.project4.security.NetworkMessage;
  * UserDelegate. On an other hand, it handles calls back from the network,
  * through implementing SecureChannelDelegate.
  */
-public class Protocol implements ProtocolDelegate, SecureChannelDelegate {
+public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 
 	////
 	// Life cycle
@@ -40,7 +38,7 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate {
 	private static Protocol instance;
 
 	/**
-	 * Get a instance of Protocol.
+	 * Get a instance of Protocol. Don't forget to call 'setProtocol' if it's the first time
 	 */
 	public static Protocol getInstance(DatabaseAccess db) {
 		if (instance == null) {
@@ -49,8 +47,8 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate {
 			return instance;
 		}
 	}
-
-	private Protocol(DatabaseAccess db) {
+	
+	public Protocol(DatabaseAccess db) {
 		database = db;
 		localUser = database.getUser();
 		secureChannel = new SecureChannel("winti.mooo.com", 9000, new DBCredentialStorage(db));
@@ -79,8 +77,8 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate {
 	////
 	
 	@Override
-	public int getMaxPostId(UserId userId) {
-		return database.getFriendMaxPostsId(userId);
+	public int getNewPostId(UserId userId) {
+		return database.getFriendMaxPostsId(userId)+1;
 	}
 	
 	@Override
@@ -129,12 +127,12 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate {
 	
 	@Override
 	public void getUserPosts(UserId userId, int postId) {
-		//retrieve data already known from database
-		database.getAllFriendPostsFrom(userId, postId);
 		//ask distant user if already all messages are in database
 		Message msg = MessageFactory.newTypeMessage(MessageType.GET_STATE);
 		PublicHeader header = new PublicHeader(0, null, StatusByte.DATA.getByte(), 0, localUser.getId(), userId);
 		secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg, 0).toString(), header));
+		//retrieve data already known from database
+		database.getAllFriendPostsFrom(userId, postId);
 	}
 	
 	@Override
@@ -147,7 +145,8 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate {
 	public void getSomeUserPosts(UserId userId, int numberPosts, int postId) {
 		//retrieve posts already in the database
 		List<Post> listPosts = database.getSomeLatestPosts(userId, numberPosts, postId);
-		for (Post p : listPosts){
+		
+		for (Post p : listPosts) {
 			userHandler.onPostReceived(p);
 		}
 		
@@ -244,6 +243,7 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate {
 		int msgId = database.getFriendMaxPostsId(localUser.getId());
 		Post post = new Post(msg, msgId);
 		database.putFriendPost(post, localUser.getId());
+		userHandler.onPostReceived(post);
 	}
 	
 	private void onAckPostReceived(Message msg) {
@@ -279,6 +279,7 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate {
 		//A friend send a post to the local user
 		Post post = new Post(msg, msg.getPostId());
 		database.putFriendPost(post, msg.getSender().getId());
+		userHandler.onPostReceived(post);
 	}
 	
 	private void onSendStateReceived(Message msg) {
