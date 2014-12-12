@@ -1,5 +1,8 @@
 package ch.ethz.inf.vs.android.glukas.project4.database;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.provider.BaseColumns;
 
 /**
@@ -15,16 +18,57 @@ public final class DatabaseContract {
 		
 	}
 	
-//	// Structure of table friends.
-//	public static abstract class FriendsEntry implements BaseColumns {
-//		public static final String TABLE_NAME = "friends";
-//		public static final String USER_ID = "friend_id_1";
-//		public static final String FRIEND_ID = "friend_id_2";
-//	}
-	// Structure of table userid
-	public static abstract class UserIdEntry implements BaseColumns {
-		public static final String THIS_USER_ID = "this_user_id";
+	public static enum CREATE_TABLE {
+		USERS("CREATE TABLE users (" +
+				BaseColumns._ID +" INTEGER, " +
+				"user_id TEXT, " +
+				"username TEXT, " +
+				"is_friend INTEGER," +
+				"count INTEGER, " +
+				"max INTEGER, " +
+				"broadcast_enc_key BLOB, " +
+				"broadcast_auth_key BLOB, " +
+				"PRIMARY KEY(user_id)" +
+				");"),
+		
+		POSTS("CREATE TABLE posts (" +
+				BaseColumns._ID+" INTEGER, " +
+				"poster_id TEXT, " +
+				"wall_id TEXT, " +
+				"date_time TEXT, " +
+				"text TEXT, " +
+				"image BLOB, " +
+				"PRIMARY KEY("+BaseColumns._ID+", wall_id), " +
+				"FOREIGN KEY (poster_id) REFERENCES users(user_id) ON DELETE SET NULL," +
+				"FOREIGN KEY (wall_id) REFERENCES users(user_id) ON DELETE CASCADE" +
+				");");
+			
+		private String command;
+		
+		CREATE_TABLE(String s){
+			command = s;
+		}
+		
+		public String getCommand() {
+			return command;
+		}
 	}
+	
+	public static enum DROP_TABLE_IF_EXIST {
+		DROP_TABLE_USERS_IF_EXIST("DROP TABLE IF EXISTS users;"),
+		DROP_TABLE_POSTS_IF_EXIST("DROP TABLE IF EXISTS posts;");
+		
+		private String command;
+		
+		DROP_TABLE_IF_EXIST(String s){
+			command = s;
+		}
+		
+		public String getCommand() {
+			return command;
+		}
+	}
+	
 	
 	// Structure of table users.
 	public static abstract class UsersEntry implements BaseColumns {

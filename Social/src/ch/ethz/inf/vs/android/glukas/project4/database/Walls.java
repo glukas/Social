@@ -21,12 +21,12 @@ class Walls {
 
 	// Get the whole wall of the user.
 	public static Wall getUserWall(SQLiteDatabase db) {
-		return getFriendWall(Utility.userID, db);
+		return getFriendWall(Utility.userId, db);
 	}
 	
 	// Delete user's wall.
 	public static void deleteUserWall(SQLiteDatabase db) {
-		deleteFriendWall(Utility.userID, db);
+		deleteFriendWall(Utility.userId, db);
 	}
 	
 	// Get the whole Wall of a certain friend.

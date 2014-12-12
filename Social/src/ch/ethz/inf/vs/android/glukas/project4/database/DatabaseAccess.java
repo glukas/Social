@@ -109,23 +109,6 @@ public interface DatabaseAccess {
 	public void setFriendMaxPostsId(int newMaxPostsId, UserId id);
 	
 	/**
-	 * Establish that user has the friends with id's in friends
-	 * Not that friends is an exhaustive list of all friends of the user, 
-	 * so it replaces the old set of friends.
-	 * @param id1 the id of the friend (128 bits)
-	 * @param id2
-	 */
-	public void setFriendsList(UserId user, List<BasicUser> friends);
-	
-	/**
-	 * Get a list of all friends of the friend with id.
-	 * @param id the id of the friend to retrieve the friends
-	 * @return List of UserIds of a the friends of the user with id 'id'
-	 * 	       These friends need not necessarily be common friends.
-	 */
-	public List<BasicUser> getFriendsList(UserId id);
-	
-	/**
 	 * Get an user name from an user id
 	 * @param id the id of the friend to retrieve the username
 	 * @return A String representation of the user
@@ -137,7 +120,7 @@ public interface DatabaseAccess {
 	 * @param username the username of the friend to retrieve the id
 	 * @return A list of different users matched by provided user name
 	 */
-	//Remark (Lukas) : Why do we need this?
+	// FIXME: Remark (Lukas) : Why do we need this?
 	public List<UserId> getFriendId(String username);
 	
 	/**

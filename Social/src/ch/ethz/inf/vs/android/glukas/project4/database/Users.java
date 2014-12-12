@@ -61,6 +61,9 @@ class Users {
 		
 		if(cursor.moveToFirst()) {
 			UserId id = new UserId(cursor.getString(0));
+			// Set static id if not already done
+			if(Utility.userId.getId().equals("-1"))
+				Utility.userId = id;
 			String username = cursor.getString(1);
 			int count = cursor.getInt(2);
 			int max = cursor.getInt(3);
