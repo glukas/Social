@@ -9,42 +9,20 @@ import java.util.TimeZone;
 import java.text.*;
 
 import ch.ethz.inf.vs.android.glukas.project4.Post;
-import ch.ethz.inf.vs.android.glukas.project4.User;
-import ch.ethz.inf.vs.android.glukas.project4.UserCredentials;
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
-import ch.ethz.inf.vs.android.glukas.project4.Wall;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 
 class Utility {
-	
-	// SQLite constants.
-	public static final String NULL_TYPE = "NULL";	// The value is a NULL value.
-	public static final String INTEGER_TYPE = "INTEGER";	// The value is a signed integer, stored in 1, 2, 3, 4, 6, or 8 bytes depending on the magnitude of the value.
-	public static final String REAL_TYPE = "REAL";	// The value is a floating point value, stored as an 8-byte IEEE floating point number.
-	public static final String TEXT_TYPE = "TEXT";	// The value is a text string, stored using the database encoding (UTF-8, UTF-16BE or UTF-16LE).
-	public static final String BLOB_TYPE = "BLOB";	// The value is a blob of data, stored exactly as it was input.
-	
-	public static final String CREATE_TABLE = "CREATE TABLE";
-	public static final String DROP_TABLE = "DROP TABLE";
-	public static final String NOT_NULL = "NOT NULL";
-	public static final String IF_EXISTS = "IF EXISTS";
-	public static final String PRIMARY_KEY = "PRIMARY KEY";
-	public static final String FOREIGN_KEY = "FOREIGN KEY";
-	public static final String REFERENCES = "REFERENCES";
-	public static final String ON_DELETE = "ON DELETE";
-	public static final String CASCADE = "CASCADE";
-	public static final String SET_NULL = "SET NULL";
-	public static final String NO_ACTION = "NO ACTION";
 	
 	// Implementation constants.
 	// TODO: think about making them dynamic
 	public static final int MAX_BLOB_SIZE = 0;	// TODO: define # of bytes needed for a blob (max 400kB?)
 	public static final int MAX_DATABASE_SIZE = 0;	// TODO: define max byte size the database can reach (dynamic?)
 	
-	public static UserId userId;
+	public static UserId userId = new UserId("-1");
 	
 	private static SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy MM dd HH:mm:ss");
 	
@@ -112,26 +90,31 @@ class Utility {
 	 * @return Post object
 	 */
 	public static final Post buildPost(Cursor cursor) {
+		for (int i = 0; i < 6; i++){
+			Log.d("DATABASE DEBUG", "###"+cursor.getString(i));
+		}
 		// Get id.
 		int id = cursor.getInt(0);
 		// Get poster id.
-		UserId poster_id = new UserId(cursor.getBlob(1));
+		UserId poster_id = new UserId(cursor.getString(1));
+		
+		UserId wall_owner_id = new UserId(cursor.getString(2));
 		// Get text.
-		String text = cursor.getString(2);
+		String text = cursor.getString(3);
 		// Get image.
 		Bitmap image;
-		if(cursor.getBlob(3) != null)
-			image = Utility.toBitmap(cursor.getBlob(3));
+		if(cursor.getBlob(4) != null)
+			image = Utility.toBitmap(cursor.getBlob(4));
 		else
 			image = null;
 		// Get datetime.
 		Date datetime;
-		if(cursor.getString(4) != null)
-			datetime = Utility.toJavaDate(cursor.getString(4));
+		if(cursor.getString(5) != null)
+			datetime = Utility.toJavaDate(cursor.getString(5));
 		else
 			datetime = null;
 		// Build and return post.
-		return new Post(id, poster_id, text, image, datetime);
+		return new Post(id, poster_id, wall_owner_id, text, image, datetime);
 	}
 	
 }

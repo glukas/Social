@@ -52,13 +52,15 @@
  * 		 Private key encryption is done by combining a AES-128 in CBC mode (PKCS7Padding padding) and a HMAC based on SHA256 in an "Encrypt-then-Authenticate" fashion.
  * 		 So a private key is 128 or 256 bits, and a key pair is 128+256 bits.
  * 
- * (I)   Key exchange in physical proximity:
+ * (I)   Public Key exchange in physical proximity:
  *  
  * 	     **Simple key exchange protocol**
  *		
  *       A and B exchange the public keys used for encryption and verification over the channel.
  *       We assume no active attacker has access to the channel.
- *       A sends her symmetric encryption key KsimA to B encrypted under B's public encryption key.
+
+ *      **Symmetric Key exchange using public keys**
+ *       A sends her symmetric encryption key KsimA to B encrypted under B's public encryption key, and authenticated under B's public authentication key
  *       The same with reversed roles.
  *
  * (II) 
@@ -69,8 +71,8 @@
  * 	   [A has T's broadcast key KT
  * 		T has A's broadcast key KA]
  * 
- * 	   Discovery 1) A -> T : PEnc(PKencT, ("list of friends", N_A)) [fresh N_A]
- * 	   Discovery 2) T -> A : Sign(SKsignT, (("my friends", T, (B_0, ..., B_n))_KT, N_A)) //where (B_0, ...., B_n) are the friends of T
+ * 	   Discovery 1) A -> T : {("list of friends", N_A)}_KsimT [fresh N_A]
+ * 	   Discovery 2) T -> A : {"my friends", T, (B_0, ..., B_n), N_A}_KsimT //where (B_0, ...., B_n) are the friends of T
  *
  *	   [A holds a fresh list of friends of T]
  *
@@ -84,13 +86,14 @@
  * 	   A has broadcast key KA,
  * 	   B has broadcast key KB]
  *  
- * 	   Friend 1)  A -> B : Sign(SKsignA, {"friend", B}_KSimA)  //certificate that A wants to friend B
+ * 	   Friend 1)  A -> B : Sign(SKsignA, ("friend", B)) //certificate that A wants to friend B
  *	   
  *	   If B wants to friend A:
  *
- *	   Friend 2)  B -> A : Sign(SKsignB, {"friend", A}_KsimB)  //certificate that B wants to friend A
+ *	   Friend 2)  B -> A : Sign(SKsignB, ("friend", A))  //certificate that B wants to friend A
  *
  *     Friend 3a, 3b) Both A and B perform the Public Key Voting Protocol to get their respective public keys
+ *     Friend 4) Then they perform a symmetric key exchange using public keys.
  *	
  *	   [A has B's broadcast key KB,
  * 	    B has A's broadcast key KA]
@@ -98,67 +101,42 @@
  *	   **Public Key Voting Protocol**
  *
  *     Say B has a certificate from A that A wants to friend B.
- *     B wants to get trustworthy votes on the public key KA of A.
+ *     B wants to get trustworthy votes on the public key PKA of A.
+ *     A special case is where just a single friend is asked for the public key.
  *     
  *     [B has the broadcast keys of his common friends (T_1, ..., T_M) with A,
  *     The common friends of A and B have the broadcast keys of A and B,
- * 	   A has broadcast key KA]
+ * 	   A has public key PKA]
  *     
  *     [fresh N_B]
  *     
  *	   For all the common friends T in (T_1,...,T_M) of A and B: 
  *
- *		   Voting 1)  B -> T : Sign(SKsignA, {"friend", B}_KsimA),	N_B		  //certificate that A wants to friend B
+ *		   Voting 1)  B -> T : Sign(SKsignA, ("friend", B)), N_B		  //certificate that A wants to friend B
  *	   
- *		   Voting 2)  T -> B : Sign(SKSignT, PEnc(PKencB, "vote", A, KA, N_B)),   //certificate that T believes A's key is KA, encrypted under B's public key
+ *		   Voting 2)  T -> B : Sign(SKSignT, "vote", A, PKA, N_B),   //certificate that T believes A's key is PKA
  *		  
- *	   [B chooses the majority vote on KA]
- *
+ *	   [B chooses the majority vote on PKA]
  *
  * (III) 
  *   
- * 	 (TODO: specify if the public protocol header is also authenticated - probably not, as the security implications are not clear)
- * 
- *	
  *  (a) Transmission of Protocol messages:
  *       
  *       In the some of the protocols above, we have assumed the existence of a secure symmetric key message transmission mechanism.
  *       We use an encrypt-then-authenticate approach.
- *       Using this approach with a CPA-secure private key encryption scheme and a secure MAC with unique tags gives CCA secure and authenticated communication.
- *       [Introduction to Modern Cryptography, Katz/Lindell, Theorem 4.25] 
  *       
- *       Say A want to send protocol message p to B
+ *       Say A want to send protocol message p with header h to B
  *       
  *       [A and B share a secret key KAB=(K1, K2)]
  *       
- *       A -> B : Enc(K1, p), MAC(K2, Enc(K1, p))
+ *       A -> B : Enc(K1, p), MAC(K2, Enc(K1, h|p))
  *       
- *       [p is transmitted securely, meaning CCA-secure and authenticated]
+ *       [Claim: p is transmitted securely, meaning CPA-secure and authenticated]
  *       
  *   (b) Transmission of Posts:
- *       //TODO this section is out of date
+ *   
  *       As already mentioned, posts are encrypted using the broadcast keys. This allows a peer to encrypt its posts once for all friends.
- *       The method is similar to (b), but we additionally sign the MACs:
- *       The signatures are necessary because the MAC can be generated by anyone who has the public broadcast key for A: this
- *       includes all friends of A. We do not want to sign the whole message though, because public key cryptography is slow. Thus
- *       we sign the MACs, once for the author of the post, and once for the owner of the wall.
- *       
- *       So we do "Encrypt-Authenticate-Sign":
- *       
- *       
- *       Say A wants to post m to B's wall, and B has friends (B_0, ..., B_N)
- *       Posts must have unique identifiers, and include the owner of the wall and author of the post.
- *       Note that A=B is possible, in which case A->B is trivial.
- *       
- *       [A has private broadcast key ((KAEnc, KAAuth), (SKA,PKA), (SKEncA, PKEncA)),
- *        B has private broadcast key ((KBEnc, KBAuth), (SKB,PKB), (SKEncB, PKEncB)),
- *        A has B's public broadcast key ((KBEnc, KBAuth), PKB, PKencB),
- *        B has A's public broadcast key ((KAEnc, KAAuth), PKA, PKencA),
- *       
- *       A -> B : Enc(KBEnc, m), Sign(SKA, MAC(KBAuth, Enc(KBEnc, m)))
- *       B -> (B_0, ...., B_N) :  Enc(KBEnc, m), Sign(SKA, MAC(KBAuth, Enc(KBEnc, m))), Sign(SKB, MAC(KBAuth, Enc(KBEnc, m)))
- *       
- *     
+ *       The encryption/authentication is the same as in (b)
  *       
 
  **/

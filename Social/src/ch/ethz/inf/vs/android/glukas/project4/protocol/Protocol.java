@@ -1,13 +1,13 @@
 package ch.ethz.inf.vs.android.glukas.project4.protocol;
 
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 import android.util.Log;
 import ch.ethz.inf.vs.android.glukas.project4.Post;
 import ch.ethz.inf.vs.android.glukas.project4.BasicUser;
+import ch.ethz.inf.vs.android.glukas.project4.User;
 import ch.ethz.inf.vs.android.glukas.project4.UserDelegate;
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
+import ch.ethz.inf.vs.android.glukas.project4.Wall;
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseAccess;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.DatabaseException;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.UnhandledFunctionnality;
@@ -29,7 +29,7 @@ import ch.ethz.inf.vs.android.glukas.project4.security.NetworkMessage;
  * UserDelegate. On an other hand, it handles calls back from the network,
  * through implementing SecureChannelDelegate.
  */
-public class Protocol implements ProtocolDelegate, SecureChannelDelegate {
+public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 
 	////
 	// Life cycle
@@ -38,7 +38,7 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate {
 	private static Protocol instance;
 
 	/**
-	 * Get a instance of Protocol.
+	 * Get a instance of Protocol. Don't forget to call 'setProtocol' if it's the first time
 	 */
 	public static Protocol getInstance(DatabaseAccess db) {
 		if (instance == null) {
@@ -47,14 +47,13 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate {
 			return instance;
 		}
 	}
-
-	private Protocol(DatabaseAccess db) {
+	
+	public Protocol(DatabaseAccess db) {
 		database = db;
 		localUser = database.getUser();
 		secureChannel = new SecureChannel("winti.mooo.com", 9000, new DBCredentialStorage(db));
 		secureChannel.setDelegate(this);
 		messageRelay = new MessageRelay(secureChannel);
-		wallAsked = new TreeSet<UserId>();
 	}
 
 	////
@@ -69,7 +68,6 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate {
 
 	//caching
 	private BasicUser localUser;
-	private volatile Set<UserId> wallAsked;
 	
 	//exceptional behaviors
 	private final String unexpectedMsg = "Unexpected message arrived : ";
@@ -77,6 +75,32 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate {
 	////
 	// ProtocolDelegate
 	////
+	
+	@Override
+	public int getNewPostId(UserId userId) {
+		return database.getFriendMaxPostsId(userId)+1;
+	}
+	
+	@Override
+	public List<BasicUser> getFriendsList(UserId userId) {
+		return database.getFriendsList(userId);
+	}
+	
+	@Override
+	public Wall getUserWall() {
+		return database.getUserWall();
+	}
+	
+	@Override
+	public User getUser() {
+		return database.getUser();
+	}
+
+	@Override
+	public void putUser(User user) {
+		database.putUser(user);
+		localUser = user;
+	}
 
 	@Override
 	public void connect() {
@@ -90,21 +114,23 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate {
 
 	@Override
 	public void postPost(Post post) throws DatabaseException {
-		// The order matters !
-		//database.putUserPost(post);
-		//int msgId = post.getId();
-		// TODO : methods actually added in DBAccess, just has to use them
-		// int maxNumPosts = DatabaseManager.getNumPosts();
-		// database.setUserMaxId(msgId);
-		// database.setUserNumPosts(maxNumPosts);
-		
-		database.putUserPost(post);
-		int msgId = post.getId();
-		int maxNumPosts = database.getUserPostsCount()+1;
-		database.setUserMaxPostsId(msgId);
-		database.setUserPostsCount(maxNumPosts);
-		
-		
+		//if (post.getWallOwner().equals(localUser.getId())) {
+			database.putUserPost(post);
+			/*int msgId = post.getId();
+			int maxNumPosts = database.getUserPostsCount()+1;
+			database.setUserMaxPostsId(msgId);
+			database.setUserPostsCount(maxNumPosts);*/
+			userHandler.onPostReceived(post);
+		/*
+		  } else {
+			database.putFriendPost(post, post.getWallOwner());*/
+			/*Message msg = MessageFactory.newPostMessage(post, localUser, database.getFriend(post.getWallOwner()), false);
+			PublicHeader header = new PublicHeader(0, null, StatusByte.POST.getByte(), post.getId(), localUser.getId(), post.getWallOwner());
+			secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg).toString(), header));*/
+		//	userHandler.onPostReceived(post);
+	//	}
+	
+
 	}
 
 	@Override
@@ -114,13 +140,12 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate {
 	
 	@Override
 	public void getUserPosts(UserId userId, int postId) {
-		//retrieve data already known from database
-		database.getAllFriendPostsFrom(userId, postId);
 		//ask distant user if already all messages are in database
 		Message msg = MessageFactory.newTypeMessage(MessageType.GET_STATE);
 		PublicHeader header = new PublicHeader(0, null, StatusByte.DATA.getByte(), 0, localUser.getId(), userId);
 		secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg, 0).toString(), header));
-		wallAsked.add(userId);
+		//retrieve data already known from database
+		database.getAllFriendPostsFrom(userId, postId);
 	}
 	
 	@Override
@@ -131,16 +156,17 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate {
 	
 	@Override
 	public void getSomeUserPosts(UserId userId, int numberPosts, int postId) {
-		//List<Post> listPosts = database.getSomeUserPosts(userId, numberPosts, postId);
-		List<Post> listPosts = null;
-		for (Post p : listPosts){
+		//retrieve posts already in the database
+		List<Post> listPosts = database.getSomeLatestPosts(userId, numberPosts, postId);
+		
+		for (Post p : listPosts) {
 			userHandler.onPostReceived(p);
 		}
 		
-		Message msg = MessageFactory.newTypeMessage(MessageType.GET_STATE);
-		PublicHeader header = new PublicHeader(0, null, StatusByte.DATA.getByte(), 0, localUser.getId(), userId);
-		secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg, 0).toString(), header));
-		wallAsked.add(userId);
+		//ask for update
+		//Message msg = MessageFactory.newTypeMessage(MessageType.GET_STATE);
+		//PublicHeader header = new PublicHeader(0, null, StatusByte.DATA.getByte(), 0, localUser.getId(), userId);
+		//secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg, 0).toString(), header));
 	}
 
 	@Override
@@ -175,7 +201,7 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate {
 	@Override
 	public void onMessageReceived(NetworkMessage message) {
 		//react to an incoming message
-		Message msg = MessageParser.parseMessage(message.text, message.header, database);
+		Message msg = MessageParser.parseMessage(message.getText(), message.header, database);
 		
 		MessageType type = msg.getRequestType();
 	
@@ -230,6 +256,7 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate {
 		int msgId = database.getFriendMaxPostsId(localUser.getId());
 		Post post = new Post(msg, msgId);
 		database.putFriendPost(post, localUser.getId());
+		userHandler.onPostReceived(post);
 	}
 	
 	private void onAckPostReceived(Message msg) {
@@ -265,38 +292,40 @@ public class Protocol implements ProtocolDelegate, SecureChannelDelegate {
 		//A friend send a post to the local user
 		Post post = new Post(msg, msg.getPostId());
 		database.putFriendPost(post, msg.getSender().getId());
+		userHandler.onPostReceived(post);
 	}
 	
 	private void onSendStateReceived(Message msg) {
 		//Someone send his / her state, so retrieve data from the message
-		UserId userId = msg.getSender().getId();
-		int maxNumMsgs = msg.getNumM();
+		UserId friendId = msg.getSender().getId();
+		int numMsgs = msg.getNumM();
 		int maxPostId = msg.getId();
 		
-		//check if local user was waiting on this wall
-		boolean isWaitingOnWall = wallAsked.contains(userId);
-		if (isWaitingOnWall) {
-			//ask to have posts that local user doesn't have in database
-			int oldMaxPostId = database.getFriendMaxPostsId(userId);
+		//ask to have posts that local user doesn't have in database
+		int oldMaxPostId = database.getFriendMaxPostsId(friendId);
+		int oldNumMsgs = database.getFriendPostsCount(friendId);
+		if (oldNumMsgs < numMsgs) {
 			Message msgToSend = MessageFactory.newGetPostsMessage(oldMaxPostId, localUser, msg.getSender());
-			PublicHeader header = new PublicHeader(0, null, StatusByte.SEND.getByte(), 0, localUser.getId(), userId);
+			PublicHeader header = new PublicHeader(0, null, StatusByte.SEND.getByte(), 0, localUser.getId(), friendId);
 			NetworkMessage networkMessage = new NetworkMessage(JSONObjectFactory.createJSONObject(msgToSend).toString(), header);
 			secureChannel.sendMessage(networkMessage);
 		}
 		
-		//And stores informations into the database
-		database.setFriendMaxPostsId(maxNumMsgs, userId);
-		database.setFriendPostsCount(maxPostId, userId);
+		//update database
+		database.setFriendMaxPostsId(maxPostId, friendId);
+		database.setFriendPostsCount(numMsgs, friendId);
 	}
 	
 	private void onGetStateReceived(Message msg) {
 		//Someone wants user state, so retrieve data from database
 		int maxPostId = database.getFriendMaxPostsId(localUser.getId());
 		int maxNumMsgs = database.getFriendMaxPostsId(localUser.getId());
+		
 		//create message encapsulating all informations
 		BasicUser userToSend = msg.getSender();
 		String msgToSend = JSONObjectFactory.createJSONObject(MessageFactory.newSendStateMessage(localUser, userToSend, maxPostId, maxNumMsgs)).toString();
 		PublicHeader header = new PublicHeader(0, null, StatusByte.SEND.getByte(), 0, localUser.getId(), userToSend.getId());
+		
 		//send reply
 		secureChannel.sendMessage(new NetworkMessage(msgToSend, header));
 	}

@@ -53,7 +53,7 @@ public class StaticSecureChannel implements AsyncServerDelegate {
 		buf.rewind();
 		PublicHeader header = new PublicHeader(buf);
 		Log.i("DEBUG", Data.tag+"try create new network message");
-		NetworkMessage netMessage = new NetworkMessage("", header);
+		NetworkMessage netMessage = new NetworkMessage(new byte[0], header);
 		delegate.onMessageReceived(netMessage);
 		Log.i("DEBUG", Data.tag+"return onReceive");
 	}

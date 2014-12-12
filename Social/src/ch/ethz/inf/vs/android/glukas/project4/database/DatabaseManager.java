@@ -1,7 +1,5 @@
 package ch.ethz.inf.vs.android.glukas.project4.database;
 
-import java.io.InputStream;
-import java.net.URL;
 import java.util.Date;
 import java.util.List;
 
@@ -13,10 +11,8 @@ import ch.ethz.inf.vs.android.glukas.project4.UserCredentials;
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
 import ch.ethz.inf.vs.android.glukas.project4.Wall;
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseContract.PostsEntry;
-import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseContract.UserIdEntry;
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseContract.UsersEntry;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.DatabaseException;
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -40,64 +36,15 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 
 	// DB Metadata
 	private static final String DATABASE_NAME = "SocialDB";
-	private static final int DATABASE_VERSION = 1;
+	private static final int DATABASE_VERSION = 2;
 
-	// DDL
-
-	/**
-	 * String containing SQL code to create table users.
-	 * TODO: add integrity checks and remaining columns
-	 */
-	private static final String SQL_CREATE_USERS = Utility.CREATE_TABLE + " " + UsersEntry.TABLE_NAME + " (" 
-			// Index 0: _id
-			+ UsersEntry._ID + " " + Utility.INTEGER_TYPE + ", "
-			// Index 1: user_id
-			+ UsersEntry.USER_ID + " " + Utility.TEXT_TYPE + ", "
-			// Index 2: username
-			+ UsersEntry.USERNAME + " " + Utility.TEXT_TYPE + ", "
-			// Index 3: is_friend
-			+ UsersEntry.IS_FRIEND + " " + Utility.INTEGER_TYPE + ", "
-			// Index 4: count
-			+ UsersEntry.COUNT + " " + Utility.INTEGER_TYPE + ", "
-			// Index 5: max
-			+ UsersEntry.MAX + " " + Utility.INTEGER_TYPE + ", "
-			// Index 6: broadcast_enc_key
-			+ UsersEntry.BROADCAST_ENC_KEY + " " + Utility.BLOB_TYPE + ", "
-			// Index 7: broadcast_auth_key
-			+ UsersEntry.BROADCAST_AUTH_KEY + " " + Utility.BLOB_TYPE + ", "
-			// Primary key
-			+ Utility.PRIMARY_KEY + " (" + UsersEntry.USER_ID + ")"
-			+ ");";
-
-	/**
-	 * String containing SQL code to create table posts.
-	 * TODO: add integrity checks
-	 */
-	private static final String SQL_CREATE_POSTS = Utility.CREATE_TABLE + " " + PostsEntry.TABLE_NAME + " (" 
-			// Index 0: _id
-			+ PostsEntry._ID + " " + Utility.INTEGER_TYPE + ", "
-			// Index 1: poster_id
-			+ PostsEntry.POSTER_ID + " " + Utility.TEXT_TYPE + ", "
-			// Index 2: wall_id
-			+ PostsEntry.WALL_ID + " " + Utility.TEXT_TYPE + ", "
-			// Index 3: datetime
-			+ PostsEntry.DATE_TIME + " " + Utility.TEXT_TYPE + ", "
-			// Index 4: text
-			+ PostsEntry.TEXT + " " + Utility.TEXT_TYPE + ", "
-			// Index 5: image
-			+ PostsEntry.IMAGE + " " + Utility.BLOB_TYPE + ", "
-			// Primary key
-			+ Utility.PRIMARY_KEY + " (" + PostsEntry._ID + ", " + PostsEntry.WALL_ID + "), "
-			// Foreign key references
-			+ Utility.FOREIGN_KEY + " (" + PostsEntry.POSTER_ID + ")" + " " + Utility.REFERENCES + " " + UsersEntry.TABLE_NAME + "(" + UsersEntry.USER_ID + ") " 
-			+ Utility.ON_DELETE + " " + Utility.SET_NULL + ", "
-			+ Utility.FOREIGN_KEY + " (" + PostsEntry.WALL_ID + ")" + " " + Utility.REFERENCES + " " + UsersEntry.TABLE_NAME + "(" + UsersEntry.USER_ID + ") "
-			+ Utility.ON_DELETE + " " + Utility.CASCADE
-			+ ");";
+	//Accessors
+	PostsInterface posts;
 
 	// CREATION
 	public DatabaseManager(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
+		posts = new Posts();
 	}
 
 	@Override
@@ -105,8 +52,9 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 		// TODO: set limit constants
 		// Create tables.
 		try {
-			db.execSQL(SQL_CREATE_USERS);
-			db.execSQL(SQL_CREATE_POSTS);
+			for (DatabaseContract.CREATE_TABLE ct : DatabaseContract.CREATE_TABLE.values()) {
+				db.execSQL(ct.getCommand());
+			}
 		} catch (SQLException e) {
 			Log.e(TAG, "Failed creating tables");
 			throw new DatabaseException();
@@ -115,11 +63,16 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		// TODO: decide if needed and define upgrade policy in case it is
+		Log.d("DATABASE TESTING", "###onUpgrade");
+		for(DatabaseContract.DROP_TABLE_IF_EXIST dt : DatabaseContract.DROP_TABLE_IF_EXIST.values()) {
+			db.execSQL(dt.getCommand());
+		}
+	    onCreate(db);
 	}
 	
-	public void setStaticUserId(UserId userId) {
-		Utility.userId = userId;
+	@Override
+	public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+		onUpgrade(db, oldVersion, newVersion);
 	}
 
 	/**
@@ -236,17 +189,17 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 		return Friends.getFriend(id, this.getReadableDatabase());
 	}
 
-	// Set friend's of friends list
-	@Override
-	public void setFriendsList(UserId user, List<BasicUser> friends) {
-		Friends.setFriendsList(user, friends, this.getWritableDatabase());
-	}
-
-	// Get the list of friends of friend with id
-	@Override
-	public List<BasicUser> getFriendsList(UserId id) {
-		return Friends.getFriendsList(id, this.getReadableDatabase());
-	}
+//	// Set friend's of friends list
+//	@Override
+//	public void setFriendsList(UserId user, List<BasicUser> friends) {
+//		Friends.setFriendsList(user, friends, this.getWritableDatabase());
+//	}
+//
+//	// Get the list of friends of friend with id
+//	@Override
+//	public List<BasicUser> getFriendsList(UserId id) {
+//		return Friends.getFriendsList(id, this.getReadableDatabase());
+//	}
 
 
 	/**
@@ -255,55 +208,55 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 	// Update the wall of the user with the given post.
 	@Override
 	public void putUserPost(Post post) {
-		Posts.putUserPost(post, this.getWritableDatabase());
+		posts.putUserPost(post, this.getWritableDatabase());
 	}
 
 	// Get all the Posts in a Wall starting from id -> id or time?
 	@Override
 	public List<Post> getAllUserPostsFrom(int from) {
-		return Posts.getAllUserPostsFrom(from, this.getReadableDatabase());
+		return posts.getAllUserPostsFrom(from, this.getReadableDatabase());
 	}
 
 	// Delete a certain post from the user's wall.
 	@Override
 	public void deleteUserPost(int postid) {
-		Posts.deleteUserPost(postid, this.getWritableDatabase());
+		posts.deleteUserPost(postid, this.getWritableDatabase());
 	}
 
 	// Get a certain post from the user's wall.
 	@Override
 	public Post getUserPost(int postid) {
-		return Posts.getUserPost(postid, this.getReadableDatabase());
+		return posts.getUserPost(postid, this.getReadableDatabase());
 	}
 
 	// Update the wall of a friend whose wall is saved on our phone
 	@Override
 	public void putFriendPost(Post post, UserId friendid) {
-		Posts.putFriendPost(post, friendid, this.getWritableDatabase());
+		posts.putFriendPost(post, friendid, this.getWritableDatabase());
 	}
 
 	// Get a certain Post from a certain friend
 	@Override
 	public Post getFriendPost(int postid, UserId friendid) {
-		return Posts.getFriendPost(postid, friendid, this.getReadableDatabase());
+		return posts.getFriendPost(postid, friendid, this.getReadableDatabase());
 	}
 
 	// Get all Posts of a certain friend starting at a certain time/timestamp
 	@Override
 	public List<Post> getAllFriendPostsFrom(UserId friendid, int from) {
-		return Posts.getAllFriendPostsFrom(friendid, from, this.getReadableDatabase());
+		return posts.getAllFriendPostsFrom(friendid, from, this.getReadableDatabase());
 	}
 
 	// delete a certain Post of a certain friend
 	@Override
 	public void deleteFriendPost(int postid, UserId friendid) {
-		Posts.deleteFriendPost(postid, friendid, this.getWritableDatabase());
+		posts.deleteFriendPost(postid, friendid, this.getWritableDatabase());
 	}
 
 	// Get numberPosts older than postId
 	@Override
 	public List<Post> getSomeLatestPosts(UserId id, int numberPosts, int postId) {
-		return Posts.getSomeLatestPosts(id, numberPosts, postId, this.getReadableDatabase());
+		return posts.getSomeLatestPosts(id, numberPosts, postId, this.getReadableDatabase());
 	}
 
 
@@ -343,13 +296,13 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 	public void initializeTest(Context context) {
 		User user = new User("Alice");
 		this.putUser(user);
-		Post post = new Post(1, user.getId(), "Hello World!", null, new Date());
+		Post post = new Post(1, user.getId(), user.getId(), "Hello World!", null, new Date());
 		this.putUserPost(post);
-		post = new Post(2, user.getId(), "Amazing app!!", null, null);
+		post = new Post(2, user.getId(), user.getId(), "Amazing app!!", null, new Date());
 		this.putUserPost(post);
 		Bitmap icon = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher);
 		icon = Bitmap.createScaledBitmap(icon, 500, 500, false);
-		post = new Post(3, user.getId(), "Testing image.. and now with a much longer text to see how it breaks onto the next line and stuff..", icon, null);
+		post = new Post(3, user.getId(), user.getId(), "Testing image.. and now with a much longer text to see how it breaks onto the next line and stuff..", icon, null);
 		this.putUserPost(post);
 	}
 

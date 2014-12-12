@@ -8,7 +8,7 @@ import ch.ethz.inf.vs.android.glukas.project4.security.CryptographyParameters;
 /**
  * Represents the identity of a peer
  */
-public class UserId {
+public class UserId implements Comparable<UserId>{
 
 	private BigInteger id;
 	public static final int LENGTH = 16;
@@ -33,9 +33,26 @@ public class UserId {
 		return id;
 	}
 	
+	@Override
 	public String toString() {
 		return "userId : " + id;
 	}
+	
+	@Override
+	public int compareTo(UserId otherId) {
+		return this.id.compareTo(otherId.id);
+	}
+	
+	@Override
+	public int hashCode() {
+		return this.id.intValue();
+	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return (other instanceof UserId) && this.compareTo((UserId)other) == 0;
+	}
+	
 	
 	/**
 	 * Get a fixed size byte array representing this UserId

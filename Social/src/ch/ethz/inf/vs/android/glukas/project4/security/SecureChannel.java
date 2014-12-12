@@ -60,7 +60,8 @@ public class SecureChannel implements AsyncServerDelegate {
 	
 	/**
 	 * Asynchronously sends a public header
-	 * to the server. 
+	 * to the server.
+	 * At the moment there is no authentication/encryption between the clients and the server.
 	 * @param header
 	 */
 	public void sendHeader(PublicHeader header) {
@@ -82,7 +83,10 @@ public class SecureChannel implements AsyncServerDelegate {
 		NetworkMessage decrypted = crypto.decryptPost(message);
 		if (decrypted != null) {//For now, ignore all corrupted messages
 			//forward to delegate
-			this.secureChannelDelegate.onMessageReceived(decrypted);
+			if (this.secureChannelDelegate != null) {
+				this.secureChannelDelegate.onMessageReceived(decrypted);
+				Log.d(this.getClass().toString(), "received message, but delegate is null");
+			}
 		} else {
 			Log.e(this.getClass().toString(), "received invalid message");
 		}

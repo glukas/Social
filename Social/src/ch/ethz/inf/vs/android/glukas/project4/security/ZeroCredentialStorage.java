@@ -22,6 +22,14 @@ public class ZeroCredentialStorage implements CredentialStorage {
 	public SecretKey getBroadcastAuthenticationKey(UserId user) {
 		return auth;
 	}
+	
+	public SecretKey getPublicEncryptionKey(UserId user) {
+		return null;
+	}
+	
+	public SecretKey getPublicAuthenticationKey(UserId user) {
+		return null;
+	}
 
 	@Override
 	public UserCredentials getUserCredentials(UserId user) {

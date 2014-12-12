@@ -7,24 +7,20 @@ import ch.ethz.inf.vs.android.glukas.project4.Post.PostType;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class WallPostAdapter extends ArrayAdapter<Post> {
-	
-	private final Context mContext;
+public class WallPostAdapter extends SortedSetAdapter<Post> {
 
 	public WallPostAdapter(Context context, List<Post> objects) {
-		super(context, 0, objects);
-		mContext = context;
+		super(context, objects);
 	}
 
-	@SuppressLint("InflateParams") 
-	@Override
 	public View getView (int position, View convertView, ViewGroup parent) {
 		LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
@@ -32,14 +28,15 @@ public class WallPostAdapter extends ArrayAdapter<Post> {
 
 		View rowView = null;
 		// Inflate the views from XML
+		//TODO reuse convertView when possible
 		if (currentPost.getType() == PostType.PICTURE) {
-			rowView = inflater.inflate(R.layout.my_wall_list_row_picture, null);
+			rowView = inflater.inflate(R.layout.my_wall_list_row_picture, parent, false);
 			
 			// Load the image and set it on the ImageView
 			ImageView imageView = (ImageView) rowView.findViewById(R.id.image);
 			imageView.setImageDrawable(new BitmapDrawable(null, currentPost.getImage()));
 		} else {
-			rowView = inflater.inflate(R.layout.my_wall_list_row_text, null);
+			rowView = inflater.inflate(R.layout.my_wall_list_row_text, parent, false);
 		}
 
 		// Set the text on the TextView
@@ -48,4 +45,5 @@ public class WallPostAdapter extends ArrayAdapter<Post> {
 
 		return rowView;
 	}
+	
 }

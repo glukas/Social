@@ -1,9 +1,7 @@
 package ch.ethz.inf.vs.android.glukas.project4.database;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;

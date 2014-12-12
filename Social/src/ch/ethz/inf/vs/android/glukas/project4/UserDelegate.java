@@ -21,36 +21,5 @@ public interface UserDelegate {
 	 */
 	public void onConnectionFailed(FailureReason reason);
 	
-	/**
-	 * The connection to the server succeeded 
-	 */
-	public void onConnectionSucceeded();
-	
-	/**
-	 * The disconnection from the server failed
-	 * @param reason
-	 */
-	public void onDisconnectionFailed(FailureReason reason);
-	
-	/**
-	 * The disconnection from the server succeeded
-	 */
-	public void onDisconnectionSucceeded();
-	
-	/**
-	 * Peers in the local bluetooth network have been discovered
-	 * @param peers
-	 */
-	public void onPeersDiscoverySuccess(List<User> peers);
-	
-	/**
-	 * The friendship demand has been accepted
-	 */
-	public void onFriendshipAccepted();
-	
-	/**
-	 * The friendship demand has been declined
-	 */
-	public void onFriendshipDeclined();
 }
  
