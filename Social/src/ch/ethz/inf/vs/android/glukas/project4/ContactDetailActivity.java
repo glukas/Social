@@ -1,9 +1,12 @@
 package ch.ethz.inf.vs.android.glukas.project4;
 
+import java.util.ArrayList;
+
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseAccess;
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseManager;
 import ch.ethz.inf.vs.android.glukas.project4.networking.FriendshipRequest;
 import ch.ethz.inf.vs.android.glukas.project4.networking.FriendshipResponse;
+import ch.ethz.inf.vs.android.glukas.project4.protocol.Protocol;
 import android.app.Activity;
 import android.content.Intent;
 import android.nfc.NdefMessage;
@@ -13,21 +16,33 @@ import android.os.Parcelable;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ListView;
 import android.widget.TextView;
 
 public class ContactDetailActivity extends Activity {
 
 	public static final String USERID_EXTRA = "ch.ethz.inf.vs.android.glukas.project4.USERID_EXTRA";
 
-	TextView contactTextView;
-	FriendshipResponse response;
-	DatabaseAccess dbmanager;
+	private ListView listView;
+	private FriendshipResponse response;
+	private DatabaseAccess dbmanager;
+	private WallPostAdapter userWallAdapter;
+	private Protocol protocol;
+	private User friend;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_contact_detail);
-		this.contactTextView = (TextView) findViewById(R.id.contactTextView);
+		listView = (ListView) findViewById(R.id.listView1);
+		
 		dbmanager = new DatabaseManager(this);
+		protocol = new Protocol(dbmanager);
+		
+		userWallAdapter = new WallPostAdapter(this, new ArrayList<Post>());
+		
+		listView.setAdapter(userWallAdapter);
+		
 	}
 
 	@Override
@@ -63,12 +78,18 @@ public class ContactDetailActivity extends Activity {
 		if (id != null) {
 			UserId uid = new UserId(id);
 			Log.d(this.getClass().toString(), uid.toString());
-			User friend = this.dbmanager.getFriend(uid);
+			friend = this.dbmanager.getFriend(uid);
 			showFriend(friend);
 		} else if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction())) {
 			processIntent(getIntent());
 		}
-
+		
+		if (friend != null) {//Testing
+			for (int index = 0; index < 20; index ++) {
+				Post p = new Post(index, friend.id, friend.id, String.format("post with id : %d by %s", index, friend.username), null, null);
+				userWallAdapter.add(p);
+			}
+		}
 
 	}
 
@@ -87,16 +108,20 @@ public class ContactDetailActivity extends Activity {
 	}
 	// Save friend in database
 	private void saveFriend(FriendshipResponse response) {
+		friend = response.getSender();
 		dbmanager.putFriend(response.getSender());
 	}
 
 	private void showFriend(User friend) {
-		this.getActionBar().setTitle(friend.getUsername());
-		contactTextView.setText(friend.getUsername());
+		if (friend != null) {
+			this.getActionBar().setTitle(friend.getUsername());
+		} else {
+			displayFailure();
+		}
 	}
 
 	private void displayFailure() {
-		contactTextView.setText("Friendship request failed. Please try again");
+		this.getActionBar().setTitle("Error");
 		Log.d(this.getClass().toString(), "Friend request failed.");
 	}
 
