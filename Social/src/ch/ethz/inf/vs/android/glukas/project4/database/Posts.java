@@ -9,27 +9,25 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import ch.ethz.inf.vs.android.glukas.project4.Post;
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
-import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseContract.PostsEntry;
+import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseContract.*;
 
 /**
  * Helper class that implements all functionalities of table Posts.
  * @author alessiobaehler
  *
  */
-class Posts implements PostsInterface{
+class Posts {
 	
 	////
 	//Deletions
 	////
-	@Override
-	public void deleteUserPost(int postid, SQLiteDatabase db) {
+	public static void deleteUserPost(int postid, SQLiteDatabase db) {
 		deleteFriendPost(postid, Utility.userId, db);
 	}
 	
-	@Override
-	public void deleteFriendPost(int postid, UserId friendid, SQLiteDatabase db) {
+	public static void deleteFriendPost(int postid, UserId friendid, SQLiteDatabase db) {
 		// SQL WHERE clause.
-		String selection = Definitions.SELECTIONS.POST_BY_ID_AND_WALL.getCommand();
+		String selection =  DatabaseContract.SELECTIONS.POST_BY_ID_AND_WALL.getCommand();;
 		
 		// Arguments for selection.
 		String[] selectionArgs = {Integer.toString(postid), Utility.toSQLiteId(friendid)};
@@ -42,30 +40,31 @@ class Posts implements PostsInterface{
 	// Insertions
 	////
 
-	@Override
-	public void putUserPost(Post post, SQLiteDatabase db) {
-		// Avoid code duplication by calling this function.
-		// Get data.
-		int id = post.getId();
-		UserId poster = post.getPoster();
-		String text = post.getText();
-		Bitmap image = post.getImage();
-		Date datetime = post.getDateTime();
-		
-		// Create content to insert.
-		ContentValues values = new ContentValues();
-		values.put(PostsEntry._ID, id);
-		values.put(PostsEntry.POSTER_ID, Utility.toSQLiteId(poster));
-		if(text != null)
-			values.put(PostsEntry.TEXT, text);
-		if(image != null)
-			values.put(PostsEntry.IMAGE, Utility.toByteArray(image));
-		values.put(PostsEntry.WALL_ID, Utility.toSQLiteId(Utility.userId));
-		if(datetime != null)
-			values.put(PostsEntry.DATE_TIME, Utility.toSQLiteDate(datetime));
-		
-		// Insert content.
-		db.insert(PostsEntry.TABLE_NAME, null, values);
+	public static void putUserPost(Post post, SQLiteDatabase db) {
+		putFriendPost(post, Utility.userId, db);
+//		// Get data.
+//		int id = post.getId();
+//		UserId poster = post.getPoster();
+//		String text = post.getText();
+//		Bitmap image = post.getImage();
+//		String link = post.getImageLink();
+//		Date datetime = post.getDateTime();
+//		
+//		// Create content to insert.
+//		ContentValues values = new ContentValues();
+//		values.put(PostsEntry._ID, id);
+//		values.put(PostsEntry.POSTER_ID, Utility.toSQLiteId(poster));
+//		if(text != null)
+//			values.put(PostsEntry.TEXT, text);
+//		if(image != null)
+//			values.put(PostsEntry.IMAGE, Utility.toByteArray(image));
+//		values.put(PostsEntry.IMAGE_LINK, link);
+//		values.put(PostsEntry.WALL_ID, Utility.toSQLiteId(Utility.userId));
+//		if(datetime != null)
+//			values.put(PostsEntry.DATE_TIME, Utility.toSQLiteDate(datetime));
+//		
+//		// Insert content.
+//		db.insert(PostsEntry.TABLE_NAME, null, values);
 	}
 	
 //<<<<<<< HEAD
@@ -104,14 +103,14 @@ class Posts implements PostsInterface{
 //	 */
 //	public static void putFriendPost(Post post, UserId friendid, SQLiteDatabase db) {
 //=======
-//	@Override
-	public void putFriendPost(Post post, UserId friendid, SQLiteDatabase db) {
-//>>>>>>> branch 'master' of https://github.com/glukas/Social
+	
+	public static void putFriendPost(Post post, UserId friendid, SQLiteDatabase db) {
 		// Get data.
 		int id = post.getId();
 		UserId poster = post.getPoster();
 		String text = post.getText();
 		Bitmap image = post.getImage();
+		String link = post.getImageLink();
 		Date datetime = post.getDateTime();
 		
 		// Create content to insert.
@@ -123,7 +122,6 @@ class Posts implements PostsInterface{
 			values.put(PostsEntry.TEXT, text);
 		if(image != null)
 			values.put(PostsEntry.IMAGE, Utility.toByteArray(image));
-		
 		if(datetime != null)
 			values.put(PostsEntry.DATE_TIME, Utility.toSQLiteDate(datetime));
 		
@@ -136,19 +134,19 @@ class Posts implements PostsInterface{
 	////
 	
 	// Get all the Posts in a Wall with from as least id
-	public List<Post> getAllUserPostsFrom(int from, SQLiteDatabase db) {
+	public static List<Post> getAllUserPostsFrom(int from, SQLiteDatabase db) {
 		// Avoid code duplication by calling this function.
 		return getAllFriendPostsFrom(Utility.userId, from, db);
 	}
 	
-	@Override
-	public Post getUserPost(int postid, SQLiteDatabase db) {
+
+	public static Post getUserPost(int postid, SQLiteDatabase db) {
 		// Avoid code duplication by calling this function.
 		return getFriendPost(postid, Utility.userId, db);
 	}
 	
-	@Override
-	public Post getFriendPost(int postid, UserId friendid, SQLiteDatabase db) {
+
+	public static Post getFriendPost(int postid, UserId friendid, SQLiteDatabase db) {
 		// Columns to project.
 		String[] projection = {	PostsEntry._ID,
 								PostsEntry.POSTER_ID, 
@@ -158,7 +156,7 @@ class Posts implements PostsInterface{
 								PostsEntry.DATE_TIME};
 		
 		// SQL WHERE clause.
-		String selection = Definitions.SELECTIONS.POST_BY_ID_AND_WALL.getCommand();
+		String selection = DatabaseContract.SELECTIONS.POST_BY_ID_AND_WALL.getCommand();
 		
 		// Arguments for selection.
 		String[] selectionArgs = {Integer.toString(postid), Utility.toSQLiteId(friendid)};
@@ -181,10 +179,14 @@ class Posts implements PostsInterface{
 		}	
 	}
 	
-	@Override
-	public List<Post> getAllFriendPostsFrom(UserId friendid, int from, SQLiteDatabase db) {
+	public static List<Post> getAllFriendPostsFrom(UserId friendid, int from, SQLiteDatabase db) {
 		// SQL SELECT clause.
-		String[] projection = {PostsEntry._ID, PostsEntry.POSTER_ID, PostsEntry.TEXT, PostsEntry.IMAGE, PostsEntry.DATE_TIME};
+		String[] projection = { PostsEntry._ID, 
+								PostsEntry.POSTER_ID, 
+								PostsEntry.WALL_ID,
+								PostsEntry.TEXT, 
+								PostsEntry.IMAGE, 
+								PostsEntry.DATE_TIME};
 		
 		// SQL WHERE clause.
 		String selection = PostsEntry.WALL_ID + " == ? AND " + PostsEntry.DATE_TIME + " > ?";

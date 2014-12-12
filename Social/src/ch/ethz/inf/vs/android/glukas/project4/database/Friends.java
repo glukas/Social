@@ -2,6 +2,7 @@ package ch.ethz.inf.vs.android.glukas.project4.database;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -65,11 +66,6 @@ class Friends {
 		}
 	}
 	
-	// TODO: Create a friendship relation between two users.
-	public static void putFriendFriendship(UserId id, String username, SQLiteDatabase db) {
-		
-	}
-	
 	// Get an user name from an user id
 	public static String getFriendUsername(UserId id, SQLiteDatabase db) {
 		// SQL SELECT clause
@@ -127,7 +123,22 @@ class Friends {
 	 * @param db
 	 */
 	public static void putFriend(User user, SQLiteDatabase db) {
-		Users.putUser(user, db);
+		// Get data.
+		UserId id = user.getId();
+		String username = user.getUsername();
+		byte[] encryption_key = user.getCredentials().broadcastEncryptionKey;
+		byte[] authentication_key = user.getCredentials().broadcastAuthenticationKey;
+		
+		// Create content to insert.
+		ContentValues values = new ContentValues();
+		values.put(UsersEntry.USER_ID, Utility.toSQLiteId(id));
+		values.put(UsersEntry.USERNAME, username);
+		values.put(UsersEntry.IS_FRIEND, "1");
+		values.put(UsersEntry.BROADCAST_ENC_KEY, encryption_key);
+		values.put(UsersEntry.BROADCAST_AUTH_KEY, authentication_key);
+
+		// Insert content.
+		db.insert(UsersEntry.TABLE_NAME, null, values);
 	}
 	
 	/**

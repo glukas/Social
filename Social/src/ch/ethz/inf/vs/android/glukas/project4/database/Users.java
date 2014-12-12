@@ -91,8 +91,9 @@ class Users {
 		
 		// Get and return result.
 		if(cursor.moveToFirst()) {
+			int count = cursor.getInt(0);
 			cursor.close();
-			return cursor.getInt(0);
+			return count;
 		} else {
 			cursor.close();
 			return -1;
@@ -156,7 +157,8 @@ class Users {
 		// Arguments for selection.
 		String[] selectionArgs = {"0"};
 		
-		db.update(UsersEntry.TABLE_NAME, values, selection, selectionArgs);	}
+		db.update(UsersEntry.TABLE_NAME, values, selection, selectionArgs);	
+	}
 	
 	public static void updateUserMaxPostsId(int newMax, SQLiteDatabase db) {
 		// Create updated content.

@@ -32,7 +32,12 @@ class Walls {
 	// Get the whole Wall of a certain friend.
 	public static Wall getFriendWall(UserId friendid, SQLiteDatabase db) {
 		// SQL SELECT clause
-		String[] projection = {PostsEntry._ID, PostsEntry.POSTER_ID, PostsEntry.TEXT, PostsEntry.IMAGE, PostsEntry.DATE_TIME};
+		String[] projection = {	PostsEntry._ID, 
+								PostsEntry.POSTER_ID, 
+								PostsEntry.WALL_ID,
+								PostsEntry.TEXT, 
+								PostsEntry.IMAGE, 
+								PostsEntry.DATE_TIME};
 		// SQL WHERE clause
 		String selection = PostsEntry.WALL_ID + " == ?";
 		

@@ -69,6 +69,46 @@ public final class DatabaseContract {
 		}
 	}
 	
+	/**
+	 * Enumerate all selections query made by the database
+	 */
+	public enum SELECTIONS {
+		
+		POST_BY_ID_AND_WALL( PostsEntry._ID + " == ? AND " + PostsEntry.POSTER_ID + " == ?");
+		
+		private String command;
+		
+		SELECTIONS(String s){
+			command = s;
+		}
+		
+		public String getCommand() {
+			return command;
+		}
+	}
+	
+	/**
+	 * Enumerate all projections query made by the database
+	 */
+//	public enum PROJECTIONS {
+//		
+//		POST_DATA(	PostsEntry._ID,
+//					PostsEntry.POSTER_ID, 
+//					PostsEntry.WALL_ID,
+//					PostsEntry.TEXT,
+//					PostsEntry.IMAGE,
+//					PostsEntry.DATE_TIME );
+//		
+//		private String command;
+//		
+//		PROJECTIONS(String id, String id){
+//			command = s;
+//		}
+//		
+//		public String getCommand() {
+//			return command;
+//		}
+//	}
 	
 	// Structure of table users.
 	public static abstract class UsersEntry implements BaseColumns {
@@ -95,12 +135,4 @@ public final class DatabaseContract {
 		public static final String DATE_TIME = "date_time";
 		public static final String POSTER_ID = "poster_id";
 	}
-	
-	// Structure of table appowner
-	public static abstract class AppOwnerEntry implements BaseColumns {
-		public static final String TABLE_NAME = "appowner";
-		public static final String USER_ID = "user_id";
-	}
-	
-
 }

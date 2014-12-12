@@ -15,7 +15,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 
-class Utility {
+public class Utility {
 	
 	// Implementation constants.
 	// TODO: think about making them dynamic
@@ -62,9 +62,8 @@ class Utility {
 	 * @return Java Date object
 	 */
 	public static final Date toJavaDate(String sqlDate) {
-		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		try {
-			return format.parse(sqlDate);
+			return dateFormatter.parse(sqlDate);
 		}
 		catch(ParseException e) {
 			return null;

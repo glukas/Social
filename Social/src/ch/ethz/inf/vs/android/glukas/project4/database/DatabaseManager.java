@@ -44,7 +44,6 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 	// CREATION
 	public DatabaseManager(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
-		posts = new Posts();
 	}
 
 	@Override
@@ -304,6 +303,24 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 		icon = Bitmap.createScaledBitmap(icon, 500, 500, false);
 		post = new Post(3, user.getId(), user.getId(), "Testing image.. and now with a much longer text to see how it breaks onto the next line and stuff..", icon, null);
 		this.putUserPost(post);
+	}
+	
+	// Empty all the tables
+	public void resetDB(Context context) {
+		String selection = "*";
+		
+		String[] selectionArgs = {};
+		
+		this.getReadableDatabase().delete(UsersEntry.TABLE_NAME, selection, selectionArgs);
+	}
+	
+	// Delete any previously inserted user
+	public void deleteUsers() {
+		String selection = UsersEntry.IS_FRIEND + " == ?";
+		
+		String[] selectionArgs = {"0"};
+		
+		this.getReadableDatabase().delete(UsersEntry.TABLE_NAME, selection, selectionArgs);
 	}
 
 	// return a list of all user in the DB
