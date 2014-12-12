@@ -1,6 +1,8 @@
 package ch.ethz.inf.vs.android.glukas.project4.database;
 
+import java.util.Date;
 import java.util.List;
+
 import ch.ethz.inf.vs.android.glukas.project4.BasicUser;
 import ch.ethz.inf.vs.android.glukas.project4.Post;
 import ch.ethz.inf.vs.android.glukas.project4.R;
@@ -8,8 +10,12 @@ import ch.ethz.inf.vs.android.glukas.project4.User;
 import ch.ethz.inf.vs.android.glukas.project4.UserCredentials;
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
 import ch.ethz.inf.vs.android.glukas.project4.Wall;
+import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseContract.PostsEntry;
+import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseContract.UsersEntry;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.DatabaseException;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.*;
 import android.graphics.Bitmap;
@@ -30,15 +36,14 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 
 	// DB Metadata
 	private static final String DATABASE_NAME = "SocialDB";
-	private static final int DATABASE_VERSION = 1;
-	
+	private static final int DATABASE_VERSION = 2;
+
 	//Accessors
 	PostsInterface posts;
 
 	// CREATION
 	public DatabaseManager(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
-		posts = new Posts();
 	}
 
 	@Override
@@ -46,7 +51,7 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 		// TODO: set limit constants
 		// Create tables.
 		try {
-			for (Definitions.CREATE_TABLE ct : Definitions.CREATE_TABLE.values()) {
+			for (DatabaseContract.CREATE_TABLE ct : DatabaseContract.CREATE_TABLE.values()) {
 				db.execSQL(ct.getCommand());
 			}
 		} catch (SQLException e) {
@@ -58,7 +63,7 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		Log.d("DATABASE TESTING", "###onUpgrade");
-		for(Definitions.DROP_TABLE_IF_EXIST dt : Definitions.DROP_TABLE_IF_EXIST.values()) {
+		for(DatabaseContract.DROP_TABLE_IF_EXIST dt : DatabaseContract.DROP_TABLE_IF_EXIST.values()) {
 			db.execSQL(dt.getCommand());
 		}
 	    onCreate(db);
@@ -183,17 +188,17 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 		return Friends.getFriend(id, this.getReadableDatabase());
 	}
 
-	// Set friend's of friends list
-	@Override
-	public void setFriendsList(UserId user, List<BasicUser> friends) {
-		Friends.setFriendsList(user, friends, this.getWritableDatabase());
-	}
-
-	// Get the list of friends of friend with id
-	@Override
-	public List<BasicUser> getFriendsList(UserId id) {
-		return Friends.getFriendsList(id, this.getReadableDatabase());
-	}
+//	// Set friend's of friends list
+//	@Override
+//	public void setFriendsList(UserId user, List<BasicUser> friends) {
+//		Friends.setFriendsList(user, friends, this.getWritableDatabase());
+//	}
+//
+//	// Get the list of friends of friend with id
+//	@Override
+//	public List<BasicUser> getFriendsList(UserId id) {
+//		return Friends.getFriendsList(id, this.getReadableDatabase());
+//	}
 
 
 	/**
@@ -290,19 +295,56 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 	public void initializeTest(Context context) {
 		User user = new User("Alice");
 		this.putUser(user);
-		Post post = new Post(1, user.getId(), user.getId(), "Hello World!", null, null);
+		Post post = new Post(1, user.getId(), user.getId(), "Hello World!", null, new Date());
 		this.putUserPost(post);
-		post = new Post(2, user.getId(), user.getId(), "Amazing app!!", null, null);
+		post = new Post(2, user.getId(), user.getId(), "Amazing app!!", null, new Date());
 		this.putUserPost(post);
 		Bitmap icon = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher);
 		icon = Bitmap.createScaledBitmap(icon, 500, 500, false);
 		post = new Post(3, user.getId(), user.getId(), "Testing image.. and now with a much longer text to see how it breaks onto the next line and stuff..", icon, null);
 		this.putUserPost(post);
 	}
+	
+	// Empty all the tables
+	public void resetDB(Context context) {
+		String selection = "*";
+		
+		String[] selectionArgs = {};
+		
+		this.getReadableDatabase().delete(UsersEntry.TABLE_NAME, selection, selectionArgs);
+	}
+	
+	// Delete any previously inserted user
+	public void deleteUsers() {
+		String selection = UsersEntry.IS_FRIEND + " == ?";
+		
+		String[] selectionArgs = {"0"};
+		
+		this.getReadableDatabase().delete(UsersEntry.TABLE_NAME, selection, selectionArgs);
+	}
 
 	// return a list of all user in the DB
 	public List<BasicUser> getAllUser() {
-		//		String selection = 
+
+		String[] projection = {};
+		
+		String selection = null;
+		
+		String[] selectionArgs = {};
+		
+		String orderBy = UsersEntry.USERNAME + " DESC";
+		
+		SQLiteDatabase db = this.getReadableDatabase();
+		
+		Cursor cursor = db.query(UsersEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, orderBy);
+		
+		if(cursor.moveToFirst()) {
+			while(!cursor.isAfterLast()) {
+				// TODO: implement checks for basic users
+				
+			}
+		}
+		
 		return null;
 	}
 

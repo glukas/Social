@@ -84,17 +84,17 @@ public class StaticDatabase implements DatabaseAccess {
 		
 	}
 
-	@Override
-	public void setFriendsList(UserId user, List<BasicUser> friends) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public List<BasicUser> getFriendsList(UserId id) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+//	@Override
+//	public void setFriendsList(UserId user, List<BasicUser> friends) {
+//		// TODO Auto-generated method stub
+//		
+//	}
+//
+//	@Override
+//	public List<BasicUser> getFriendsList(UserId id) {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
 
 	@Override
 	public String getFriendUsername(UserId id) {

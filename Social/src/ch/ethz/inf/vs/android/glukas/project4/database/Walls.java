@@ -21,18 +21,23 @@ class Walls {
 
 	// Get the whole wall of the user.
 	public static Wall getUserWall(SQLiteDatabase db) {
-		return getFriendWall(Utility.userID, db);
+		return getFriendWall(Utility.userId, db);
 	}
 	
 	// Delete user's wall.
 	public static void deleteUserWall(SQLiteDatabase db) {
-		deleteFriendWall(Utility.userID, db);
+		deleteFriendWall(Utility.userId, db);
 	}
 	
 	// Get the whole Wall of a certain friend.
 	public static Wall getFriendWall(UserId friendid, SQLiteDatabase db) {
 		// SQL SELECT clause
-		String[] projection = {PostsEntry._ID, PostsEntry.POSTER_ID, PostsEntry.TEXT, PostsEntry.IMAGE, PostsEntry.DATE_TIME};
+		String[] projection = {	PostsEntry._ID, 
+								PostsEntry.POSTER_ID, 
+								PostsEntry.WALL_ID,
+								PostsEntry.TEXT, 
+								PostsEntry.IMAGE, 
+								PostsEntry.DATE_TIME};
 		// SQL WHERE clause
 		String selection = PostsEntry.WALL_ID + " == ?";
 		

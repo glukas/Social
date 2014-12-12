@@ -81,9 +81,11 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 		return database.getFriendMaxPostsId(userId)+1;
 	}
 	
+	// FIXME: this method is not needed anymore
 	@Override
 	public List<BasicUser> getFriendsList(UserId userId) {
-		return database.getFriendsList(userId);
+//		return database.getFriendsList(userId);
+		return null;
 	}
 	
 	@Override
