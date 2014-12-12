@@ -17,6 +17,8 @@ import android.widget.TextView;
 
 public class ContactDetailActivity extends Activity {
 
+	public static final String USERID_EXTRA = "ch.ethz.inf.vs.android.glukas.project4.USERID_EXTRA";
+
 	TextView contactTextView;
 	FriendshipResponse response;
 	DatabaseAccess dbmanager;
@@ -46,49 +48,62 @@ public class ContactDetailActivity extends Activity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
-	
-	 @Override
-	    public void onNewIntent(Intent intent) {
-	        // onResume gets called after this to handle the intent
-	        setIntent(intent);
-	    }
-		
-		@Override
-		protected void onResume() {
-			super.onResume();
-	        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction())) {
-	        	processIntent(getIntent());
-	        }
-		}
-		
-		private void processIntent(Intent intent) {
-			Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
-	        // only one message sent during the beam
-	        NdefMessage msg = (NdefMessage) rawMsgs[0];
-	        response = new FriendshipResponse(msg);
-	        if (response.isMatching(FriendshipRequest.getCurrentRequest())) {
-	        	saveFriend(response);
-	        	displayRequest(response);
-	        } else {
-	        	displayFailure();
-	        }
-	        
-		}
-		// Save friend in database
-		private void saveFriend(FriendshipResponse response) {
 
-			dbmanager.putFriend(response.getSender());
+	@Override
+	public void onNewIntent(Intent intent) {
+		// onResume gets called after this to handle the intent
+		setIntent(intent);
+	}
 
+	@Override
+	protected void onResume() {
+		super.onResume();
+
+		byte[] id = this.getIntent().getByteArrayExtra(USERID_EXTRA);
+		if (id != null) {
+			UserId uid = new UserId(id);
+			Log.d(this.getClass().toString(), uid.toString());
+			User friend = this.dbmanager.getFriend(uid);
+			showFriend(friend);
+		} else if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction())) {
+			processIntent(getIntent());
 		}
 
-		private void displayFailure() {
-			contactTextView.setText("Friendship request failed. Please try again");
-	    	Log.d(this.getClass().toString(), "Friend request failed.");
+
+	}
+
+	private void processIntent(Intent intent) {
+		Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
+		// only one message sent during the beam
+		NdefMessage msg = (NdefMessage) rawMsgs[0];
+		response = new FriendshipResponse(msg);
+		if (response.isMatching(FriendshipRequest.getCurrentRequest())) {
+			saveFriend(response);
+			displayRequest(response);
+		} else {
+			displayFailure();
 		}
 
-		private void displayRequest(FriendshipResponse response) {
-			// TODO (Samuel) could be nicer
-			contactTextView.setText(response.getSender().getUsername());
-	    	Log.d(this.getClass().toString(), "Friend request accepted : " + response.getSender().getUsername() + " id " + response.getSender().getId());
-		}
+	}
+	// Save friend in database
+	private void saveFriend(FriendshipResponse response) {
+		dbmanager.putFriend(response.getSender());
+	}
+
+	private void showFriend(User friend) {
+		this.getActionBar().setTitle(friend.getUsername());
+		contactTextView.setText(friend.getUsername());
+	}
+
+	private void displayFailure() {
+		contactTextView.setText("Friendship request failed. Please try again");
+		Log.d(this.getClass().toString(), "Friend request failed.");
+	}
+
+	private void displayRequest(FriendshipResponse response) {
+		// TODO (Samuel) could be nicer
+		showFriend(response.getSender());
+
+		Log.d(this.getClass().toString(), "Friend request accepted : " + response.getSender().getUsername() + " id " + response.getSender().getId());
+	}
 }
