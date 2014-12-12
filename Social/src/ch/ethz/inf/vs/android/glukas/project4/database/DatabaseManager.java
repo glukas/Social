@@ -185,19 +185,6 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 		return Friends.getFriend(id, this.getReadableDatabase());
 	}
 
-//	// Set friend's of friends list
-//	@Override
-//	public void setFriendsList(UserId user, List<BasicUser> friends) {
-//		Friends.setFriendsList(user, friends, this.getWritableDatabase());
-//	}
-//
-//	// Get the list of friends of friend with id
-//	@Override
-//	public List<BasicUser> getFriendsList(UserId id) {
-//		return Friends.getFriendsList(id, this.getReadableDatabase());
-//	}
-
-
 	/**
 	 * POSTS MANAGEMENT
 	 */
@@ -309,6 +296,7 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 		String[] selectionArgs = null;
 		
 		this.getReadableDatabase().delete(UsersEntry.TABLE_NAME, selection, selectionArgs);
+		this.getReadableDatabase().delete(PostsEntry.TABLE_NAME, selection, selectionArgs);
 	}
 	
 	// Delete any previously inserted user

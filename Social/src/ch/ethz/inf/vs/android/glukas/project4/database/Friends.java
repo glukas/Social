@@ -80,8 +80,9 @@ class Friends {
 		
 		// Get and return result.
 		if(cursor.moveToFirst()) {
+			String username = cursor.getString(0);
 			cursor.close();
-			return cursor.getString(0);
+			return username;
 		} else {
 			cursor.close();
 			return null;
@@ -147,19 +148,6 @@ class Friends {
 	 * @param db
 	 */
 	public static void deleteFriend(UserId id, SQLiteDatabase db) {
-		// Not needed anymore because of ON DELETE CASCADE in users table !?
-//		// Delete posts
-//		Walls.deleteFriendWall(id, db);
-//		
-//		// SQL WHERE clause.
-//		String selection = FriendsEntry.USER_ID + " == ? AND " + FriendsEntry.FRIEND_ID + " == ?";
-//
-//		// Arguments for selection.
-//		String[] selectionArgs1 = {Utility.toSQLiteId(Utility.userID), Utility.toSQLiteId(id)};
-//		
-//		// Delete friendship
-//		db.delete(FriendsEntry.TABLE_NAME, selection, selectionArgs1);
-		
 
 		String selection = UsersEntry.USER_ID + " == ? AND " + UsersEntry.IS_FRIEND + " == ?";
 		String[] selectionArgs = {Utility.toSQLiteId(id), "1"};
@@ -224,56 +212,4 @@ class Friends {
 		
 		db.update(UsersEntry.TABLE_NAME, values, selection, selectionArgs);
 	}
-	
-	// Shouldn't be needed anymore
-//	public static void setFriendsList(UserId id, List<BasicUser> friends, SQLiteDatabase db) {
-//		// check who is already in
-//		List<BasicUser> oldFriends = getFriendsList(id, db);
-//		
-//		// Get list with new friends
-//		List<BasicUser> toAdd = friends;
-//		toAdd.removeAll(oldFriends);
-//		
-//		// Get list with ex-friends
-//		List<BasicUser> toDelete = oldFriends;
-//		toDelete.removeAll(friends);
-//
-//		// delete missing
-//		for(BasicUser bu : toDelete) {
-//			deleteFriend(bu.getId(), db);
-//		}
-//		// add new
-//		for(BasicUser bu : toDelete) {
-////			addFriend(bu.getId(), db);
-//		}
-//	}
-	
-	// Shouldn't be needed anymore
-//	// FIXME: Get the friends of friends list
-//	public static List<BasicUser> getFriendsList(UserId id, SQLiteDatabase db) {
-//		//
-////		String query = "SELECT " + UsersEntry.USERNAME + ", " + FriendsEntry.FRIEND_ID + " FROM " + UsersEntry.TABLE_NAME + " INNER JOIN " + FriendsEntry.TABLE_NAME
-////						+ " ON " + FriendsEntry.USER_ID + " == ?";
-////		String query = "SELECT * FROM " + UsersEntry.TABLE_NAME + " u INNER JOIN " + FriendsEntry.TABLE_NAME
-////				+ " f ON f." + FriendsEntry.USER_ID + " == ?";
-//		String query = "SELECT * FROM " + FriendsEntry.TABLE_NAME
-//				+ " WHERE " + FriendsEntry.USER_ID + " == ?";
-//		//
-//		String[] selectionArgs = {};
-//		
-//		Cursor cursor = db.query(FriendsEntry.TABLE_NAME, null, null, selectionArgs, null, null, null); //db.rawQuery(query, selectionArgs);
-//		
-//		List<BasicUser> friends = new ArrayList<BasicUser>();
-//		if(cursor.moveToFirst()) {
-//			while(!cursor.isAfterLast()) {
-//				String username = cursor.getString(0);
-//				UserId friendid = new UserId(cursor.getString(1));
-//				friends.add(new BasicUser(friendid, username));
-//			}
-//			return friends;
-//		} else {
-//			cursor.close();
-//			return null;
-//		}
-//	}
 }

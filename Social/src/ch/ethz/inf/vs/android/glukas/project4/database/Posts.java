@@ -42,29 +42,6 @@ class Posts {
 
 	public static void putUserPost(Post post, SQLiteDatabase db) {
 		putFriendPost(post, Utility.userId, db);
-//		// Get data.
-//		int id = post.getId();
-//		UserId poster = post.getPoster();
-//		String text = post.getText();
-//		Bitmap image = post.getImage();
-//		String link = post.getImageLink();
-//		Date datetime = post.getDateTime();
-//		
-//		// Create content to insert.
-//		ContentValues values = new ContentValues();
-//		values.put(PostsEntry._ID, id);
-//		values.put(PostsEntry.POSTER_ID, Utility.toSQLiteId(poster));
-//		if(text != null)
-//			values.put(PostsEntry.TEXT, text);
-//		if(image != null)
-//			values.put(PostsEntry.IMAGE, Utility.toByteArray(image));
-//		values.put(PostsEntry.IMAGE_LINK, link);
-//		values.put(PostsEntry.WALL_ID, Utility.toSQLiteId(Utility.userId));
-//		if(datetime != null)
-//			values.put(PostsEntry.DATE_TIME, Utility.toSQLiteDate(datetime));
-//		
-//		// Insert content.
-//		db.insert(PostsEntry.TABLE_NAME, null, values);
 	}
 	
 //<<<<<<< HEAD
