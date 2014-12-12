@@ -5,12 +5,29 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class Main {
+	
+	private static Thread serverThread;
+	private static Thread monitorThread;
+	
+	private static Server server;
+	private static Monitor monitor;
+	
+	private static final int PORT = 9000;
+	
 
 	public static void main(String[] args) {
-		//ThreadPoolServer server = new ThreadPoolServer(9000);
-		Server server = new Server(null, 9000);
+		//Output
 		System.out.println("Starting Server");
-		new Thread(server).start();
+		
+		// Start the server thread
+		server = new Server(null, PORT);
+		serverThread = new Thread(server);
+		serverThread.start();
+		
+		//Start the monitor thread
+		monitor = new Monitor(server, serverThread, true);
+		monitorThread = new Thread(monitor);
+		monitorThread.start();
 		
 		
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
@@ -25,11 +42,16 @@ public class Main {
 			}
         }
         
-		
-		System.out.println("Stopping Server");
-		server.stop();
-		System.out.println("Server stopped");
-		System.exit(0);
+		//Kill server
+        System.out.println("Stopping Server");
+        try {
+        	monitor.stop();
+        	monitorThread.join(5000);
+        } catch (InterruptedException e) {
+        	e.printStackTrace();
+        }
+        System.out.println("Server stopped");
+        System.exit(0);
 	}
 
 }

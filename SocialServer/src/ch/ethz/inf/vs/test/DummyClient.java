@@ -26,7 +26,7 @@ public class DummyClient implements Runnable {
 		this.port = port;
 		this.clientId = id;
 		this.clients = clients;
-		this.comm = new TCPCommunicator("winti.mooo.com", this.port);
+		this.comm = new TCPCommunicator("localhost", this.port);
 		this.me = new UserId(Integer.toString(clientId));
 		this.server = new UserId("0");
 		running = true;

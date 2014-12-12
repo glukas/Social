@@ -39,7 +39,7 @@ public class Server implements Runnable {
 	private ConnectionWorker worker;
 	
 	//Indicates whether server is running
-	protected boolean isStopped    = false;
+	protected volatile boolean isStopped    = false;
 
 	public Server(InetAddress hostAddress, int port){
 		try{

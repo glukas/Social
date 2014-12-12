@@ -95,5 +95,12 @@ public final class DatabaseContract {
 		public static final String DATE_TIME = "date_time";
 		public static final String POSTER_ID = "poster_id";
 	}
+	
+	// Structure of table appowner
+	public static abstract class AppOwnerEntry implements BaseColumns {
+		public static final String TABLE_NAME = "appowner";
+		public static final String USER_ID = "user_id";
+	}
+	
 
 }
