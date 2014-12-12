@@ -197,6 +197,7 @@ class Users {
 				byte[] auth_key = cursor.getBlob(5);
 				UserCredentials credentials = new UserCredentials(id, enc_key, auth_key);
 				friends.add(new User(id, username, credentials)); // TODO: posts count?
+				cursor.moveToNext();
 			}
 			cursor.close();
 			return friends;

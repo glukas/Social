@@ -110,7 +110,6 @@ class Posts {
 		UserId poster = post.getPoster();
 		String text = post.getText();
 		Bitmap image = post.getImage();
-		String link = post.getImageLink();
 		Date datetime = post.getDateTime();
 		
 		// Create content to insert.
@@ -222,7 +221,7 @@ class Posts {
 	}
 	
 	// Get numberPosts older than postId
-	public List<Post> getSomeLatestPosts(UserId id, int numberPosts, int postId, SQLiteDatabase db) {
+	public static List<Post> getSomeLatestPosts(UserId id, int numberPosts, int postId, SQLiteDatabase db) {
 		// Columns to project.
 		String[] projection = {	PostsEntry._ID,
 								PostsEntry.POSTER_ID, 
@@ -238,7 +237,7 @@ class Posts {
 		String[] selectionArgs = {Integer.toString(postId), Utility.toSQLiteId(id)};
 		
 		// SQL ORDER BY clause.
-		String orderBy = PostsEntry._ID + " DESC";
+		String orderBy = null; //PostsEntry._ID + " DESC";
 		
 		// SQL LIMIT clause.
 		String limit = Integer.toString(numberPosts);

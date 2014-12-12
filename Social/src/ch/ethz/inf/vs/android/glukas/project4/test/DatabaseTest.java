@@ -3,6 +3,8 @@ package ch.ethz.inf.vs.android.glukas.project4.test;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.TimeZone;
 import java.lang.reflect.Method;
@@ -13,6 +15,7 @@ import org.junit.Test;
 
 import ch.ethz.inf.vs.android.glukas.project4.Post;
 import ch.ethz.inf.vs.android.glukas.project4.User;
+import ch.ethz.inf.vs.android.glukas.project4.UserCredentials;
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseAccess;
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseManager;
 import ch.ethz.inf.vs.android.glukas.project4.database.Utility;
@@ -22,65 +25,135 @@ import android.util.Log;
 
 public class DatabaseTest extends AndroidTestCase{
 	
-	// USEERS
+	// USERS
+	
+//	@Test
+//	public void testUserInsertion() {
+//		DatabaseManager db = cleanDB();
+	
+//		db.putUser(Data.alice);
+//		User user = db.getUser();
+//		assertEquals(Data.alice, user);
+//	}
+//	
+//	@Test
+//	public void testUserPostCount() {
+//		DatabaseManager db = cleanDB();
+//		
+//		db.putUser(Data.alice);
+//		
+//		int newCount = 10;
+//		db.setUserPostsCount(newCount);
+//		int returned = db.getUserPostsCount();
+//		
+//		assertEquals(newCount, returned);
+//	}
+//	
+//	@Test
+//	public void testUserMaxPost() {
+//		DatabaseManager db = cleanDB();
+//		
+//		db.putUser(Data.alice);
+//		
+//		int newMaxCount = 20;
+//		db.setUserPostsCount(newMaxCount);
+//		int returned = db.getUserPostsCount();
+//		
+//		assertEquals(newMaxCount, returned);
+//	}
 	
 	@Test
-	public void testUserInsertion() {
-		DatabaseManager db = new DatabaseManager(getTestContext());
-		String username = "MeIAndMySelf";
-		User user = new User(username);
-		// We need to clean up the db before putting a new user, because there's a single
-		// instance and thus if a user was already inserted this will likely fail
-		db.deleteUsers();
-		db.putUser(user);
-		User user2 = db.getUser();
-		boolean response = user.getUsername().equals(user2.getUsername());
-		boolean response2 = user.getId().equals(user2.getId());
-		assertTrue(response && response2);
-	}
-	
-
-	
-	// POSTS
-	
-	// FIXME
-	public void testInsertPost() {
-		DatabaseAccess db = new DatabaseManager(getTestContext());
-		Post post1 = new Post(12, Data.dummyReceiverId, Data.dummySenderId, "I'm a message", null, new Date());
-		db.putFriendPost(post1, Data.dummySenderId);
-		Post post2 = db.getFriendPost(12, Data.dummyReceiverId);
-		assertEquals(post1, post2);
-		assertEquals(post1.getText(), post2.getText());
-		//Log.d("TEST DATABASE", Data.tag+" Post 2 id : "+post2.getId()+ ", PostId : "+post2.getPoster()+ ", OwnerWallId : "+post2.getWallOwner()+", content : "+post2.getText());
-	}
-	
-	// FIXME
-	@Test
-	public void testGetSomePosts() {
-		DatabaseAccess db = new DatabaseManager(getTestContext());
-		List<Post> listPostInsert = new ArrayList<Post>();
-		Post post1 = new Post(1, Data.dummyReceiverId, Data.dummySenderId, "I'm a message1", null, new Date());
-		Post post2 = new Post(2, Data.dummyReceiverId, Data.dummySenderId, "I'm a message2", null, new Date());
-		Post post3 = new Post(3, Data.dummyReceiverId, Data.dummySenderId, "I'm a message3", null, new Date());
-		Post post4 = new Post(4, Data.dummyReceiverId, Data.dummySenderId, "I'm a message4", null, new Date());
-		listPostInsert.add(post1);
-		listPostInsert.add(post2);
-		listPostInsert.add(post3);
-		listPostInsert.add(post4);
-		db.putFriendPost(post1, Data.dummySenderId);
-		db.putFriendPost(post2, Data.dummySenderId);
-		db.putFriendPost(post3, Data.dummySenderId);
-		db.putFriendPost(post4, Data.dummySenderId);
-		List<Post> listPost = db.getSomeLatestPosts(Data.dummySenderId, 4, 4);
-		assertTrue(listPost.size() == 4);
+	public void testUserCredentials() {
+		DatabaseManager db = cleanDB();
+		
+		db.putUser(Data.alice);
+		
+		UserCredentials returned = db.getUserCredentials(Data.alice.getId());
+		byte[] temp1 = Data.alice.getCredentials().broadcastAuthenticationKey;
+		byte[] temp2 = Data.alice.getCredentials().broadcastEncryptionKey;
+		
+		assertEquals(Data.alice.getId(), returned.userId);
 		int i = 0;
-		for (Post p : listPost){
-			assertEquals(listPostInsert.get(3-i), p);
-			assertEquals(listPostInsert.get(3-i).getText(), p.getText());
-			//Log.d("", "###"+p.getText()+" "+p.getId()+ " "+p.getWallOwner());
+		for(byte elem : temp1) {
+			assertEquals(elem, returned.broadcastAuthenticationKey[i]);
+			i++;
+		}
+		i = 0;
+		for(byte elem : temp2) {
+			assertEquals(elem, returned.broadcastEncryptionKey[i]);
 			i++;
 		}
 	}
+	
+//	@Test
+//	public void testGetUserFriends() {
+//		DatabaseManager db = cleanDB();
+//		
+//		db.putUser(Data.alice);
+//		
+//		List<User> friends = new ArrayList<User>();
+//		friends.add(Data.bob);
+//		friends.add(Data.eve);
+//		
+//		for(User friend : friends)
+//			db.putFriend(friend);
+//		
+//		List<User> returned = db.getUserFriendsList();
+//		
+//		assertTrue(returned.size() == friends.size());
+//		int i = 0;
+//		for(User friend : returned) {
+//			assertEquals(friend.getId(), friends.get(i).getId());
+//			assertEquals(friend.getUsername(), friends.get(i).getUsername());
+//			i++;
+//		}
+//		
+//	}
+	
+	// POSTS
+
+//	public void testInsertFriendPost() {
+//		DatabaseManager db = cleanDB();
+//		
+//		db.putUser(Data.alice);
+//		db.putFriend(Data.bob);
+//		
+//		db.putFriendPost(Data.post2, Data.post2.getPoster());
+//		
+//		Post returned = db.getFriendPost(Data.post2.getId(), Data.post2.getPoster());
+//
+//		assertEquals(Data.post2, returned);
+////		Log.d("TEST DATABASE", Data.tag+" Post 2 id : "+post2.getId()+ ", PostId : "+post2.getPoster()+ ", OwnerWallId : "+post2.getWallOwner()+", content : "+post2.getText());
+//	}
+	
+
+//	@Test
+//	public void testGetSomePosts() {
+//		DatabaseManager db = cleanDB();
+//		
+//		db.putUser(Data.alice);
+//		db.putFriend(Data.bob);
+//		
+//		List<Post> listPostInsert = new ArrayList<Post>();		
+//		listPostInsert.add(Data.post2);
+//		listPostInsert.add(Data.post4);
+//		
+//		for(Post post : listPostInsert)
+//			db.putFriendPost(post, post.getPoster());
+//
+//		List<Post> listPost = db.getSomeLatestPosts(Data.bob.getId(), 4, 30);
+//		Collections.sort(listPost, new postIdComparator());
+//		assertTrue(listPost.size() == listPostInsert.size());
+//		
+//		int i = 0;
+//		for(Post post : listPost) {
+//			Post inserted = listPostInsert.get(i);
+//			assertEquals(post.getId(), inserted.getId());
+//			assertEquals(post.getText(), inserted.getText());
+//			assertEquals(post.getPoster(), inserted.getPoster());
+//			i++;
+//		}
+//	}
 	
 	// WALLS
 	
@@ -88,12 +161,12 @@ public class DatabaseTest extends AndroidTestCase{
 	
 	// UTILITY
 	
-	@Test
-	public void testDatetoStringConversionConversion() {
-		Date now = new Date();
-		Date now2 = Utility.toJavaDate(Utility.toSQLiteDate(now));
-		assertTrue(now.toString().equals(now2.toString()));
-	}
+//	@Test
+//	public void testDatetoStringConversionConversion() {
+//		Date now = new Date();
+//		Date now2 = Utility.toJavaDate(Utility.toSQLiteDate(now));
+//		assertTrue(now.toString().equals(now2.toString()));
+//	}
 	/**
 	 * @return The {@link Context} of the test project.
 	 */
@@ -109,5 +182,26 @@ public class DatabaseTest extends AndroidTestCase{
 	        exception.printStackTrace();
 	        return null;
 	    }
+	}
+	
+	/**
+	 * Get a db instance and cleans it
+	 * We need to clean up the db using it, because there's a single
+	 * instance and thus there could be conflicts with the previous data
+	 * e.g. putUser
+	 * @return the database instance
+	 */
+	private DatabaseManager cleanDB() {
+		DatabaseManager db = new DatabaseManager(getTestContext());
+		db.resetDB();
+		return db;
+	}
+	
+	// Assmues there aren't two posts with the same id!
+	private class postIdComparator implements Comparator<Post> {
+		@Override
+		public int compare(Post a, Post b) {
+			return a.getId() < b.getId() ? -1 : 1;
+		}
 	}
 }
