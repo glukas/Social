@@ -38,9 +38,6 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 	private static final String DATABASE_NAME = "SocialDB";
 	private static final int DATABASE_VERSION = 2;
 
-	//Accessors
-	PostsInterface posts;
-
 	// CREATION
 	public DatabaseManager(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -207,55 +204,55 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 	// Update the wall of the user with the given post.
 	@Override
 	public void putUserPost(Post post) {
-		posts.putUserPost(post, this.getWritableDatabase());
+		Posts.putUserPost(post, this.getWritableDatabase());
 	}
 
 	// Get all the Posts in a Wall starting from id -> id or time?
 	@Override
 	public List<Post> getAllUserPostsFrom(int from) {
-		return posts.getAllUserPostsFrom(from, this.getReadableDatabase());
+		return Posts.getAllUserPostsFrom(from, this.getReadableDatabase());
 	}
 
 	// Delete a certain post from the user's wall.
 	@Override
 	public void deleteUserPost(int postid) {
-		posts.deleteUserPost(postid, this.getWritableDatabase());
+		Posts.deleteUserPost(postid, this.getWritableDatabase());
 	}
 
 	// Get a certain post from the user's wall.
 	@Override
 	public Post getUserPost(int postid) {
-		return posts.getUserPost(postid, this.getReadableDatabase());
+		return Posts.getUserPost(postid, this.getReadableDatabase());
 	}
 
 	// Update the wall of a friend whose wall is saved on our phone
 	@Override
 	public void putFriendPost(Post post, UserId friendid) {
-		posts.putFriendPost(post, friendid, this.getWritableDatabase());
+		Posts.putFriendPost(post, friendid, this.getWritableDatabase());
 	}
 
 	// Get a certain Post from a certain friend
 	@Override
 	public Post getFriendPost(int postid, UserId friendid) {
-		return posts.getFriendPost(postid, friendid, this.getReadableDatabase());
+		return Posts.getFriendPost(postid, friendid, this.getReadableDatabase());
 	}
 
 	// Get all Posts of a certain friend starting at a certain time/timestamp
 	@Override
 	public List<Post> getAllFriendPostsFrom(UserId friendid, int from) {
-		return posts.getAllFriendPostsFrom(friendid, from, this.getReadableDatabase());
+		return Posts.getAllFriendPostsFrom(friendid, from, this.getReadableDatabase());
 	}
 
 	// delete a certain Post of a certain friend
 	@Override
 	public void deleteFriendPost(int postid, UserId friendid) {
-		posts.deleteFriendPost(postid, friendid, this.getWritableDatabase());
+		Posts.deleteFriendPost(postid, friendid, this.getWritableDatabase());
 	}
 
 	// Get numberPosts older than postId
 	@Override
 	public List<Post> getSomeLatestPosts(UserId id, int numberPosts, int postId) {
-		return posts.getSomeLatestPosts(id, numberPosts, postId, this.getReadableDatabase());
+		return Posts.getSomeLatestPosts(id, numberPosts, postId, this.getReadableDatabase());
 	}
 
 
@@ -306,10 +303,10 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 	}
 	
 	// Empty all the tables
-	public void resetDB(Context context) {
-		String selection = "*";
+	public void resetDB() {
+		String selection = null;
 		
-		String[] selectionArgs = {};
+		String[] selectionArgs = null;
 		
 		this.getReadableDatabase().delete(UsersEntry.TABLE_NAME, selection, selectionArgs);
 	}
@@ -345,11 +342,6 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 			}
 		}
 		
-		return null;
-	}
-
-	// return a list of all friendship tuples (username, username) in the DB
-	public List<Pair<String,String>> getAllFriendship() {
 		return null;
 	}
 
