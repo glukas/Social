@@ -1,22 +1,45 @@
-<?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?><RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
+    
+    <LinearLayout
+        android:id="@+id/bottom_write_bar"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true" >
+
+        <EditText
+            android:id="@+id/text"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_margin="5sp"
+            android:layout_weight="1"
+            android:background="@drawable/message_field"
+            android:hint="Add post"
+            android:padding="5sp"
+            android:textColor="#000" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_margin="5sp"
+            android:background="@drawable/send_button"
+            android:onClick="sendMessage"
+            android:paddingBottom="5sp"
+            android:paddingLeft="15sp"
+            android:paddingRight="15sp"
+            android:paddingTop="5sp"
+            android:text="@string/send_button"
+            android:textColor="#FFF" />
+
+    </LinearLayout>
 
     <ListView
-    android:id="@id/android:list"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_weight="1"
-    android:drawSelectorOnTop="false" />
-    
-    <TextView
-        android:id="@+id/textView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:text="My Wall ... WIP"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:id="@id/android:list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/bottom_write_bar"
+        android:layout_weight="1"
+        android:drawSelectorOnTop="false" />
 
 </RelativeLayout>
