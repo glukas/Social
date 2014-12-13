@@ -175,8 +175,8 @@ class Friends {
 			String username = cursor.getString(2);
 			int count = cursor.getInt(3);
 			int max = cursor.getInt(4);
-			byte[] enc_key = cursor.getBlob(5);
-			byte[] auth_key = cursor.getBlob(6);
+			byte[] enc_key = cursor.getBlob(6);
+			byte[] auth_key = cursor.getBlob(7);
 			UserCredentials credentials = new UserCredentials(id, enc_key, auth_key);
 			cursor.close();
 			return new User(id, username, credentials);
