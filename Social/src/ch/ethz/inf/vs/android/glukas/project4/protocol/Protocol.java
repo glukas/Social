@@ -1,6 +1,9 @@
 package ch.ethz.inf.vs.android.glukas.project4.protocol;
 
+import java.util.Date;
 import java.util.List;
+
+import android.graphics.Bitmap;
 import android.util.Log;
 import ch.ethz.inf.vs.android.glukas.project4.Post;
 import ch.ethz.inf.vs.android.glukas.project4.BasicUser;
@@ -73,19 +76,12 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 	private final String unexpectedMsg = "Unexpected message arrived : ";
 
 	////
-	// ProtocolDelegate
+	// ProtocolInterface
 	////
 	
 	@Override
 	public int getNewPostId(UserId userId) {
 		return database.getFriendMaxPostsId(userId)+1;
-	}
-	
-	// FIXME: this method is not needed anymore
-	@Override
-	public List<BasicUser> getFriendsList(UserId userId) {
-//		return database.getFriendsList(userId);
-		return null;
 	}
 	
 	@Override
@@ -113,24 +109,35 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 	public void disconnect() {
 		messageRelay.disconnect(localUser.getId());
 	}
+	
+	@Override
+	public void post(String text, Bitmap image) {
+		postLocally(new Post(database.getUserMaxPostsId()+1, localUser.getId(), localUser.getId(), text, image, new Date()));
+	}
+	
+	private void postLocally(Post post) {
+		Log.d(this.getClass().toString(), "postLocally : " + post.getText() + " , " + post.getPoster().getId() + " , " + post.getWallOwner().getId());
+		database.putPost(post);
+		int msgId = post.getId();
+		int maxNumPosts = database.getUserPostsCount()+1;
+		database.setUserMaxPostsId(msgId);
+		database.setUserPostsCount(maxNumPosts);
+		userHandler.onPostReceived(post);
+	}
 
 	@Override
 	public void postPost(Post post) throws DatabaseException {
-		//if (post.getWallOwner().equals(localUser.getId())) {
-			database.putUserPost(post);
-			/*int msgId = post.getId();
-			int maxNumPosts = database.getUserPostsCount()+1;
-			database.setUserMaxPostsId(msgId);
-			database.setUserPostsCount(maxNumPosts);*/
-			userHandler.onPostReceived(post);
-		/*
+		if (post.getWallOwner().equals(localUser.getId())) {
+			postLocally(post);
+		
 		  } else {
-			database.putFriendPost(post, post.getWallOwner());*/
+			throw new UnhandledFunctionnality();
+			//database.putFriendPost(post, post.getWallOwner());*/
 			/*Message msg = MessageFactory.newPostMessage(post, localUser, database.getFriend(post.getWallOwner()), false);
 			PublicHeader header = new PublicHeader(0, null, StatusByte.POST.getByte(), post.getId(), localUser.getId(), post.getWallOwner());
 			secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg).toString(), header));*/
 		//	userHandler.onPostReceived(post);
-	//	}
+		}
 	
 
 	}
@@ -152,13 +159,13 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 	
 	@Override
 	public void getSomeUserPosts(UserId userId, int numberPosts) {
-		int oldestPost = database.getFriendMaxPostsId(userId);
-		getSomeUserPosts(userId, numberPosts, oldestPost);
+		getSomeUserPosts(userId, numberPosts, Integer.MAX_VALUE);
 	}
 	
 	@Override
 	public void getSomeUserPosts(UserId userId, int numberPosts, int postId) {
 		//retrieve posts already in the database
+		Log.d(this.getClass().toString(), "getSomeUserPosts " + userId.toString());
 		List<Post> listPosts = database.getSomeLatestPosts(userId, numberPosts, postId);
 		
 		for (Post p : listPosts) {
@@ -169,26 +176,6 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 		//Message msg = MessageFactory.newTypeMessage(MessageType.GET_STATE);
 		//PublicHeader header = new PublicHeader(0, null, StatusByte.DATA.getByte(), 0, localUser.getId(), userId);
 		//secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg, 0).toString(), header));
-	}
-
-	@Override
-	public void askFriendship(String distUsername) {
-		//for the moment, we only use NFC
-		try {
-			throw new UnhandledFunctionnality();
-		} catch (UnhandledFunctionnality e) {
-			e.printStackTrace();
-		}
-	}
-
-	@Override
-	public void discoverFriends() {
-		//for the moment, we only use NFC
-		try {
-			throw new UnhandledFunctionnality();
-		} catch (UnhandledFunctionnality e) {
-			e.printStackTrace();
-		}
 	}
 
 	@Override
@@ -257,7 +244,7 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 		//A friend posted a post onto the wall's local user
 		int msgId = database.getFriendMaxPostsId(localUser.getId());
 		Post post = new Post(msg, msgId);
-		database.putFriendPost(post, localUser.getId());
+		database.putPost(post);
 		userHandler.onPostReceived(post);
 	}
 	
@@ -293,7 +280,7 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 	private void onSendReceived(Message msg) {
 		//A friend send a post to the local user
 		Post post = new Post(msg, msg.getPostId());
-		database.putFriendPost(post, msg.getSender().getId());
+		database.putPost(post);
 		userHandler.onPostReceived(post);
 	}
 	
@@ -353,4 +340,5 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 		//User should not be targeted by these kind of messages
 		Log.d(getClass().toString(), unexpectedMsg+msg.toString());
 	}
+
 }

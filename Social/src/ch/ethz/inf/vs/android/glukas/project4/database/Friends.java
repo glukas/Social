@@ -34,9 +34,9 @@ class Friends {
 		
 		// Get and return result.
 		if(cursor.moveToFirst()) {
-			// FIXME
+			int result = cursor.getInt(0);
 			cursor.close();
-			return cursor.getInt(0);
+			return result;
 		} else {
 			cursor.close();
 			return -1;
@@ -58,8 +58,9 @@ class Friends {
 		
 		// Get and return result.
 		if(cursor.moveToFirst()) {
+			int result = cursor.getInt(0);
 			cursor.close();
-			return cursor.getInt(0);
+			return result;
 		} else {
 			cursor.close();
 			return -1;

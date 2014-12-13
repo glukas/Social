@@ -40,8 +40,8 @@ class Posts {
 	// Insertions
 	////
 
-	public static void putUserPost(Post post, SQLiteDatabase db) {
-		putFriendPost(post, Utility.userId, db);
+	public static void putPost(Post post, SQLiteDatabase db) {
+		putFriendPost(post, db);
 	}
 	
 //<<<<<<< HEAD
@@ -81,10 +81,11 @@ class Posts {
 //	public static void putFriendPost(Post post, UserId friendid, SQLiteDatabase db) {
 //=======
 	
-	public static void putFriendPost(Post post, UserId friendid, SQLiteDatabase db) {
+	public static void putFriendPost(Post post, SQLiteDatabase db) {
 		// Get data.
 		int id = post.getId();
 		UserId poster = post.getPoster();
+		UserId wallOwner = post.getWallOwner();
 		String text = post.getText();
 		Bitmap image = post.getImage();
 		Date datetime = post.getDateTime();
@@ -93,7 +94,7 @@ class Posts {
 		ContentValues values = new ContentValues();
 		values.put(PostsEntry._ID, id);
 		values.put(PostsEntry.POSTER_ID, Utility.toSQLiteId(poster));
-		values.put(PostsEntry.WALL_ID, Utility.toSQLiteId(friendid));
+		values.put(PostsEntry.WALL_ID, Utility.toSQLiteId(wallOwner));
 		if(text != null)
 			values.put(PostsEntry.TEXT, text);
 		if(image != null)
