@@ -120,7 +120,7 @@ public class DatabaseTest extends AndroidTestCase{
 		db.putUser(Data.alice);
 		db.putFriend(Data.bob);
 		
-		db.putFriendPost(Data.post2, Data.post2.getPoster());
+		db.putPost(Data.post2);
 		
 		Post returned = db.getFriendPost(Data.post2.getId(), Data.post2.getPoster());
 
@@ -134,7 +134,7 @@ public class DatabaseTest extends AndroidTestCase{
 		
 		db.putUser(Data.alice);
 		
-		db.putUserPost(Data.post1);
+		db.putPost(Data.post1);
 		
 		db.deleteUserPost(Data.post1.getId());
 		
@@ -149,11 +149,11 @@ public class DatabaseTest extends AndroidTestCase{
 		db.putFriend(Data.bob);
 		
 		List<Post> listPostInsert = new ArrayList<Post>();		
-		listPostInsert.add(Data.post2);
-		listPostInsert.add(Data.post4);
+		listPostInsert.add(Data.post1);
+		listPostInsert.add(Data.post3);
 		
 		for(Post post : listPostInsert)
-			db.putFriendPost(post, post.getPoster());
+			db.putPost(post);
 
 		List<Post> listPost = db.getSomeLatestPosts(Data.bob.getId(), 4, 30);
 		Collections.sort(listPost, new postIdComparator());
@@ -182,7 +182,7 @@ public class DatabaseTest extends AndroidTestCase{
 		posts.add(Data.post3);
 		
 		for(Post post : posts)
-			db.putUserPost(post);
+			db.putPost(post);
 	
 		Wall returned = db.getUserWall();
 		List<Post> returnedPosts = returned.getPosts();
@@ -199,8 +199,8 @@ public class DatabaseTest extends AndroidTestCase{
 		
 		db.deleteUserWall();
 		
-		assertTrue(db.getUserWall() == null);
-		
+		assertTrue(db.getUserWall() != null);
+		assertTrue(db.getUserWall().getPosts().isEmpty());
 	}
 	
 	// FRIENDS
@@ -212,20 +212,6 @@ public class DatabaseTest extends AndroidTestCase{
 		db.putFriend(Data.bob);
 		
 		assertEquals(Data.bob.getUsername(), db.getFriendUsername(Data.bob.getId()));
-	}
-	
-	@Test
-	public void testGetFriendId() {
-		DatabaseManager db = cleanDB();
-		
-		db.putFriend(Data.bob);
-		
-		List<UserId> returned = db.getFriendId(Data.bob.getUsername());
-		UserId lookUp = Data.bob.getId();
-		
-		for(UserId id : returned)
-			assertEquals(lookUp, id);
-			
 	}
 	
 	@Test

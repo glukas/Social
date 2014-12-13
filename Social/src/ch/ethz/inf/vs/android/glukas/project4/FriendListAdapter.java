@@ -12,10 +12,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class FriendListAdapter extends SortedSetAdapter<BasicUser> {
+public class FriendListAdapter extends SortedSetAdapter<User> {
 
-	public FriendListAdapter(Context context, List<BasicUser> objects) {
-		super(context, objects);
+	public FriendListAdapter(Context context, List<User> userList) {
+		super(context, userList);
 	}
 
 	@Override

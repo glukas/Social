@@ -116,14 +116,6 @@ public interface DatabaseAccess {
 	public String getFriendUsername(UserId id);
 	
 	/**
-	 * Get an user id from an user name (cannot ensures uniqueness)
-	 * @param username the username of the friend to retrieve the id
-	 * @return A list of different users matched by provided user name
-	 */
-	// FIXME: Remark (Lukas) : Why do we need this?
-	public List<UserId> getFriendId(String username);
-	
-	/**
 	 * Insert a friend.
 	 * @param friend the friend object
 	 */
@@ -150,10 +142,10 @@ public interface DatabaseAccess {
 	////
 	
 	/**
-	 * Add a user post to the database
+	 * Add a post to the database
 	 * @param post
 	 */
-	public void putUserPost(Post post);
+	public void putPost(Post post);
 	
 	/**
 	 * Get multiple posts from the user's wall
@@ -175,13 +167,6 @@ public interface DatabaseAccess {
 	 */
 	public Post getUserPost(int id);
 	
-	/**
-	 * Add a friend post to the database.
-	 * @param post the post to add
-	 * @param id the id of the friend
-	 */
-	public void putFriendPost(Post post, UserId id);
-
 	/**
 	 * Get a post of a friend
 	 * @param postid the id of the post to retrieve

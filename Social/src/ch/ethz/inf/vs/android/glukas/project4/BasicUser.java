@@ -1,6 +1,6 @@
 package ch.ethz.inf.vs.android.glukas.project4;
 
-public class BasicUser implements Comparable<BasicUser> {
+public class BasicUser implements Comparable<User> {
 
 	protected UserId id;
 	protected String username;
@@ -32,7 +32,11 @@ public class BasicUser implements Comparable<BasicUser> {
 	}
 	
 	@Override
-	public int compareTo(BasicUser another) {
+	public int compareTo(User another) {
+		return basicCompareTo(another);
+	}
+	
+	private int basicCompareTo(BasicUser another) {
 		int usernameComparison = this.username.compareTo(another.username);
 		if (usernameComparison != 0) return usernameComparison;
 		return this.id.compareTo(another.id);
@@ -40,7 +44,7 @@ public class BasicUser implements Comparable<BasicUser> {
 	
 	@Override
 	public boolean equals(Object another) {
-		return (another instanceof BasicUser) && this.compareTo((BasicUser) another) == 0;
+		return (another instanceof BasicUser) && basicCompareTo((BasicUser) another) == 0;
 	}
 	
 	@Override
