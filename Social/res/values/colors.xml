@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-	<color name="listViewBg">#DADFEE</color>
-
-	<color name="sendLightColor">#8897BF</color>
-	<color name="sendMeduimColor">#5D6CA5</color>
-	<color name="sendDarkColor">#515F9F</color>
+	<color name="sendLightColor">#1a9bcb</color>
+	<color name="sendMeduimColor">#33b5e5</color>
+	<color name="sendDarkColor">#178ab4</color>
 
 </resources>

@@ -5,14 +5,14 @@
 			android:state_pressed="true">
         <shape android:padding="10dp" android:shape="rectangle">
             <solid android:color="#FFFFFF" />
-            <stroke android:width="2dp" android:color="#FFCE3D" />
+            <stroke android:width="2dp" android:color="#7E7E7E" />
             <corners android:bottomLeftRadius="15dp" android:bottomRightRadius="15dp" android:topLeftRadius="15dp" android:topRightRadius="15dp" />
         </shape>
     </item>
     <item android:state_enabled="true" android:state_focused="true">
         <shape android:padding="10dp" android:shape="rectangle">
             <solid android:color="#FFFFFF" />
-            <stroke android:width="2dp" android:color="#FFCE3D" />
+            <stroke android:width="2dp" android:color="#7E7E7E" />
             <corners android:bottomLeftRadius="15dp" android:bottomRightRadius="15dp" android:topLeftRadius="15dp" android:topRightRadius="15dp" />
         </shape>
     </item>

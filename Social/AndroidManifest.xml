@@ -37,7 +37,8 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/title_activity_main" 
-            android:windowSoftInputMode="stateHidden" >
+            android:windowSoftInputMode="stateHidden"
+            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -47,7 +48,8 @@
         <activity
             android:name=".IncomingFriendshipActivity"
             android:label="@string/title_activity_incoming_friendship"
-            android:parentActivityName=".MainActivity" >
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.nfc.action.NDEF_DISCOVERED" />
 
@@ -63,7 +65,8 @@
         <activity
             android:name=".ContactDetailActivity"
             android:label="@string/title_activity_contact_detail"
-            android:parentActivityName=".MainActivity" >
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.nfc.action.NDEF_DISCOVERED" />
 
