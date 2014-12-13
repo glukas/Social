@@ -1,17 +1,30 @@
 package ch.ethz.inf.vs.android.glukas.project4.protocol;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.nio.ByteBuffer;
+
+import ch.ethz.glukas.orderedset.Buffer;
+
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Base64;
+import android.util.Log;
 
 public class ImageParser {
 
 	// Parse the bitmap image to a bytearray
 
 	public byte[] getBytesfrom(Bitmap image) {
+
 		ByteArrayOutputStream boas = new ByteArrayOutputStream();
-		image.compress(Bitmap.CompressFormat.PNG, 100, boas);
+		boolean compression = image.compress(Bitmap.CompressFormat.PNG, 100,
+				boas);
+		if (compression) {
+			Log.v("Decode: ", "possible");
+		} else {
+			Log.v("Decode: ", "not possible");
+		}
 		byte[] result = boas.toByteArray();
 		return result;
 	}
@@ -25,8 +38,9 @@ public class ImageParser {
 
 	// Get a Bitmap from a Bytearray
 	public Bitmap getBitmapfromByteArray(byte[] imagebytes) {
-		Bitmap resultimage = BitmapFactory.decodeByteArray(imagebytes, 0,
-				imagebytes.length);
+		ByteArrayInputStream bois = new ByteArrayInputStream(imagebytes);
+		Bitmap resultimage = BitmapFactory.decodeStream(bois);
+
 		return resultimage;
 
 	}
