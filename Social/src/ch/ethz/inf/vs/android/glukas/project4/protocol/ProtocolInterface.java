@@ -2,6 +2,8 @@ package ch.ethz.inf.vs.android.glukas.project4.protocol;
 
 import java.util.List;
 
+import android.graphics.Bitmap;
+
 import ch.ethz.inf.vs.android.glukas.project4.BasicUser;
 import ch.ethz.inf.vs.android.glukas.project4.Post;
 import ch.ethz.inf.vs.android.glukas.project4.User;
@@ -46,6 +48,13 @@ public interface ProtocolInterface {
 	public void postPost(Post post) throws DatabaseException;
 	
 	/**
+	 * Post a text and optionally an image to the wall of the app owner
+	 * @param text
+	 * @param image
+	 */
+	public void post(String text, Bitmap image);
+	
+	/**
 	 * Get a wall from a distant user
 	 * @param userId, the user to get the wall
 	 */
@@ -78,12 +87,12 @@ public interface ProtocolInterface {
 	 * @param DistUsername
 	 * @throws NetworkException, if network is not accessible
 	 */
-	public void askFriendship(String distUsername);
+	//public void askFriendship(String distUsername);
 
 	/**
 	 * Search for accessible persons over all user's friends
 	 */
-	public void discoverFriends();
+	//public void discoverFriends();
 	
 	/**
 	 * Get the local user
@@ -105,7 +114,7 @@ public interface ProtocolInterface {
 	 * @param userId
 	 * @return
 	 */
-	public List<BasicUser> getFriendsList(UserId userId);
+	//public List<BasicUser> getFriendsList(UserId userId);
 	
 	/**
 	 * Get the max id of a wall

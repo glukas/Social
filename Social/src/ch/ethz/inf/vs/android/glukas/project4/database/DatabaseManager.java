@@ -149,12 +149,6 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 		return Friends.getFriendUsername(id, this.getReadableDatabase());
 	}
 
-	// Get an user id from an user name (cannot ensures uniqueness)
-	@Override
-	public List<UserId> getFriendId(String username) {
-		return Friends.getFriendId(username, this.getReadableDatabase());
-	}
-
 	// Add a friend in the List of Friends of the user
 	@Override
 	public void putFriend(User friend) {
@@ -190,8 +184,8 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 	 */
 	// Update the wall of the user with the given post.
 	@Override
-	public void putUserPost(Post post) {
-		Posts.putUserPost(post, this.getWritableDatabase());
+	public void putPost(Post post) {
+		Posts.putPost(post, this.getWritableDatabase());
 	}
 
 	// Get all the Posts in a Wall starting from id -> id or time?
@@ -210,12 +204,6 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 	@Override
 	public Post getUserPost(int postid) {
 		return Posts.getUserPost(postid, this.getReadableDatabase());
-	}
-
-	// Update the wall of a friend whose wall is saved on our phone
-	@Override
-	public void putFriendPost(Post post, UserId friendid) {
-		Posts.putFriendPost(post, friendid, this.getWritableDatabase());
 	}
 
 	// Get a certain Post from a certain friend
@@ -280,13 +268,13 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 		User user = new User("Alice");
 		this.putUser(user);
 		Post post = new Post(1, user.getId(), user.getId(), "Hello World!", null, new Date());
-		this.putUserPost(post);
+		this.putPost(post);
 		post = new Post(2, user.getId(), user.getId(), "Amazing app!!", null, new Date());
-		this.putUserPost(post);
+		this.putPost(post);
 		Bitmap icon = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher);
 		icon = Bitmap.createScaledBitmap(icon, 500, 500, false);
 		post = new Post(3, user.getId(), user.getId(), "Testing image.. and now with a much longer text to see how it breaks onto the next line and stuff..", icon, null);
-		this.putUserPost(post);
+		this.putPost(post);
 	}
 	
 	// Empty all the tables

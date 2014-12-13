@@ -60,16 +60,11 @@ class Walls {
 				wall.addPost(Utility.buildPost(cursor));
 				cursor.moveToNext();
 			}
-			// Close cursor
-			cursor.close();
-			
-			// Return wall
-			return wall;
-		} else {
-			// Close cursor
-			cursor.close();
-			return null;
 		}
+		// Close cursor
+		cursor.close();
+		// Return wall
+		return wall;
 	}
 	
 	/**

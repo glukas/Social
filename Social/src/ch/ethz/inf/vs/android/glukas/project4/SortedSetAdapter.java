@@ -20,8 +20,10 @@ public abstract class SortedSetAdapter<T extends Comparable<T>> extends BaseAdap
 	private final RankedTree<T> items = new RandomizedBST<T>();//a randomized binary search tree is a bit overkill, but it provides access by rank, and it scales to hundreds of thousands of posts (in expectation) :)
 	
 	public void add(T item) {
-		items.add(item);
-		this.notifyDataSetChanged();
+		boolean changed = items.add(item);
+		if (changed) {
+			this.notifyDataSetChanged();
+		}
 	}
 	
 	public SortedSetAdapter(Context context, List<T> objects) {

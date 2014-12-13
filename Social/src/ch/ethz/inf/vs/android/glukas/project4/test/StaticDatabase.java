@@ -103,12 +103,6 @@ public class StaticDatabase implements DatabaseAccess {
 	}
 
 	@Override
-	public List<UserId> getFriendId(String username) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public void putFriend(User friend) {
 		// TODO Auto-generated method stub
 		
@@ -131,12 +125,6 @@ public class StaticDatabase implements DatabaseAccess {
 	}
 
 	@Override
-	public void putUserPost(Post post) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public List<Post> getAllUserPostsFrom(int from) {
 		// TODO Auto-generated method stub
 		return null;
@@ -152,12 +140,6 @@ public class StaticDatabase implements DatabaseAccess {
 	public Post getUserPost(int id) {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	@Override
-	public void putFriendPost(Post post, UserId id) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
@@ -206,6 +188,12 @@ public class StaticDatabase implements DatabaseAccess {
 	public List<Post> getSomeLatestPosts(UserId id, int numberPosts, int postId) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void putPost(Post post) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
