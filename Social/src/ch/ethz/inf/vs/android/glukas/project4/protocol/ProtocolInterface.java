@@ -41,16 +41,17 @@ public interface ProtocolInterface {
 	public void disconnect();
 	
 	/**
+	 * Post a text and optionally an image to the wall of the user with specified id
+	 * @param wallOwnerId 
+	 * @param text
+	 * @param image
+	 */
+	public void post(UserId wallOwnerId, String text, Bitmap image);
+	
+	/**
 	 * Post a post of the user on his / her own wall
 	 * @param post, to post 
 	 * @throws DatabaseException, if database access is impossible
-	 */
-	public void postPost(Post post) throws DatabaseException;
-	
-	/**
-	 * Post a text and optionally an image to the wall of the app owner
-	 * @param text
-	 * @param image
 	 */
 	public void post(String text, Bitmap image);
 	
@@ -122,4 +123,6 @@ public interface ProtocolInterface {
 	 * @return
 	 */
 	public int getNewPostId(UserId userId);
+
+	
 }

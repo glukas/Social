@@ -111,36 +111,40 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 	}
 	
 	@Override
+	public void post(UserId wallOwner, String text, Bitmap image) {
+		postLocally(new Post(database.getFriendMaxPostsId(wallOwner)+1, localUser.getId(), wallOwner, text, image, new Date()));//TODO do not just post locally
+	}
+	
+	@Override
 	public void post(String text, Bitmap image) {
-		postLocally(new Post(database.getUserMaxPostsId()+1, localUser.getId(), localUser.getId(), text, image, new Date()));
+		post(localUser.getId(), text, image);
 	}
 	
 	private void postLocally(Post post) {
 		Log.d(this.getClass().toString(), "postLocally : " + post.getText() + " , " + post.getPoster().getId() + " , " + post.getWallOwner().getId());
 		database.putPost(post);
 		int msgId = post.getId();
-		int maxNumPosts = database.getUserPostsCount()+1;
-		database.setUserMaxPostsId(msgId);
-		database.setUserPostsCount(maxNumPosts);
+		int maxNumPosts = database.getFriendPostsCount(post.getWallOwner())+1;
+		database.setFriendMaxPostsId(msgId, post.getWallOwner());
+		database.setFriendPostsCount(maxNumPosts, post.getWallOwner());
 		userHandler.onPostReceived(post);
 	}
 
-	@Override
+	/*@Override
 	public void postPost(Post post) throws DatabaseException {
 		if (post.getWallOwner().equals(localUser.getId())) {
 			postLocally(post);
 		
 		  } else {
 			throw new UnhandledFunctionnality();
-			//database.putFriendPost(post, post.getWallOwner());*/
-			/*Message msg = MessageFactory.newPostMessage(post, localUser, database.getFriend(post.getWallOwner()), false);
+			//database.putFriendPost(post, post.getWallOwner())
+			Message msg = MessageFactory.newPostMessage(post, localUser, database.getFriend(post.getWallOwner()), false);
 			PublicHeader header = new PublicHeader(0, null, StatusByte.POST.getByte(), post.getId(), localUser.getId(), post.getWallOwner());
-			secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg).toString(), header));*/
+			secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg).toString(), header));
 		//	userHandler.onPostReceived(post);
 		}
-	
 
-	}
+	}*/
 
 	@Override
 	public void getUserWall(UserId userId) {

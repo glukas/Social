@@ -8,6 +8,8 @@ import ch.ethz.inf.vs.android.glukas.project4.networking.FriendshipRequest;
 import ch.ethz.inf.vs.android.glukas.project4.networking.FriendshipResponse;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.Protocol;
 import android.app.Activity;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
@@ -19,30 +21,22 @@ import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class ContactDetailActivity extends Activity {
+public class ContactDetailActivity extends WallActivity {
 
 	public static final String USERID_EXTRA = "ch.ethz.inf.vs.android.glukas.project4.USERID_EXTRA";
 
-	private ListView listView;
 	private FriendshipResponse response;
-	private DatabaseAccess dbmanager;
-	private WallPostAdapter userWallAdapter;
-	private Protocol protocol;
-	private User friend;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_contact_detail);
-		listView = (ListView) findViewById(R.id.listView1);
 		
-		dbmanager = new DatabaseManager(this);
-		protocol = new Protocol(dbmanager);
-		
-		userWallAdapter = new WallPostAdapter(this, new ArrayList<Post>());
-		
-		listView.setAdapter(userWallAdapter);
-		
+		FragmentManager fragmentManager = getFragmentManager();
+		FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+		WallFragment fragment = new WallFragment();
+		fragmentTransaction.add(R.id.friendWallContainer, fragment);
+		fragmentTransaction.commit();
 	}
 
 	@Override
@@ -72,25 +66,17 @@ public class ContactDetailActivity extends Activity {
 
 	@Override
 	protected void onResume() {
-		super.onResume();
-
 		byte[] id = this.getIntent().getByteArrayExtra(USERID_EXTRA);
 		if (id != null) {
 			UserId uid = new UserId(id);
 			Log.d(this.getClass().toString(), uid.toString());
-			friend = this.dbmanager.getFriend(uid);
-			showFriend(friend);
+			wallOwner = this.dbmanager.getFriend(uid);
+			showFriend(wallOwner);
 		} else if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction())) {
 			processIntent(getIntent());
 		}
 		
-		if (friend != null) {//Testing
-			for (int index = 0; index < 20; index ++) {
-				Post p = new Post(index, friend.id, friend.id, String.format("post with id : %d by %s", index, friend.username), null, null);
-				userWallAdapter.add(p);
-			}
-		}
-
+		super.onResume();
 	}
 
 	private void processIntent(Intent intent) {
@@ -108,7 +94,7 @@ public class ContactDetailActivity extends Activity {
 	}
 	// Save friend in database
 	private void saveFriend(FriendshipResponse response) {
-		friend = response.getSender();
+		wallOwner = response.getSender();
 		dbmanager.putFriend(response.getSender());
 	}
 
