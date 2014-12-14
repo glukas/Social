@@ -1,7 +1,10 @@
 package ch.ethz.inf.vs.android.glukas.project4.protocol;
 
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import android.graphics.Bitmap;
 import android.util.Log;
@@ -57,6 +60,14 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 		secureChannel = new SecureChannel("winti.mooo.com", 9000, new DBCredentialStorage(db));
 		secureChannel.setDelegate(this);
 		messageRelay = new MessageRelay(secureChannel);
+		List<User> users = database.getUserFriendsList();
+		userMapping = new HashMap<UserId, User>();
+		for (User user : users) {
+			userMapping.put(user.getId(), user);
+		}
+		if (localUser != null) {
+			userMapping.put(localUser.getId(), localUser);
+		}
 	}
 
 	////
@@ -70,7 +81,8 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 	private DatabaseAccess database;
 
 	//caching
-	private BasicUser localUser;
+	private User localUser;
+	private Map<UserId, User> userMapping;
 	
 	//exceptional behaviors
 	private final String unexpectedMsg = "Unexpected message arrived : ";
@@ -79,12 +91,10 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 	// ProtocolInterface
 	////
 	
-	@Override
 	public int getNewPostId(UserId userId) {
 		return database.getFriendMaxPostsId(userId)+1;
 	}
 	
-	@Override
 	public Wall getUserWall() {
 		return database.getUserWall();
 	}
@@ -98,6 +108,23 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 	public void putUser(User user) {
 		database.putUser(user);
 		localUser = user;
+		userMapping.put(user.getId(), user);
+	}
+	
+	@Override
+	public void putFriend(User friend) {
+		database.putFriend(friend);
+		userMapping.put(friend.getId(), friend);
+	}
+	
+	@Override
+	public User getFriend(UserId id) {
+		return database.getFriend(id);
+	}
+	
+	@Override
+	public Map<UserId, User> getUserMapping() {
+		return Collections.unmodifiableMap(userMapping);
 	}
 
 	@Override
@@ -112,7 +139,14 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 	
 	@Override
 	public void post(UserId wallOwner, String text, Bitmap image) {
-		postLocally(new Post(database.getFriendMaxPostsId(wallOwner)+1, localUser.getId(), wallOwner, text, image, new Date()));//TODO do not just post locally
+		Post post = new Post(getNewPostId(wallOwner), localUser.getId(), wallOwner, text, image, new Date());
+		postLocally(post);
+		//post on some friends wall:
+		if (!wallOwner.equals(localUser)) {
+			Message msg = MessageFactory.newPostMessage(post, localUser, database.getFriend(post.getWallOwner()), false);
+			PublicHeader header = new PublicHeader(0, null, StatusByte.POST.getByte(), post.getId(), localUser.getId(), post.getWallOwner());
+			secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg).toString(), header));
+		}
 	}
 	
 	@Override
@@ -177,9 +211,9 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 		}
 		
 		//ask for update
-		//Message msg = MessageFactory.newTypeMessage(MessageType.GET_STATE);
-		//PublicHeader header = new PublicHeader(0, null, StatusByte.DATA.getByte(), 0, localUser.getId(), userId);
-		//secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg, 0).toString(), header));
+		Message msg = MessageFactory.newTypeMessage(MessageType.GET_STATE);
+		PublicHeader header = new PublicHeader(0, null, StatusByte.DATA.getByte(), 0, localUser.getId(), userId);
+		secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg).toString(), header));
 	}
 
 	@Override

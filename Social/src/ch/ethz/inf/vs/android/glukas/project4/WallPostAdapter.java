@@ -1,11 +1,14 @@
 package ch.ethz.inf.vs.android.glukas.project4;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import ch.ethz.inf.vs.android.glukas.project4.Post.PostType;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,8 +20,11 @@ import android.widget.TextView;
 
 public class WallPostAdapter extends SortedSetAdapter<Post> {
 
-	public WallPostAdapter(Context context, List<Post> objects) {
-		super(context, objects);
+	private Map<UserId, User> userMap;
+	
+	public WallPostAdapter(Context context, Map<UserId, User> userMap) {
+		super(context, new ArrayList<Post>());
+		this.userMap = userMap;
 	}
 
 	public View getView (int position, View convertView, ViewGroup parent) {
@@ -43,6 +49,13 @@ public class WallPostAdapter extends SortedSetAdapter<Post> {
 		TextView textView = (TextView) rowView.findViewById(R.id.post);
 		textView.setText(currentPost.getText());
 
+		//Set the author
+		TextView authorTextView = (TextView) rowView.findViewById(R.id.author);
+		User author = userMap.get(currentPost.getPoster());
+		authorTextView.setText(author.getUsername());
+		
+		authorTextView.setTextColor(Color.parseColor(author.getColor()));
+		
 		return rowView;
 	}
 	

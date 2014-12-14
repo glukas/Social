@@ -2,6 +2,10 @@ package ch.ethz.inf.vs.android.glukas.project4;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ListFragment;
@@ -44,7 +48,7 @@ public class WallActivity extends Activity implements UserDelegate {
 	private static final int PICTURE_GALLERY = 1;
 	private static final int PICTURE_TAKEN = 2;
 
-	protected DatabaseAccess dbmanager;
+	private DatabaseAccess dbmanager;
 	
 	protected ProtocolInterface mProtocol;
 
@@ -71,12 +75,15 @@ public class WallActivity extends Activity implements UserDelegate {
 		mProtocol = Protocol.getInstance(dbmanager);
 		mProtocol.setDelegate(this);
 		
-		userWallAdapter = new WallPostAdapter(getApplicationContext(), new ArrayList<Post>());
+		userWallAdapter = new WallPostAdapter(getApplicationContext(), mProtocol.getUserMapping());
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
+		if (mProtocol.getUser() != null) {
+			mProtocol.disconnect();
+		}
 	}
 
 	@Override
@@ -84,6 +91,10 @@ public class WallActivity extends Activity implements UserDelegate {
 		super.onResume();
 		mProtocol.setDelegate(this);
 		updateWall();
+		if (mProtocol.getUser() != null) {
+			mProtocol.connect();
+		}
+		
 	}
 	
 	protected void updateWall() {
@@ -91,6 +102,7 @@ public class WallActivity extends Activity implements UserDelegate {
 			mProtocol.getSomeUserPosts(wallOwner.id, 30);
 		}
 	}
+	
 	
 	////
 	//Posting to wall

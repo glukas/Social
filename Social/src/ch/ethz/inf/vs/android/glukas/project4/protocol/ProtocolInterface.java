@@ -1,6 +1,7 @@
 package ch.ethz.inf.vs.android.glukas.project4.protocol;
 
 import java.util.List;
+import java.util.Map;
 
 import android.graphics.Bitmap;
 
@@ -84,18 +85,6 @@ public interface ProtocolInterface {
 	public void getSomeUserPosts(UserId userId, int numberPosts, int postId);
 	
 	/**
-	 * Ask an user to be friend
-	 * @param DistUsername
-	 * @throws NetworkException, if network is not accessible
-	 */
-	//public void askFriendship(String distUsername);
-
-	/**
-	 * Search for accessible persons over all user's friends
-	 */
-	//public void discoverFriends();
-	
-	/**
 	 * Get the local user
 	 */
 	public User getUser();
@@ -106,23 +95,23 @@ public interface ProtocolInterface {
 	public void putUser(User user);
 	
 	/**
-	 * Get the wall of the local user
-	 */
-	public Wall getUserWall();
-	
-	/**
-	 * Get the list of friends of a particular user
-	 * @param userId
+	 * Get a mapping from user ids to user objects
 	 * @return
 	 */
-	//public List<BasicUser> getFriendsList(UserId userId);
-	
+	public Map<UserId, User> getUserMapping();
+
 	/**
-	 * Get the max id of a wall
-	 * @param userId
+	 * Add a friend
+	 * @param friend
+	 */
+	public void putFriend(User friend);
+
+	/**
+	 * 
+	 * @param id
 	 * @return
 	 */
-	public int getNewPostId(UserId userId);
+	public User getFriend(UserId id);
 
 	
 }
