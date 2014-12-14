@@ -18,6 +18,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Bitmap.Config;
 import android.graphics.PorterDuff.Mode;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -55,6 +56,8 @@ public class WallActivity extends Activity implements UserDelegate {
 	private EditText textField;
 	private ImageView postPicture;
 	private Button cameraButton;
+	
+	private Bitmap currentPicture;
 	
 	////
 	//LIFECYCLE
@@ -98,12 +101,13 @@ public class WallActivity extends Activity implements UserDelegate {
 
 	public void sendPost (View v) {
 		Editable post = textField.getText();
-		Log.d(this.getClass().toString(), post.toString());
-		if (!post.toString().isEmpty()) {
-			mProtocol.post(wallOwner.id, post.toString(), null);
+		Drawable picture =  postPicture.getDrawable();
+		if (!post.toString().isEmpty() || picture != null) {
+			mProtocol.post(wallOwner.id, post.toString(), picture == null ? null:currentPicture);
 			textField.setText("");
+			textField.clearFocus();
+			removePictureFromPost();
 		}
-		textField.clearFocus();
 	}
 
 	public void addPicture (View v) {
@@ -153,7 +157,7 @@ public class WallActivity extends Activity implements UserDelegate {
 
 					bitmap = BitmapFactory.decodeFile(f.getAbsolutePath(),
 							bitmapOptions); 
-
+					currentPicture = bitmap;
 					bitmap = Bitmap.createScaledBitmap(bitmap, 
 							textField.getWidth() - 40,
 							(int)(bitmap.getHeight() * ((float)((textField.getWidth() - 20))/bitmap.getWidth())), 
@@ -199,7 +203,7 @@ public class WallActivity extends Activity implements UserDelegate {
 				String picturePath = c.getString(columnIndex);
 				c.close();
 				Bitmap thumbnail = (BitmapFactory.decodeFile(picturePath));
-
+				currentPicture = thumbnail;
 				thumbnail = Bitmap.createScaledBitmap(thumbnail, 
 						textField.getWidth() - 40,
 						(int)(thumbnail.getHeight() * ((float)((textField.getWidth() - 20))/thumbnail.getWidth())), 
@@ -322,7 +326,7 @@ public class WallActivity extends Activity implements UserDelegate {
 
 	private void removePictureFromPost() {
 		postPicture.setPadding(0, 0, 0, 0);
-		postPicture.setImageBitmap(null);
+		postPicture.setImageDrawable(null);
 	}
 	
 }
