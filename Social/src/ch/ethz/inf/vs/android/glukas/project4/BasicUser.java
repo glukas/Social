@@ -60,7 +60,6 @@ public class BasicUser implements Comparable<User> {
 		} else {
 			raw = "#"+raw.substring(0, 6);
 		}
-		System.out.println(raw);
 		return raw;
 	}
 	

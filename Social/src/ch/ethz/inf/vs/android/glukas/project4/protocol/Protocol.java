@@ -145,7 +145,7 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 		if (!wallOwner.equals(localUser)) {
 			Message msg = MessageFactory.newPostMessage(post, localUser, database.getFriend(post.getWallOwner()), false);
 			PublicHeader header = new PublicHeader(0, null, StatusByte.POST.getByte(), post.getId(), localUser.getId(), post.getWallOwner());
-			secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg).toString(), header));
+			//secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg).toString(), header));
 		}
 	}
 	
@@ -213,7 +213,7 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 		//ask for update
 		Message msg = MessageFactory.newTypeMessage(MessageType.GET_STATE);
 		PublicHeader header = new PublicHeader(0, null, StatusByte.DATA.getByte(), 0, localUser.getId(), userId);
-		secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg).toString(), header));
+		//secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg).toString(), header));
 	}
 
 	@Override

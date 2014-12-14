@@ -24,7 +24,7 @@ public class MessageRelay {
 	 * @param header
 	 */
 	public void connect(UserId userId){
-		PublicHeader header = new PublicHeader(0, null, StatusByte.CONNECT.getByte(), 0, userId, new UserId("0"));
+		PublicHeader header = new PublicHeader(PublicHeader.BYTES_LENGTH_HEADER, null, StatusByte.CONNECT.getByte(), 0, userId, new UserId("0"));
 		channel.sendHeader(header);
 	}
 	
@@ -34,7 +34,7 @@ public class MessageRelay {
 	 * @param header
 	 */
 	public void disconnect(UserId userId){
-		PublicHeader header = new PublicHeader(0, null, StatusByte.DISCONNECT.getByte(), 0, userId, new UserId("0"));
+		PublicHeader header = new PublicHeader(PublicHeader.BYTES_LENGTH_HEADER, null, StatusByte.DISCONNECT.getByte(), 0, userId, new UserId("0"));
 		channel.sendHeader(header);
 	}
 	
