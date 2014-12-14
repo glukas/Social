@@ -1,10 +1,6 @@
 package ch.ethz.inf.vs.android.glukas.project4;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import android.app.Activity;
 import android.app.AlertDialog;
