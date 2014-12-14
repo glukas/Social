@@ -10,6 +10,7 @@ import java.text.*;
 
 import ch.ethz.inf.vs.android.glukas.project4.Post;
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
+import ch.ethz.inf.vs.android.glukas.project4.protocol.ImageParser;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -42,7 +43,8 @@ public class Utility {
 	 */
 	public static final byte[] toByteArray(Bitmap bitmapImage) {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		bitmapImage.compress(Bitmap.CompressFormat.JPEG, 100, bos);	// TODO: adapt quality (second parameter)
+		boolean success = bitmapImage.compress(Bitmap.CompressFormat.JPEG, 50, bos);
+		if (!success) throw new RuntimeException();
 		return bos.toByteArray();
 	}
 	
@@ -89,8 +91,8 @@ public class Utility {
 	 * @return Post object
 	 */
 	public static final Post buildPost(Cursor cursor) {
-		for (int i = 0; i < 6; i++){
-			Log.d("DATABASE DEBUG", "###"+cursor.getString(i));
+		for (int i = 0; i < 3; i++){
+			Log.d("DATABASE DEBUG", "col " + i + " # "+cursor.getString(i));
 		}
 		// Get id.
 		int id = cursor.getInt(0);
@@ -101,17 +103,15 @@ public class Utility {
 		// Get text.
 		String text = cursor.getString(3);
 		// Get image.
-		Bitmap image;
-		if(cursor.getBlob(4) != null)
+		Bitmap image = null;
+		if(cursor.getBlob(4) != null) {
 			image = Utility.toBitmap(cursor.getBlob(4));
-		else
-			image = null;
+		}
 		// Get datetime.
-		Date datetime;
-		if(cursor.getString(5) != null)
+		Date datetime = null;
+		if(cursor.getString(5) != null) {
 			datetime = Utility.toJavaDate(cursor.getString(5));
-		else
-			datetime = null;
+		}
 		// Build and return post.
 		return new Post(id, poster_id, wall_owner_id, text, image, datetime);
 	}
