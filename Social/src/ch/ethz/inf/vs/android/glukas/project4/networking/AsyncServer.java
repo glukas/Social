@@ -101,7 +101,12 @@ public class AsyncServer {
 
 	public void sendMessage(final byte[] message) {
 		if (noConnection){
-			start();
+			requestHandler.post(new Runnable() {
+				@Override
+				public void run() {
+					start();
+				}
+			});
 		}
 		requestHandler.post(new Runnable() {
 			@Override
