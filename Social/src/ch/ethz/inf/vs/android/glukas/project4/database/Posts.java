@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import ch.ethz.inf.vs.android.glukas.project4.Post;
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseContract.*;
+import ch.ethz.inf.vs.android.glukas.project4.protocol.ImageParser;
 
 /**
  * Helper class that implements all functionalities of table Posts.
@@ -224,7 +225,7 @@ class Posts {
 		Cursor cursor = db.query(PostsEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, orderBy, limit);
 		
 		List<Post> older = new ArrayList<Post>();
-		if(cursor.moveToFirst()) {
+		if(cursor.getCount() > 0 && cursor.moveToFirst()) {
 			while(!cursor.isAfterLast()) {
 				older.add(Utility.buildPost(cursor));
 				cursor.moveToNext();
