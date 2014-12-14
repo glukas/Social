@@ -65,7 +65,8 @@ public class AsyncServer {
 					}
 				} catch (IOException e) {
 					if (running){
-						Log.e(this.getClass().toString(), e.getLocalizedMessage());
+						e.printStackTrace();
+						Log.e(this.getClass().toString(), "exception + " + e.getMessage());
 					}
 				}
 			}
@@ -107,6 +108,7 @@ public class AsyncServer {
 			public void run() {
 				try {
 					comm.sendMessage(message);
+					Log.d(this.getClass().toString(), "sendMessage");
 				} catch (IOException e) {
 					Log.e("Error delivering : " +this.getClass().toString(), e.getLocalizedMessage());
 					close();

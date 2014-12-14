@@ -5,6 +5,7 @@ import java.util.List;
 import ch.ethz.inf.vs.android.glukas.project4.Post.PostType;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,7 +33,8 @@ public class FriendListAdapter extends SortedSetAdapter<User> {
 		// Set the text on the TextView
 		TextView textView = (TextView) rowView.findViewById(R.id.userName);
 		textView.setText(currentUser.getUsername());
-
+		textView.setTextColor(Color.parseColor(currentUser.getColor()));
+		
 		return rowView;
 	}
 

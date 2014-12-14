@@ -70,7 +70,7 @@ public class ContactDetailActivity extends WallActivity {
 		if (id != null) {
 			UserId uid = new UserId(id);
 			Log.d(this.getClass().toString(), uid.toString());
-			wallOwner = this.dbmanager.getFriend(uid);
+			wallOwner = mProtocol.getFriend(uid);
 			showFriend(wallOwner);
 		} else if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction())) {
 			processIntent(getIntent());
@@ -95,7 +95,7 @@ public class ContactDetailActivity extends WallActivity {
 	// Save friend in database
 	private void saveFriend(FriendshipResponse response) {
 		wallOwner = response.getSender();
-		dbmanager.putFriend(response.getSender());
+		mProtocol.putFriend(response.getSender());
 	}
 
 	private void showFriend(User friend) {

@@ -1,5 +1,7 @@
 package ch.ethz.inf.vs.android.glukas.project4.security;
 
+import java.nio.ByteBuffer;
+
 import android.os.Handler;
 import android.util.Log;
 import ch.ethz.inf.vs.android.glukas.project4.networking.AsyncServer;
@@ -48,13 +50,16 @@ public class SecureChannel implements AsyncServerDelegate {
 	 */
 	public void sendMessage(NetworkMessage message) {
 		byte[] encrypted;
-		//if(message.consistency=...) {
-		//For broadcasts:
-		encrypted = crypto.encryptPost(message);
-		//TODO (direct messages)
-		//else {
 		
-		//}
+		//encrypted = crypto.encryptPost(message);
+		
+		int length = message.text.length+PublicHeader.BYTES_LENGTH_HEADER;
+		message.header.setLength(length);
+		ByteBuffer result = ByteBuffer.allocate(length);
+		result.put(message.header.getbytes());
+		result.put(message.text);
+		encrypted = result.array();
+		
 		this.asyncServer.sendMessage(encrypted);
 	}
 	
@@ -79,8 +84,24 @@ public class SecureChannel implements AsyncServerDelegate {
 
 	@Override
 	public void onReceive(byte[] message) {
+		Log.d(this.getClass().toString(), "onReceive");
+		ByteBuffer messageBuffer = ByteBuffer.wrap(message);
+		
+		PublicHeader header = new PublicHeader(messageBuffer);
+		byte[] text;
+		if (messageBuffer.capacity() > PublicHeader.BYTES_LENGTH_HEADER) {
+			messageBuffer.position(PublicHeader.BYTES_LENGTH_HEADER);
+			text = new byte[message.length-PublicHeader.BYTES_LENGTH_HEADER];
+			messageBuffer.get(text);
+		} else {
+			text = new byte[0];
+		}
+	
+		if (this.secureChannelDelegate != null) {
+			this.secureChannelDelegate.onMessageReceived(new NetworkMessage(text, header));
+		}
 		//decrypt
-		NetworkMessage decrypted = crypto.decryptPost(message);
+		/*NetworkMessage decrypted = crypto.decryptPost(message);
 		if (decrypted != null) {//For now, ignore all corrupted messages
 			//forward to delegate
 			if (this.secureChannelDelegate != null) {
@@ -89,7 +110,7 @@ public class SecureChannel implements AsyncServerDelegate {
 			}
 		} else {
 			Log.e(this.getClass().toString(), "received invalid message");
-		}
+		}*/
 	}
 
 	@Override

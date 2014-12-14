@@ -5,13 +5,14 @@ import java.util.Date;
 import ch.ethz.inf.vs.android.glukas.project4.BasicUser;
 import ch.ethz.inf.vs.android.glukas.project4.Post;
 import ch.ethz.inf.vs.android.glukas.project4.User;
+import ch.ethz.inf.vs.android.glukas.project4.UserCredentials;
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseAccess;
 
 public class Data {
 
-	public static final User alice = new User("Alice");
-	public static final User bob = new User("Bob");
+	public static final User alice = new User(new UserId("1"), "Alice", new UserCredentials(new UserId("1")));
+	public static final User bob = new User(new UserId("2"), "Bob", new UserCredentials(new UserId("2")));
 	public static final User eve = new User("Eve");
 	
 	public static final Post post1 = new Post(12, alice.getId(), bob.getId(), "1) Hello Bob!", null, new Date());

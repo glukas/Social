@@ -4,6 +4,7 @@ import ch.ethz.inf.vs.android.glukas.project4.RegistrationDialogFragment.Registr
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseManager;
 import ch.ethz.inf.vs.android.glukas.project4.networking.FriendshipRequest;
 import ch.ethz.inf.vs.android.glukas.project4.networking.FriendshipResponse;
+import ch.ethz.inf.vs.android.glukas.project4.protocol.Protocol;
 import ch.ethz.inf.vs.android.glukas.project4.security.ZeroCredentialStorage;
 import android.app.Activity;
 import android.content.DialogInterface;
@@ -27,8 +28,8 @@ OnNdefPushCompleteCallback, RegistrationDialogFragmentDelegate {
 	FriendshipRequest request;
 	FriendshipResponse response;
 	NfcAdapter nfcAdapter;
-	DatabaseManager dbmanager;
-
+	Protocol protocol;
+	
 	////
 	//LIFECYCLE
 	////
@@ -37,7 +38,7 @@ OnNdefPushCompleteCallback, RegistrationDialogFragmentDelegate {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_incoming_friendship);
-		dbmanager = new DatabaseManager(this);
+		protocol = new Protocol(new DatabaseManager(this));
 		this.usernameTextView = (TextView) findViewById(R.id.usernameTextView);
 	}
 
@@ -77,7 +78,7 @@ OnNdefPushCompleteCallback, RegistrationDialogFragmentDelegate {
 	}
 
 	private void checkUserRegistered() {
-		if(dbmanager.getUser() == null) {
+		if(protocol.getUser() == null) {
 			// Create registration dialog
 			RegistrationDialogFragment dialog = new RegistrationDialogFragment(this);
 			dialog.show(this.getFragmentManager(), this.getClass().toString());
@@ -104,16 +105,14 @@ OnNdefPushCompleteCallback, RegistrationDialogFragmentDelegate {
 		nfcAdapter.setOnNdefPushCompleteCallback(this, this);
 
 		displayRequest(request);
-		if (dbmanager.getUser() != null) {
+		if (protocol.getUser() != null) {
 			prepareResponse();
 		}
 	}
 
 	// Save friend in database
 	private void saveFriend(FriendshipRequest request) {
-
-		dbmanager.putFriend(request.getSender());
-
+		protocol.putFriend(request.getSender());
 	}
 
 	private void displayRequest(FriendshipRequest request) {
@@ -124,7 +123,7 @@ OnNdefPushCompleteCallback, RegistrationDialogFragmentDelegate {
 	}
 
 	private void prepareResponse() {
-		response = request.createAcceptingResponse(dbmanager.getUser());
+		response = request.createAcceptingResponse(protocol.getUser());
 	}
 
 	////
@@ -133,7 +132,7 @@ OnNdefPushCompleteCallback, RegistrationDialogFragmentDelegate {
 
 	@Override
 	public void onUserRegistered(String username) {
-		this.dbmanager.putUser(new User(username));
+		protocol.putUser(new User(username));
 		prepareResponse();
 	}
 

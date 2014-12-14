@@ -52,4 +52,16 @@ public class BasicUser implements Comparable<User> {
 		return this.id.hashCode();
 	}
 	
+	//Returns a color characteristic to the user
+	public String getColor() {
+		String raw = id.getId().abs().toString(16);
+		if (raw.length() < 6) {
+			raw = "white";
+		} else {
+			raw = "#"+raw.substring(0, 6);
+		}
+		System.out.println(raw);
+		return raw;
+	}
+	
 }
