@@ -1,12 +1,10 @@
 package ch.ethz.inf.vs.android.glukas.project4;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import ch.ethz.inf.vs.android.glukas.project4.Post.PostType;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
@@ -14,7 +12,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -34,7 +31,6 @@ public class WallPostAdapter extends SortedSetAdapter<Post> {
 
 		View rowView = null;
 		// Inflate the views from XML
-		//TODO reuse convertView when possible
 		if (currentPost.getType() == PostType.PICTURE) {
 			rowView = inflater.inflate(R.layout.my_wall_list_row_picture, parent, false);
 			
@@ -44,17 +40,16 @@ public class WallPostAdapter extends SortedSetAdapter<Post> {
 		} else {
 			rowView = inflater.inflate(R.layout.my_wall_list_row_text, parent, false);
 		}
-
-		// Set the text on the TextView
-		TextView textView = (TextView) rowView.findViewById(R.id.post);
-		textView.setText(currentPost.getText());
-
+		
 		//Set the author
 		TextView authorTextView = (TextView) rowView.findViewById(R.id.author);
 		User author = userMap.get(currentPost.getPoster());
 		authorTextView.setText(author.getUsername());
-		
 		authorTextView.setTextColor(Color.parseColor(author.getColor()));
+
+		// Set the text on the TextView
+		TextView textView = (TextView) rowView.findViewById(R.id.post);
+		textView.setText(currentPost.getText());
 		
 		return rowView;
 	}

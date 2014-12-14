@@ -240,6 +240,9 @@ public class WallActivity extends Activity implements UserDelegate {
 						InputMethodManager imm = (InputMethodManager)getSystemService(
 								Context.INPUT_METHOD_SERVICE);
 						imm.hideSoftInputFromWindow(textField.getWindowToken(), 0);
+						
+					} else {
+						setSelection(0);
 					}
 				}
 			});
@@ -274,8 +277,7 @@ public class WallActivity extends Activity implements UserDelegate {
 
 	private static Bitmap getRoundedCornerBitmap(Bitmap bitmap) {
 
-		Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
-				bitmap.getHeight(), Config.ARGB_8888);
+		Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Config.ARGB_8888);
 		Canvas canvas = new Canvas(output);
 
 		final int color = 0xff424242;
