@@ -91,9 +91,9 @@ public class Utility {
 	 * @return Post object
 	 */
 	public static final Post buildPost(Cursor cursor) {
-		for (int i = 0; i < 3; i++){
+		/*for (int i = 0; i < 3; i++){
 			Log.d("DATABASE DEBUG", "col " + i + " # "+cursor.getString(i));
-		}
+		}*/
 		// Get id.
 		int id = cursor.getInt(0);
 		// Get poster id.

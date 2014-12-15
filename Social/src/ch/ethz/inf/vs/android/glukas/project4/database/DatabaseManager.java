@@ -262,20 +262,6 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 	/**
 	 *  TESTING
 	 */
-
-	// Inserts static test data in the DB
-	public void initializeTest(Context context) {
-		User user = new User("Alice");
-		this.putUser(user);
-		Post post = new Post(1, user.getId(), user.getId(), "Hello World!", null, new Date());
-		this.putPost(post);
-		post = new Post(2, user.getId(), user.getId(), "Amazing app!!", null, new Date());
-		this.putPost(post);
-		Bitmap icon = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher);
-		icon = Bitmap.createScaledBitmap(icon, 500, 500, false);
-		post = new Post(3, user.getId(), user.getId(), "Testing image.. and now with a much longer text to see how it breaks onto the next line and stuff..", icon, null);
-		this.putPost(post);
-	}
 	
 	// Empty all the tables
 	public void resetDB() {
@@ -295,34 +281,5 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 		
 		this.getReadableDatabase().delete(UsersEntry.TABLE_NAME, selection, selectionArgs);
 	}
-
-	// return a list of all user in the DB
-	public List<BasicUser> getAllUser() {
-
-		String[] projection = {};
-		
-		String selection = null;
-		
-		String[] selectionArgs = {};
-		
-		String orderBy = UsersEntry.USERNAME + " DESC";
-		
-		SQLiteDatabase db = this.getReadableDatabase();
-		
-		Cursor cursor = db.query(UsersEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, orderBy);
-		
-		if(cursor.moveToFirst()) {
-			while(!cursor.isAfterLast()) {
-				// TODO: implement checks for basic users
-				
-			}
-		}
-		
-		return null;
-	}
-
-	// return a list of all post in the DB
-	public List<Post> getAllPost() {
-		return null;
-	}
+	
 }

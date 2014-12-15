@@ -54,21 +54,19 @@ public class Post implements Comparable<Post> {
 	 * Network point of view
 	 * Create a new Post
 	 * @param msg
-	 * @param id
+	 * @param id the local lamport time stamp
 	 */
 	public Post(Message msg, int id) {
 		MessageType type = msg.getRequestType();
 		this.poster = msg.getSender();
 		this.wallOwner = msg.getReceiver();
+		this.id = Math.max(id+1, msg.getId());//Lamport time stamps, TODO: this way we always set the new post on top, this may not be what we want
+		this.text = msg.getMessage();
 		if (type.equals(MessageType.POST_PICTURE)) {
-			this.id = msg.getId();
-			this.text = msg.getMessage();
 			this.image = null;
 			this.type = PostType.PICTURE;
 			this.imageLink = msg.getHttpLink();
 		} else if (type.equals(MessageType.POST_TEXT)) {
-			this.id = msg.getId();
-			this.text = msg.getMessage();
 			this.image = null;
 			this.type = PostType.TEXT;
 			this.imageLink = "";

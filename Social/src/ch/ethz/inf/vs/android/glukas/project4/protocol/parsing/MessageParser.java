@@ -15,7 +15,7 @@ import ch.ethz.inf.vs.android.glukas.project4.protocol.StatusByte;
  */
 public class MessageParser {
 
-	public static Message parseMessage(String message, PublicHeader header, DatabaseAccess db) {
+	public static Message parseMessage(String message, PublicHeader header) {
 
 		// Parse the header
 		Message msg = MessageFactory.newEmptyMessage();

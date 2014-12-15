@@ -18,7 +18,7 @@ public class MessagesParsingTest extends AndroidTestCase {
 		Message getPostMessage1 = MessageFactory.newGetPostsMessage(Data.dummyOldPostCount, Data.dummySender.getId(), Data.dummyReceiver.getId());
 		String getPostMessageTxt = JSONObjectFactory.createJSONObject(getPostMessage1).toString();
 		PublicHeader header = new PublicHeader(0, null, StatusByte.SEND.getByte(), 0, Data.dummySender.getId(), Data.dummyReceiver.getId());
-		Message getPostMessage2 = MessageParser.parseMessage(getPostMessageTxt, header, Data.db);
+		Message getPostMessage2 = MessageParser.parseMessage(getPostMessageTxt, header);
 		boolean equals = getPostMessage1.toString().equals(getPostMessage2.toString());
 		if (!equals){
 			Log.d("Before Parsing", Data.tag+" "+getPostMessage1.toString());
@@ -34,7 +34,7 @@ public class MessagesParsingTest extends AndroidTestCase {
 		PublicHeader header = new PublicHeader(0, null, StatusByte.SEND.getByte(), 0, Data.dummySender.getId(), Data.dummyReceiver.getId());
 		
 		//Log.i("DEBUG",Data.tag+sendStateMessageTxt);
-		Message sendStateMessage2 = MessageParser.parseMessage(sendStateMessageTxt, header, Data.db);
+		Message sendStateMessage2 = MessageParser.parseMessage(sendStateMessageTxt, header);
 		boolean equals = sendStateMessage1.toString().equals(sendStateMessage2.toString());
 		if (!equals){
 			Log.d("Before Parsing", Data.tag+" "+sendStateMessage1.toString());
@@ -50,7 +50,7 @@ public class MessagesParsingTest extends AndroidTestCase {
 		PublicHeader header = new PublicHeader(0, null, StatusByte.SEND.getByte(), 0, Data.dummySender.getId(), Data.dummyReceiver.getId());
 		
 		//Log.i("DEBUG",Data.tag+getStateMessageTxt);
-		Message sendStateMessage2 = MessageParser.parseMessage(getStateMessageTxt, header, Data.db);
+		Message sendStateMessage2 = MessageParser.parseMessage(getStateMessageTxt, header);
 		boolean equals = getStateMessage1.toString().equals(sendStateMessage2.toString());
 		if (!equals){
 			Log.d("Before Parsing", Data.tag+" "+getStateMessage1.toString());
@@ -67,7 +67,7 @@ public class MessagesParsingTest extends AndroidTestCase {
 		PublicHeader header = new PublicHeader(0, null, StatusByte.SEND.getByte(), 0, Data.dummySender.getId(), Data.dummyReceiver.getId());
 		
 		//Log.i("DEBUG",Data.tag+getStateMessageTxt);
-		Message sendStateMessage2 = MessageParser.parseMessage(getStateMessageTxt, header, Data.db);
+		Message sendStateMessage2 = MessageParser.parseMessage(getStateMessageTxt, header);
 		boolean equals = getStateMessage1.toString().equals(sendStateMessage2.toString());
 		if (!equals){
 			Log.d("Before Parsing", Data.tag+" "+getStateMessage1.toString());
@@ -84,7 +84,7 @@ public class MessagesParsingTest extends AndroidTestCase {
 		PublicHeader header = new PublicHeader(0, null, StatusByte.SEND.getByte(), 0, Data.dummySender.getId(), Data.dummyReceiver.getId());
 		
 		//Log.i("DEBUG",Data.tag+getPostMessageTxt);
-		Message sendPostMessage2 = MessageParser.parseMessage(getPostMessageTxt, header, Data.db);
+		Message sendPostMessage2 = MessageParser.parseMessage(getPostMessageTxt, header);
 		boolean equals = getPostMessage1.toString().equals(sendPostMessage2.toString());
 		if (!equals){
 			Log.d("Before Parsing", Data.tag+" "+getPostMessage1.toString());
@@ -102,7 +102,7 @@ public class MessagesParsingTest extends AndroidTestCase {
 		PublicHeader header = new PublicHeader(0, null, StatusByte.SEND.getByte(), 0, Data.dummySender.getId(), Data.dummyReceiver.getId());
 		
 		//Log.i("DEBUG",Data.tag+getPostMessageTxt);
-		Message sendPostMessage2 = MessageParser.parseMessage(getPostMessageTxt, header, Data.db);
+		Message sendPostMessage2 = MessageParser.parseMessage(getPostMessageTxt, header);
 		boolean equals = getPostMessage1.toString().equals(sendPostMessage2.toString());
 		if (!equals){
 			Log.d("Before Parsing", Data.tag+" "+getPostMessage1.toString());

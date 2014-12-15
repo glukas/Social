@@ -163,22 +163,6 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 		userHandler.onPostReceived(post);
 	}
 
-	/*@Override
-	public void postPost(Post post) throws DatabaseException {
-		if (post.getWallOwner().equals(localUser.getId())) {
-			postLocally(post);
-		
-		  } else {
-			throw new UnhandledFunctionnality();
-			//database.putFriendPost(post, post.getWallOwner())
-			Message msg = MessageFactory.newPostMessage(post, localUser, database.getFriend(post.getWallOwner()), false);
-			PublicHeader header = new PublicHeader(0, null, StatusByte.POST.getByte(), post.getId(), localUser.getId(), post.getWallOwner());
-			secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg).toString(), header));
-		//	userHandler.onPostReceived(post);
-		}
-
-	}*/
-
 	@Override
 	public void getUserWall(UserId userId) {
 		getUserPosts(userId, 0);
@@ -230,25 +214,23 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 		StatusByte status = StatusByte.constructStatusByte(message.header.getConsistency());
 		Log.d(this.getClass().toString(), "header received : " + status.name());
 		//react to an incoming message
-		if (message.text.length == 0) {
+		
+		if (message.text.length == 0) {//
 			onHeaderReceived(message.header);
 		} else {
 
-			Message msg = MessageParser.parseMessage(message.getText(), message.header, database);
+			Message msg = MessageParser.parseMessage(message.getText(), message.header);
 
 			MessageType type = msg.getRequestType();
 
-			// Post new messages
-			if (type.equals(MessageType.POST_PICTURE)) {
+			if (type.equals(MessageType.POST_PICTURE)) {// Post new messages
 				onPostPictureReceived(msg);
 			} else if (type.equals(MessageType.POST_TEXT)) {
 				onPostTextReceived(msg);
 			} else if (type.equals(MessageType.ACK_POST)) {
 				onAckPostReceived(msg);
-			}
-
-			// Retrieve data
-			else if (type.equals(MessageType.GET_POSTS)) {
+				
+			} else if (type.equals(MessageType.GET_POSTS)) {// Retrieve data
 				onGetPostsReceived(msg);
 			} else if (type.equals(MessageType.SHOW_IMAGE)) {
 				onShowImageReceived(msg);
@@ -293,10 +275,13 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 	
 	private void onPostReceived(Message msg) {
 		//A friend posted a post onto the wall's local user
-		int msgId = database.getFriendMaxPostsId(localUser.getId());
-		Post post = new Post(msg, msgId);
-		database.putPost(post);
-		userHandler.onPostReceived(post);
+		if (!msg.sender.equals(localUser.getId()) && msg.receiver.equals(localUser.getId())) {
+			int msgId = database.getFriendMaxPostsId(localUser.getId());
+			Post post = new Post(msg, msgId);
+			database.putPost(post);
+			database.setUserMaxPostsId(post.getId());
+			userHandler.onPostReceived(post);
+		}
 	}
 	
 	private void onAckPostReceived(Message msg) {

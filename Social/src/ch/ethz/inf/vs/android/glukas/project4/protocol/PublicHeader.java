@@ -144,4 +144,9 @@ public class PublicHeader {
 		}
 		return false;
 	}
+	
+	
+	public String toString() {
+		return "PublicHeader [ type : " + StatusByte.constructStatusByte(this.consistency).name()  + ",sender " + this.sender.getId().toString() + ", receiver : " + this.receiver.getId() + "]";  
+	}
 }
