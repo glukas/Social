@@ -95,7 +95,13 @@ public class ContactDetailActivity extends WallActivity {
 	// Save friend in database
 	private void saveFriend(FriendshipResponse response) {
 		wallOwner = response.getSender();
-		mProtocol.putFriend(response.getSender());
+		final User friend = wallOwner;
+		this.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				mProtocol.putFriend(friend);
+			}
+		});
 	}
 
 	private void showFriend(User friend) {

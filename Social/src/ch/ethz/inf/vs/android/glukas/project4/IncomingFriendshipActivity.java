@@ -110,7 +110,13 @@ OnNdefPushCompleteCallback, RegistrationDialogFragmentDelegate {
 
 	// Save friend in database
 	private void saveFriend(FriendshipRequest request) {
-		protocol.putFriend(request.getSender());
+		final User friend = request.getSender();
+		this.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				protocol.putFriend(friend);
+			}
+		});
 	}
 
 	private void displayRequest(FriendshipRequest request) {

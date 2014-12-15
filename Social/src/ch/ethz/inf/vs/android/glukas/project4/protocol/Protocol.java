@@ -60,8 +60,12 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 		secureChannel = new SecureChannel("winti.mooo.com", 9000, new DBCredentialStorage(db));
 		secureChannel.setDelegate(this);
 		messageRelay = new MessageRelay(secureChannel);
-		List<User> users = database.getUserFriendsList();
 		userMapping = new HashMap<UserId, User>();
+		refreshUserMapping();
+	}
+	
+	private void refreshUserMapping() {
+		List<User> users = database.getUserFriendsList();
 		for (User user : users) {
 			userMapping.put(user.getId(), user);
 		}
@@ -108,13 +112,16 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 	public void putUser(User user) {
 		database.putUser(user);
 		localUser = user;
-		userMapping.put(user.getId(), user);
+		refreshUserMapping();
+		//userMapping.put(user.getId(), user);
 	}
 	
 	@Override
 	public void putFriend(User friend) {
 		database.putFriend(friend);
-		userMapping.put(friend.getId(), friend);
+		refreshUserMapping();
+		//userMapping.put(friend.getId(), friend);
+		//Log.d(this.getClass().toString(), userMapping.toString());
 	}
 	
 	@Override
@@ -124,6 +131,7 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 	
 	@Override
 	public Map<UserId, User> getUserMapping() {
+		refreshUserMapping();
 		return Collections.unmodifiableMap(userMapping);
 	}
 
@@ -215,7 +223,7 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 		Log.d(this.getClass().toString(), "header received : " + status.name());
 		//react to an incoming message
 		
-		if (message.text.length == 0) {//
+		if (message.text.length == 0) {
 			onHeaderReceived(message.header);
 		} else {
 
