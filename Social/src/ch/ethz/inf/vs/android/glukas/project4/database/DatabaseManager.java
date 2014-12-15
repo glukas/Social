@@ -36,7 +36,7 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 
 	// DB Metadata
 	private static final String DATABASE_NAME = "SocialDB";
-	private static final int DATABASE_VERSION = 10;
+	private static final int DATABASE_VERSION = 11;
 
 	// CREATION
 	public DatabaseManager(Context context) {

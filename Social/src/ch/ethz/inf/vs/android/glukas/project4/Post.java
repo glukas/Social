@@ -66,7 +66,7 @@ public class Post implements Comparable<Post> {
 			this.image = null;
 			this.type = PostType.PICTURE;
 			this.imageLink = msg.getHttpLink();
-		} else if (type.equals(MessageType.POST_TEXT)) {
+		} else if (type.equals(MessageType.POST_TEXT) || type.equals(MessageType.SEND_TEXT)) {
 			this.image = null;
 			this.type = PostType.TEXT;
 			this.imageLink = "";

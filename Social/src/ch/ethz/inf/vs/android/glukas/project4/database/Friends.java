@@ -25,9 +25,9 @@ class Friends {
 		// SQL SELECT clause
 		String[] projection = {UsersEntry.COUNT};
 		// SQL WHERE clause
-		String selection = UsersEntry.USER_ID + " == ? AND " + UsersEntry.IS_FRIEND + " == ?";
+		String selection = UsersEntry.USER_ID + " == ?";
 		// Arguments for selection
-		String[] selectionArgs = {Utility.toSQLiteId(id), "1"};
+		String[] selectionArgs = {Utility.toSQLiteId(id)};
 		
 		// Execute query
 		Cursor cursor = db.query(UsersEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, null);
@@ -162,9 +162,9 @@ class Friends {
 		// SQL SELECT clause
 		String[] projection = null;
 		// SQL WHERE clause
-		String selection = UsersEntry.USER_ID + " == ? AND " + UsersEntry.IS_FRIEND + " == ?";
+		String selection = UsersEntry.USER_ID + " == ? ";
 		// Arguments for selection.
-		String[] selectionArgs = {Utility.toSQLiteId(friendid), "1"};
+		String[] selectionArgs = {Utility.toSQLiteId(friendid)};
 		
 		// Execute query.
 		Cursor cursor = db.query(UsersEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, null);

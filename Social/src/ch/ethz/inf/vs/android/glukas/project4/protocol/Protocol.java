@@ -86,6 +86,7 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 
 	//caching
 	private User localUser;
+	private UserId currentWall;
 	private Map<UserId, User> userMapping;
 	
 	//exceptional behaviors
@@ -202,9 +203,10 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 		}
 		
 		//ask for update
-		Message msg = MessageFactory.newTypeMessage(MessageType.GET_STATE);
-		PublicHeader header = new PublicHeader(0, null, StatusByte.DATA.getByte(), 0, localUser.getId(), userId);
-		secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg).toString(), header));
+		this.currentWall = userId;
+		//Message msg = MessageFactory.newTypeMessage(MessageType.GET_STATE);
+		//PublicHeader header = new PublicHeader(PublicHeader.BYTES_LENGTH_HEADER, null, StatusByte.DATA.getByte(), 0, localUser.getId(), userId);
+		//secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg).toString(), header));
 	}
 
 	@Override
@@ -220,7 +222,7 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 	public void onMessageReceived(NetworkMessage message) {
 		
 		StatusByte status = StatusByte.constructStatusByte(message.header.getConsistency());
-		Log.d(this.getClass().toString(), "header received : " + status.name());
+		//Log.d(this.getClass().toString(), "header received : " + status.name());
 		//react to an incoming message
 		
 		if (message.text.length == 0) {
@@ -268,7 +270,11 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 	}
 	
 	private void onHeaderReceived(PublicHeader header) {
-
+		if (header.getConsistency() == StatusByte.CONNECT.getByte()) {
+			Message msg = MessageFactory.newTypeMessage(MessageType.GET_STATE);
+			PublicHeader request = new PublicHeader(PublicHeader.BYTES_LENGTH_HEADER, null, StatusByte.DATA.getByte(), 0, localUser.getId(), currentWall);
+			secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg).toString(), request));
+		}
 	}
 
 	private void onPostPictureReceived(Message msg) {
@@ -350,13 +356,16 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 	}
 	
 	private void onGetStateReceived(Message msg) {
+		
+		Log.d(this.getClass().toString(), "onGetStateReceived");
+		
 		//Someone wants user state, so retrieve data from database
-		int maxPostId = database.getFriendMaxPostsId(localUser.getId());
-		int maxNumMsgs = database.getFriendMaxPostsId(localUser.getId());
+		int maxPostId = database.getUserMaxPostsId();
+		int maxNumMsgs = database.getUserPostsCount();
 		
 		//create message encapsulating all informations
 		UserId userToSend = msg.getSender();
-		String msgToSend = JSONObjectFactory.createJSONObject(MessageFactory.newSendStateMessage(localUser.getId(), userToSend, maxPostId, maxNumMsgs)).toString();
+		String msgToSend = JSONObjectFactory.createJSONObject(MessageFactory.newSendStateMessage(localUser.getId(), userToSend, maxPostId, maxNumMsgs), maxNumMsgs).toString();
 		PublicHeader header = new PublicHeader(0, null, StatusByte.SEND.getByte(), 0, localUser.getId(), userToSend);
 		
 		//send reply

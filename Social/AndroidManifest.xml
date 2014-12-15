@@ -28,12 +28,14 @@
         android:label="Tests"
         android:targetPackage="ch.ethz.inf.vs.android.glukas.project4" />
 
-    <application>
-        <uses-library android:name="android.test.runner" />
-        android:allowBackup="true"
+    <application
+        android:allowBackup="false"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+         >
+        
+        <uses-library android:name="android.test.runner" />
+       
         <activity
             android:name=".MainActivity"
             android:label="@string/title_activity_main" 
@@ -49,7 +51,8 @@
             android:name=".IncomingFriendshipActivity"
             android:label="@string/title_activity_incoming_friendship"
             android:parentActivityName=".MainActivity"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait"
+            >
             <intent-filter>
                 <action android:name="android.nfc.action.NDEF_DISCOVERED" />
 

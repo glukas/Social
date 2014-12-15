@@ -56,7 +56,8 @@ public class MessageParser {
 		
 		// State
 		else if (command.equals(Args.GET_STATE.getStr())) {
-			//empty message, only header is important
+			msg.setRequestType(MessageType.GET_STATE);
+			
 		} else if (command.equals(Args.SEND_STATE.getStr())) {
 			parseSendState(msg, obj);
 		} 

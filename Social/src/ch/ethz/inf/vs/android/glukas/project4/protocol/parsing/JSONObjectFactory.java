@@ -57,10 +57,8 @@ public class JSONObjectFactory {
 				setSendTextObj(request, obj);
 			} else if (request.getRequestType().equals(MessageType.GET_STATE)) {
 				setGetStateObj(request, obj);
-	
-				// In case of Unknown message
 			} else {
-					throw new UnknowRequestType(request.getRequestType());
+				throw new UnknowRequestType(request.getRequestType());
 			}
 			
 		} catch (JSONException e) {

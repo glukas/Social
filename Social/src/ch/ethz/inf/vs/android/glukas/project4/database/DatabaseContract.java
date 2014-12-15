@@ -38,7 +38,7 @@ public final class DatabaseContract {
 				"date_time TEXT, " +
 				"text TEXT, " +
 				"image BLOB, " +
-				"PRIMARY KEY("+BaseColumns._ID+", poster_id), " +
+				"PRIMARY KEY("+BaseColumns._ID+", wall_id, poster_id), " +
 				"FOREIGN KEY (poster_id) REFERENCES users(user_id) ON DELETE SET NULL," +
 				"FOREIGN KEY (wall_id) REFERENCES users(user_id) ON DELETE CASCADE" +
 				");");

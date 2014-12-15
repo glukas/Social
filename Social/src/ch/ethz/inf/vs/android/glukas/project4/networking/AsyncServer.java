@@ -75,16 +75,13 @@ public class AsyncServer {
 	}
 	
 	private void postReceivedToDelegate(final byte[] message) {		
-		Log.i("DEBUG", "###"+"new message");
+		Log.i(this.getClass().toString(), "postReceivedToDelegate");
 		delegate.getCallbackHandler().post(new Runnable() {
 			@Override
 			public void run() {
 				delegate.onReceive(message);
 			}
 		});
-		Log.i("DEBUG", "###"+"post returned");
-		
-	//	delegate.onReceive(message);
 	}
 	
 	public void close() {
