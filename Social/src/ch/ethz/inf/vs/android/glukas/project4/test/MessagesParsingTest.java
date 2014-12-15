@@ -15,7 +15,7 @@ public class MessagesParsingTest extends AndroidTestCase {
 	
 	@Test
 	public void testGetPostMessage() {
-		Message getPostMessage1 = MessageFactory.newGetPostsMessage(Data.dummyOldPostCount, Data.dummySender, Data.dummyReceiver);
+		Message getPostMessage1 = MessageFactory.newGetPostsMessage(Data.dummyOldPostCount, Data.dummySender.getId(), Data.dummyReceiver.getId());
 		String getPostMessageTxt = JSONObjectFactory.createJSONObject(getPostMessage1).toString();
 		PublicHeader header = new PublicHeader(0, null, StatusByte.SEND.getByte(), 0, Data.dummySender.getId(), Data.dummyReceiver.getId());
 		Message getPostMessage2 = MessageParser.parseMessage(getPostMessageTxt, header, Data.db);
@@ -29,7 +29,7 @@ public class MessagesParsingTest extends AndroidTestCase {
 	
 	@Test
 	public void testSendStateMessage() {
-		Message sendStateMessage1 = MessageFactory.newSendStateMessage(Data.dummySender, Data.dummyReceiver, Data.dummyPostId, Data.dummyNumMsg);
+		Message sendStateMessage1 = MessageFactory.newSendStateMessage(Data.dummySender.getId(), Data.dummyReceiver.getId(), Data.dummyPostId, Data.dummyNumMsg);
 		String sendStateMessageTxt = JSONObjectFactory.createJSONObject(sendStateMessage1, sendStateMessage1.getNumM()).toString();
 		PublicHeader header = new PublicHeader(0, null, StatusByte.SEND.getByte(), 0, Data.dummySender.getId(), Data.dummyReceiver.getId());
 		
@@ -45,7 +45,7 @@ public class MessagesParsingTest extends AndroidTestCase {
 
 	@Test
 	public static void testGetStateMessage() {
-		Message getStateMessage1 = MessageFactory.newGetStateMessage(Data.dummySender, Data.dummyReceiver);
+		Message getStateMessage1 = MessageFactory.newGetStateMessage(Data.dummySender.getId(), Data.dummyReceiver.getId());
 		String getStateMessageTxt = JSONObjectFactory.createJSONObject(getStateMessage1).toString();
 		PublicHeader header = new PublicHeader(0, null, StatusByte.SEND.getByte(), 0, Data.dummySender.getId(), Data.dummyReceiver.getId());
 		
@@ -62,7 +62,7 @@ public class MessagesParsingTest extends AndroidTestCase {
 	
 	@Test
 	public static void testAckMessage() {
-		Message getStateMessage1 = MessageFactory.newAckMessage(Data.dummySender, Data.dummyReceiver);
+		Message getStateMessage1 = MessageFactory.newAckMessage(Data.dummySender.getId(), Data.dummyReceiver.getId());
 		String getStateMessageTxt = JSONObjectFactory.createJSONObject(getStateMessage1).toString();
 		PublicHeader header = new PublicHeader(0, null, StatusByte.SEND.getByte(), 0, Data.dummySender.getId(), Data.dummyReceiver.getId());
 		
@@ -79,7 +79,7 @@ public class MessagesParsingTest extends AndroidTestCase {
 	@Test
 	public static void testPostMessage() {
 		Post post = new Post(67, Data.dummySenderId, Data.dummyReceiverId, "I'm a post!", null, null);
-		Message getPostMessage1 = MessageFactory.newPostMessage(post, Data.dummySender, Data.dummyReceiver, false);
+		Message getPostMessage1 = MessageFactory.newPostMessage(post, Data.dummySender.getId(), Data.dummyReceiver.getId(), false);
 		String getPostMessageTxt = JSONObjectFactory.createJSONObject(getPostMessage1).toString();
 		PublicHeader header = new PublicHeader(0, null, StatusByte.SEND.getByte(), 0, Data.dummySender.getId(), Data.dummyReceiver.getId());
 		
@@ -97,7 +97,7 @@ public class MessagesParsingTest extends AndroidTestCase {
 	@Test
 	public static void testSendMessage() {
 		Post post = new Post(67, Data.dummySenderId, Data.dummyReceiverId, "I'm a post!", null, null);
-		Message getPostMessage1 = MessageFactory.newPostMessage(post, Data.dummySender, Data.dummyReceiver, true);
+		Message getPostMessage1 = MessageFactory.newPostMessage(post, Data.dummySender.getId(), Data.dummyReceiver.getId(), true);
 		String getPostMessageTxt = JSONObjectFactory.createJSONObject(getPostMessage1).toString();
 		PublicHeader header = new PublicHeader(0, null, StatusByte.SEND.getByte(), 0, Data.dummySender.getId(), Data.dummyReceiver.getId());
 		

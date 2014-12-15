@@ -12,20 +12,20 @@ import android.graphics.Bitmap;
 
 public class Post implements Comparable<Post> {
 
-	private String text;
+	private final String text;
 	// It would be nice if we can manage to have multiple images per post. But maybe it make things to 
 	// complicate
 	private Bitmap image;
 	private String imageLink;
 	//the id is crucial for sorting.
-	private int id;
+	private final int id;
 	//date will not be used for sorting, but can provide friendly user content
 	private Date datetime;
 	// Id of the user that posted the message
-	private UserId poster;
+	private final UserId poster;
 	// Id of the user that owns the wall where the post is
-	private UserId wallOwner;
-	private PostType type;
+	private final UserId wallOwner;
+	private final PostType type;
 	
 	/**
 	 * Database and user interface point of view.
@@ -58,8 +58,8 @@ public class Post implements Comparable<Post> {
 	 */
 	public Post(Message msg, int id) {
 		MessageType type = msg.getRequestType();
-		this.poster = msg.getSender().id;
-		this.wallOwner = msg.getReceiver().id;
+		this.poster = msg.getSender();
+		this.wallOwner = msg.getReceiver();
 		if (type.equals(MessageType.POST_PICTURE)) {
 			this.id = msg.getId();
 			this.text = msg.getMessage();

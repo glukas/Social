@@ -141,12 +141,11 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 	public void post(UserId wallOwner, String text, Bitmap image) {
 		Post post = new Post(getNewPostId(wallOwner), localUser.getId(), wallOwner, text, image, new Date());
 		postLocally(post);
-		//post on some friends wall:
-		if (!wallOwner.equals(localUser)) {
-			Message msg = MessageFactory.newPostMessage(post, localUser, database.getFriend(post.getWallOwner()), false);
-			PublicHeader header = new PublicHeader(0, null, StatusByte.POST.getByte(), post.getId(), localUser.getId(), post.getWallOwner());
-			secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg).toString(), header));
-		}
+		
+		Message msg = MessageFactory.newPostMessage(post, localUser.getId(), post.getWallOwner(), false);
+		PublicHeader header = new PublicHeader(0, null, StatusByte.POST.getByte(), post.getId(), localUser.getId(), post.getWallOwner());
+		secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg).toString(), header));
+		
 	}
 	
 	@Override
@@ -308,8 +307,8 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 	private void onGetPostsReceived(Message msg) {
 		List<Post> listPosts = database.getAllFriendPostsFrom(localUser.getId(), msg.getId());
 		for (Post post : listPosts){
-			String msgTxt = JSONObjectFactory.createJSONObject(MessageFactory.newPostMessage(post, localUser, msg.getSender(), true)).toString();
-			PublicHeader header = new PublicHeader(0, null, StatusByte.SEND.getByte(), post.getId(), localUser.getId(), msg.getSender().getId());
+			String msgTxt = JSONObjectFactory.createJSONObject(MessageFactory.newPostMessage(post, localUser.getId(), msg.getSender(), true)).toString();
+			PublicHeader header = new PublicHeader(0, null, StatusByte.SEND.getByte(), post.getId(), localUser.getId(), msg.getSender());
 			NetworkMessage networkMsg = new NetworkMessage(msgTxt, header);
 			secureChannel.sendMessage(networkMsg);
 		}
@@ -338,7 +337,7 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 	
 	private void onSendStateReceived(Message msg) {
 		//Someone send his / her state, so retrieve data from the message
-		UserId friendId = msg.getSender().getId();
+		UserId friendId = msg.getSender();
 		int numMsgs = msg.getNumM();
 		int maxPostId = msg.getId();
 		
@@ -346,7 +345,7 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 		int oldMaxPostId = database.getFriendMaxPostsId(friendId);
 		int oldNumMsgs = database.getFriendPostsCount(friendId);
 		if (oldNumMsgs < numMsgs) {
-			Message msgToSend = MessageFactory.newGetPostsMessage(oldMaxPostId, localUser, msg.getSender());
+			Message msgToSend = MessageFactory.newGetPostsMessage(oldMaxPostId, localUser.getId(), msg.getSender());
 			PublicHeader header = new PublicHeader(0, null, StatusByte.SEND.getByte(), 0, localUser.getId(), friendId);
 			NetworkMessage networkMessage = new NetworkMessage(JSONObjectFactory.createJSONObject(msgToSend).toString(), header);
 			secureChannel.sendMessage(networkMessage);
@@ -363,9 +362,9 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 		int maxNumMsgs = database.getFriendMaxPostsId(localUser.getId());
 		
 		//create message encapsulating all informations
-		BasicUser userToSend = msg.getSender();
-		String msgToSend = JSONObjectFactory.createJSONObject(MessageFactory.newSendStateMessage(localUser, userToSend, maxPostId, maxNumMsgs)).toString();
-		PublicHeader header = new PublicHeader(0, null, StatusByte.SEND.getByte(), 0, localUser.getId(), userToSend.getId());
+		UserId userToSend = msg.getSender();
+		String msgToSend = JSONObjectFactory.createJSONObject(MessageFactory.newSendStateMessage(localUser.getId(), userToSend, maxPostId, maxNumMsgs)).toString();
+		PublicHeader header = new PublicHeader(0, null, StatusByte.SEND.getByte(), 0, localUser.getId(), userToSend);
 		
 		//send reply
 		secureChannel.sendMessage(new NetworkMessage(msgToSend, header));

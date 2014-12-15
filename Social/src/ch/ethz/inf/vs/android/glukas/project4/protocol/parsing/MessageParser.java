@@ -19,8 +19,8 @@ public class MessageParser {
 
 		// Parse the header
 		Message msg = MessageFactory.newEmptyMessage();
-		msg.setSender(db.getFriend(header.getSender()));
-		msg.setReceiver(db.getFriend(header.getReceiver()));
+		msg.setSender(header.getSender());
+		msg.setReceiver(header.getReceiver());
 		msg.setPostId(header.getMessageId());
 		
 		// Get status of the message

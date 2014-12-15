@@ -112,8 +112,9 @@ public class JSONObjectFactory {
 	}
 
 	private static void setAskFriendshipObj(Message request, JSONObject obj) throws JSONException {
-		obj.put(Cmds.CMD.getStr(), Args.ASK_FRIEND.getStr());
-		obj.put(Cmds.FROM.getStr(), request.getSender().getUsername());
+		throw new RuntimeException("Not supported");
+		//obj.put(Cmds.CMD.getStr(), Args.ASK_FRIEND.getStr());
+		//obj.put(Cmds.FROM.getStr(), request.getSender().getUsername());
 	}
 
 	////

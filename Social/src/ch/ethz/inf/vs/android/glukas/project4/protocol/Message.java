@@ -1,6 +1,7 @@
 package ch.ethz.inf.vs.android.glukas.project4.protocol;
 
 import ch.ethz.inf.vs.android.glukas.project4.BasicUser;
+import ch.ethz.inf.vs.android.glukas.project4.UserId;
 
 /**
  * A Message used by the protocol send over the network. (Either by the user or received from outside world)
@@ -20,7 +21,7 @@ public class Message {
 	 * @param id
 	 * @param numM
 	 */
-	public Message(BasicUser sender, BasicUser receiver, int postId, MessageType type, String link, String msg, String username, int id, int numM){
+	public Message(UserId sender, UserId receiver, int postId, MessageType type, String link, String msg, String username, int id, int numM){
 		this.sender = sender;
 		this.receiver = receiver;
 		this.postId = postId;
@@ -33,8 +34,8 @@ public class Message {
 	}
 	
 	//header
-	protected BasicUser sender;
-	protected BasicUser receiver;
+	protected UserId sender;
+	protected UserId receiver;
 	protected int postId;
 	protected MessageType requestType;
 	
@@ -49,19 +50,19 @@ public class Message {
 	//Getters and Setters
 	////
 	
-	public BasicUser getSender() {
+	public UserId getSender() {
 		return sender;
 	}
 
-	public void setSender(BasicUser sender) {
+	public void setSender(UserId sender) {
 		this.sender = sender;
 	}
 
-	public BasicUser getReceiver() {
+	public UserId getReceiver() {
 		return receiver;
 	}
 
-	public void setReceiver(BasicUser receiver) {
+	public void setReceiver(UserId receiver) {
 		this.receiver = receiver;
 	}
 
@@ -129,17 +130,17 @@ public class Message {
 	public String toString() {
 		if (sender != null) {
 			if (receiver != null){
-				return "Message of "+sender.getUsername()+" ("+sender.getId()+") received by "+receiver.getUsername()+" ("+receiver.getId()+
+				return "Message of "+" ("+sender.getId()+") received by "+" ("+receiver.getId()+
 						" )"+" with content : "+"(LINK)"+httpLink+" (MESSAGE) "+message+" (USERNAME)"+username+" (ID)"+id+
 						" (NUM_M)"+numM;
 			} else {
-				return "Message of "+sender.getUsername()+" ("+sender.getId()+") received by UNKNOWN with content : "
+				return "Message of "+" ("+sender.getId()+") received by UNKNOWN with content : "
 						+"(LINK)"+httpLink+" (MESSAGE) "+message+" (USERNAME)"+username+" (ID)"+id+
 						" (NUM_M)"+numM;
 			}
 		} else {
 			if (receiver != null){
-				return "Message of UNKNOWN received by "+receiver.getUsername()+" ("+receiver.getId()+
+				return "Message of UNKNOWN received by "+" ("+receiver.getId()+
 						" )"+" with content : "+"(LINK)"+httpLink+" (MESSAGE) "+message+" (USERNAME)"+username+" (ID)"+id+
 						" (NUM_M)"+numM;
 			} else {

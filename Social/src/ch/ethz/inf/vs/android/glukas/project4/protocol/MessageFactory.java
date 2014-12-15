@@ -3,6 +3,7 @@ package ch.ethz.inf.vs.android.glukas.project4.protocol;
 import ch.ethz.inf.vs.android.glukas.project4.BasicUser;
 import ch.ethz.inf.vs.android.glukas.project4.Post;
 import ch.ethz.inf.vs.android.glukas.project4.Post.PostType;
+import ch.ethz.inf.vs.android.glukas.project4.UserId;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.Message.MessageType;
 
 /**
@@ -32,7 +33,7 @@ public class MessageFactory {
 	 * @param isSend
 	 * @return
 	 */
-	public static Message newPostMessage(Post post, BasicUser sender, BasicUser receiver, boolean isSend) {
+	public static Message newPostMessage(Post post, UserId sender, UserId receiver, boolean isSend) {
 		if (isSend) {
 			if (post.getType().equals(PostType.PICTURE)){
 				return new Message(sender, receiver, post.getId(), MessageType.SEND_PICTURE, post.getImageLink(), post.getText(), "", post.getId(), 0);
@@ -56,7 +57,7 @@ public class MessageFactory {
 	 * @param numM
 	 * @return
 	 */
-	public static Message newSendStateMessage(BasicUser sender, BasicUser receiver, int id, int numM) {
+	public static Message newSendStateMessage(UserId sender, UserId receiver, int id, int numM) {
 		return new Message(sender, receiver, 0, MessageType.SEND_STATE, "", "", "", id, numM);
 	}
 	
@@ -66,7 +67,7 @@ public class MessageFactory {
 	 * @param receiver
 	 * @return
 	 */
-	public static Message newGetStateMessage(BasicUser sender, BasicUser receiver) {
+	public static Message newGetStateMessage(UserId sender, UserId receiver) {
 		return new Message(sender, receiver, 0, MessageType.GET_STATE, "", "", "", 0, 0);
 	}
 	
@@ -76,7 +77,7 @@ public class MessageFactory {
 	 * @param receiver
 	 * @return
 	 */
-	public static Message newAckMessage(BasicUser sender, BasicUser receiver) {
+	public static Message newAckMessage(UserId sender, UserId receiver) {
 		return new Message(sender, receiver, 0, MessageType.ACK_POST, "", "", "", 0, 0);
 	}
 	
@@ -87,7 +88,7 @@ public class MessageFactory {
 	 * @param receiver
 	 * @return
 	 */
-	public static Message newGetPostsMessage(int oldCountPost, BasicUser sender, BasicUser receiver) {
+	public static Message newGetPostsMessage(int oldCountPost, UserId sender, UserId receiver) {
 		return new Message(sender, receiver, 0, MessageType.GET_POSTS, "", "", "", oldCountPost, 0);
 	}
 	
