@@ -1,0 +1,26 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{mathabx}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\pagestyle{headings}
+\author{Lukas Gianinazzi}
+\title{Technical Report}
+\date{2014}
+\begin{document}
+
+\maketitle
+
+
+\section*{Security}
+
+The cryptography is peer-to-peer. The server acts as a relay for the client messages and is untrusted.
+
+On first application start, every peer generates a broadcast key. A broadcast key is a pair $(k_1, k_2)$ where $k_1$ is used for encryption and $k_2$ for message authentication.
+
+To establish a friendship, peers exchange their contact information and broadcast keys over Near-Field-Communication. Keys are exchanged in plain. This is reasonable under the assumption that the exchange occurs in a relatively private place.
+
+To post a message on Bob's wall, Alice encrypts and authenticates the post under Bob's key and broadcasts it to all friends of Bob. Since all friends of Bob share Bob's key, it is possible to post a message by encrypting it only once. Encryption is done by combining AES-128 in CBC mode and an HMAC based on SHA256 in an "Encrypt-then-Authenticate" fashion. More concretely the encryption function for message $m$ with public header $h$ is $Enc_{(k_1, k_2)}(h|m) = h | MAC_{k_2}(h | Enc_{k_1}(m)) | Enc_{k_1}(m)$.
+Assuming that no friends are compromised, this gives us authenticity and chosen plaintext security for the transmission of posts. A compromised peer exposes the communication of all of his or her friends. However, it is very expensive to eavesdrop or manipulate communication on a large scale, as there is no central storage or transmission of key material.
+
+\end{document}
