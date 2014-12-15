@@ -101,13 +101,11 @@ OnNdefPushCompleteCallback, RegistrationDialogFragmentDelegate {
 			return;
 		}
 
-		nfcAdapter.setNdefPushMessageCallback(response, this);
-		nfcAdapter.setOnNdefPushCompleteCallback(this, this);
-
 		displayRequest(request);
 		if (protocol.getUser() != null) {
 			prepareResponse();
 		}
+
 	}
 
 	// Save friend in database
@@ -123,7 +121,10 @@ OnNdefPushCompleteCallback, RegistrationDialogFragmentDelegate {
 	}
 
 	private void prepareResponse() {
+		Log.d(this.getClass().toString(), "prepare response");
 		response = request.createAcceptingResponse(protocol.getUser());
+		nfcAdapter.setNdefPushMessageCallback(response, this);
+		nfcAdapter.setOnNdefPushCompleteCallback(this, this);
 	}
 
 	////

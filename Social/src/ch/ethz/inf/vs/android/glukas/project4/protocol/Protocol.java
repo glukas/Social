@@ -145,7 +145,7 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 		if (!wallOwner.equals(localUser)) {
 			Message msg = MessageFactory.newPostMessage(post, localUser, database.getFriend(post.getWallOwner()), false);
 			PublicHeader header = new PublicHeader(0, null, StatusByte.POST.getByte(), post.getId(), localUser.getId(), post.getWallOwner());
-			//secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg).toString(), header));
+			secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg).toString(), header));
 		}
 	}
 	
@@ -213,7 +213,7 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 		//ask for update
 		Message msg = MessageFactory.newTypeMessage(MessageType.GET_STATE);
 		PublicHeader header = new PublicHeader(0, null, StatusByte.DATA.getByte(), 0, localUser.getId(), userId);
-		//secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg).toString(), header));
+		secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg).toString(), header));
 	}
 
 	@Override
@@ -227,12 +227,44 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 
 	@Override
 	public void onMessageReceived(NetworkMessage message) {
-		//react to an incoming message
-		Message msg = MessageParser.parseMessage(message.getText(), message.header, database);
 		
-		MessageType type = msg.getRequestType();
-	
-			// Friends
+		StatusByte status = StatusByte.constructStatusByte(message.header.getConsistency());
+		Log.d(this.getClass().toString(), "header received : " + status.name());
+		//react to an incoming message
+		if (message.text.length == 0) {
+			onHeaderReceived(message.header);
+		} else {
+
+			Message msg = MessageParser.parseMessage(message.getText(), message.header, database);
+
+			MessageType type = msg.getRequestType();
+
+			// Post new messages
+			if (type.equals(MessageType.POST_PICTURE)) {
+				onPostPictureReceived(msg);
+			} else if (type.equals(MessageType.POST_TEXT)) {
+				onPostTextReceived(msg);
+			} else if (type.equals(MessageType.ACK_POST)) {
+				onAckPostReceived(msg);
+			}
+
+			// Retrieve data
+			else if (type.equals(MessageType.GET_POSTS)) {
+				onGetPostsReceived(msg);
+			} else if (type.equals(MessageType.SHOW_IMAGE)) {
+				onShowImageReceived(msg);
+			} else if (type.equals(MessageType.SEND_PICTURE)) {
+				onSendPictureReceived(msg);
+			} else if (type.equals(MessageType.SEND_TEXT)) {
+				onSendTextReceived(msg);
+			} else if (type.equals(MessageType.SEND_STATE)) {
+				onSendStateReceived(msg);
+			} else if (type.equals(MessageType.GET_STATE)) {
+				onGetStateReceived(msg);
+			}
+		}
+
+		/*	// Friends
 		if (type.equals(MessageType.SEARCH_USER)) {
 			onSearchUserReceived(msg);
 		} else if (type.equals(MessageType.ACCEPT_FRIENDSHIP)) {
@@ -241,33 +273,15 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 			onRefuseFriendshipReceived(msg);
 		} else if (type.equals(MessageType.ASK_FRIENDSHIP)) {
 			onAskFriendshipReceived(msg);
-		}
+		}*/
 	
-			// Post new messages
-		else if (type.equals(MessageType.POST_PICTURE)) {
-			onPostPictureReceived(msg);
-		} else if (type.equals(MessageType.POST_TEXT)) {
-			onPostTextReceived(msg);
-		} else if (type.equals(MessageType.ACK_POST)) {
-			onAckPostReceived(msg);
-		}
-	
-			// Retrieve data
-		else if (type.equals(MessageType.GET_POSTS)) {
-			onGetPostsReceived(msg);
-		} else if (type.equals(MessageType.SHOW_IMAGE)) {
-			onShowImageReceived(msg);
-		} else if (type.equals(MessageType.SEND_PICTURE)) {
-			onSendPictureReceived(msg);
-		} else if (type.equals(MessageType.SEND_TEXT)) {
-			onSendTextReceived(msg);
-		} else if (type.equals(MessageType.SEND_STATE)) {
-			onSendStateReceived(msg);
-		} else if (type.equals(MessageType.GET_STATE)) {
-			onGetStateReceived(msg);
-		}
+
 	}
 	
+	private void onHeaderReceived(PublicHeader header) {
+
+	}
+
 	private void onPostPictureReceived(Message msg) {
 		//for the moment, we react exactly the same as on text received
 		onPostReceived(msg);

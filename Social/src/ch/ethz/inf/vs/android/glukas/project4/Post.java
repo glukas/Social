@@ -58,15 +58,19 @@ public class Post implements Comparable<Post> {
 	 */
 	public Post(Message msg, int id) {
 		MessageType type = msg.getRequestType();
+		this.poster = msg.getSender().id;
+		this.wallOwner = msg.getReceiver().id;
 		if (type.equals(MessageType.POST_PICTURE)) {
 			this.id = msg.getId();
 			this.text = msg.getMessage();
 			this.image = null;
+			this.type = PostType.PICTURE;
 			this.imageLink = msg.getHttpLink();
 		} else if (type.equals(MessageType.POST_TEXT)) {
 			this.id = msg.getId();
 			this.text = msg.getMessage();
 			this.image = null;
+			this.type = PostType.TEXT;
 			this.imageLink = "";
 		} else {
 			throw new UnknowRequestType(type);

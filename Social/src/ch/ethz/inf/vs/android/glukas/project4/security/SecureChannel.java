@@ -96,7 +96,8 @@ public class SecureChannel implements AsyncServerDelegate {
 		} else {
 			text = new byte[0];
 		}
-	
+		Log.d(this.getClass().toString(), "received : " + header.toString() + " || " + new String(text));
+		
 		if (this.secureChannelDelegate != null) {
 			this.secureChannelDelegate.onMessageReceived(new NetworkMessage(text, header));
 		}

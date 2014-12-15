@@ -89,10 +89,11 @@ public class WallActivity extends Activity implements UserDelegate {
 	protected void onResume() {
 		super.onResume();
 		mProtocol.setDelegate(this);
-		updateWall();
+		
 		if (mProtocol.getUser() != null) {
 			mProtocol.connect();
 		}
+		updateWall();
 		
 	}
 	
