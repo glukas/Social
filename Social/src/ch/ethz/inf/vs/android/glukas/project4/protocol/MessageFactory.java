@@ -33,18 +33,18 @@ public class MessageFactory {
 	 * @param isSend
 	 * @return
 	 */
-	public static Message newPostMessage(Post post, UserId sender, UserId receiver, boolean isSend) {
+	public static Message newPostMessage(Post post, boolean isSend) {
 		if (isSend) {
 			if (post.getType().equals(PostType.PICTURE)){
-				return new Message(sender, receiver, post.getId(), MessageType.SEND_PICTURE, post.getImageLink(), post.getText(), "", post.getId(), 0);
+				return new Message(post.getPoster(), post.getWallOwner(), post.getId(), MessageType.SEND_PICTURE, post.getImageLink(), post.getText(), "", post.getId(), 0);
 			} else {
-				return new Message(sender, receiver, post.getId(), MessageType.SEND_TEXT, "", post.getText(), "", post.getId(), 0);
+				return new Message(post.getPoster(), post.getWallOwner(), post.getId(), MessageType.SEND_TEXT, "", post.getText(), "", post.getId(), 0);
 			}
 		} else {
 			if (post.getType().equals(PostType.PICTURE)){
-				return new Message(sender, receiver, post.getId(), MessageType.POST_PICTURE, post.getImageLink(), post.getText(), "", post.getId(), 0);
+				return new Message(post.getPoster(), post.getWallOwner(), post.getId(), MessageType.POST_PICTURE, post.getImageLink(), post.getText(), "", post.getId(), 0);
 			} else {
-				return new Message(sender, receiver, post.getId(), MessageType.POST_TEXT, "", post.getText(), "", post.getId(), 0);
+				return new Message(post.getPoster(), post.getWallOwner(), post.getId(), MessageType.POST_TEXT, "", post.getText(), "", post.getId(), 0);
 			}
 		}
 	}

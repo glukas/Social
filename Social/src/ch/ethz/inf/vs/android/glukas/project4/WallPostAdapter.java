@@ -44,9 +44,12 @@ public class WallPostAdapter extends SortedSetAdapter<Post> {
 		//Set the author
 		TextView authorTextView = (TextView) rowView.findViewById(R.id.author);
 		User author = userMap.get(currentPost.getPoster());
-		authorTextView.setText(author.getUsername());
-		authorTextView.setTextColor(Color.parseColor(author.getColor()));
-
+		if (author != null) {//we may not know all friends of friends (with the current protocol, though it is easily feasible in principle)
+			authorTextView.setText(author.getUsername());
+			authorTextView.setTextColor(Color.parseColor(author.getColor()));
+		} else {
+			authorTextView.setText("unknown");
+		}
 		// Set the text on the TextView
 		TextView textView = (TextView) rowView.findViewById(R.id.post);
 		textView.setText(currentPost.getText());

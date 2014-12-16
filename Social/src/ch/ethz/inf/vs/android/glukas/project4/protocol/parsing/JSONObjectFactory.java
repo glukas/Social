@@ -145,6 +145,7 @@ public class JSONObjectFactory {
 		obj.put(Cmds.CMD.getStr(), Args.SEND_TXT.getStr());
 		obj.put(Cmds.ID.getStr(), request.getPostId());
 		obj.put(Cmds.TEXT.getStr(), request.getMessage());
+		obj.put(Cmds.FROM.getStr(), request.getSender().getId().toString());//this is the author of the post
 	}
 
 	private static void setSendPictureObj(Message request, JSONObject obj) throws JSONException {

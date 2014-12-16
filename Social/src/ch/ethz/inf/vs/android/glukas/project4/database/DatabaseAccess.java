@@ -144,8 +144,9 @@ public interface DatabaseAccess {
 	/**
 	 * Add a post to the database
 	 * @param post
+	 * @return true if succeeded, false otherwise
 	 */
-	public void putPost(Post post);
+	public boolean putPost(Post post);
 	
 	/**
 	 * Get multiple posts from the user's wall

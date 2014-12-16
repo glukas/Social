@@ -41,11 +41,11 @@ class Posts {
 	// Insertions
 	////
 
-	public static void putPost(Post post, SQLiteDatabase db) {
-		putFriendPost(post, db);
+	public static boolean putPost(Post post, SQLiteDatabase db) {
+		return putFriendPost(post, db) >= 0;
 	}
 	
-	public static void putFriendPost(Post post, SQLiteDatabase db) {
+	public static long putFriendPost(Post post, SQLiteDatabase db) {
 		// Get data.
 		int id = post.getId();
 		UserId poster = post.getPoster();
@@ -67,7 +67,7 @@ class Posts {
 			values.put(PostsEntry.DATE_TIME, Utility.toSQLiteDate(datetime));
 		
 		// Insert content.
-		db.insert(PostsEntry.TABLE_NAME, null, values);
+		return db.insert(PostsEntry.TABLE_NAME, null, values);
 	}
 	
 	////
@@ -130,7 +130,7 @@ class Posts {
 								PostsEntry.DATE_TIME};
 		
 		// SQL WHERE clause.
-		String selection = PostsEntry.WALL_ID + " == ? AND " + PostsEntry._ID + " > ?";
+		String selection = PostsEntry.WALL_ID + " == ? AND " + PostsEntry._ID + " >= ?";
 		
 		// Arguments for selection.
 		String[] selectionArgs = {Utility.toSQLiteId(friendid), Integer.toString(from)};

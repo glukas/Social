@@ -148,12 +148,12 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 	@Override
 	public void post(UserId wallOwner, String text, Bitmap image) {
 		Post post = new Post(getNewPostId(wallOwner), localUser.getId(), wallOwner, text, image, new Date());
-		postLocally(post);
-		
-		Message msg = MessageFactory.newPostMessage(post, localUser.getId(), post.getWallOwner(), false);
-		PublicHeader header = new PublicHeader(0, null, StatusByte.POST.getByte(), post.getId(), localUser.getId(), post.getWallOwner());
-		secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg).toString(), header));
-		
+		boolean success = postLocally(post);
+		if (success) {
+			Message msg = MessageFactory.newPostMessage(post, false);
+			PublicHeader header = new PublicHeader(0, null, StatusByte.POST.getByte(), post.getId(), localUser.getId(), post.getWallOwner());
+			secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg).toString(), header));
+		}
 	}
 	
 	@Override
@@ -161,14 +161,17 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 		post(localUser.getId(), text, image);
 	}
 	
-	private void postLocally(Post post) {
-		Log.d(this.getClass().toString(), "postLocally : " + post.getText() + " , " + post.getPoster().getId() + " , " + post.getWallOwner().getId());
-		database.putPost(post);
-		int msgId = post.getId();
-		int maxNumPosts = database.getFriendPostsCount(post.getWallOwner())+1;
-		database.setFriendMaxPostsId(msgId, post.getWallOwner());
-		database.setFriendPostsCount(maxNumPosts, post.getWallOwner());
-		userHandler.onPostReceived(post);
+	private boolean postLocally(Post post) {
+		boolean success = database.putPost(post);
+		if (success) {
+			Log.d(this.getClass().toString(), "postLocally : " + post.getText() + " , " + post.getPoster().getId() + " , " + post.getWallOwner().getId());
+			int localNumberOfPosts = database.getFriendPostsCount(post.getWallOwner());
+			int localTimestamp = database.getFriendMaxPostsId(post.getWallOwner());
+			database.setFriendMaxPostsId(Math.max(post.getId(), localTimestamp), post.getWallOwner());
+			database.setFriendPostsCount(localNumberOfPosts+1, post.getWallOwner());
+			userHandler.onPostReceived(post);
+		}
+		return success;
 	}
 
 	@Override
@@ -272,12 +275,7 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 		if (!msg.sender.equals(localUser.getId())) {
 			Post post = new Post(msg);
 			Log.d(this.getClass().toString(), "post : " + post.toString());
-			database.putPost(post);
-			int localTimestamp = database.getFriendMaxPostsId(post.getWallOwner());
-			database.setUserMaxPostsId(Math.max(post.getId(), localTimestamp));//TODO this may still not be quite right
-			int localNumberOfPosts = database.getFriendPostsCount(post.getWallOwner());
-			database.setFriendPostsCount(localNumberOfPosts, post.getWallOwner());
-			userHandler.onPostReceived(post);
+			postLocally(post);
 		}
 	}
 	
@@ -291,7 +289,7 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 	private void onGetPostsReceived(Message msg) {
 		List<Post> listPosts = database.getAllFriendPostsFrom(localUser.getId(), msg.getId());
 		for (Post post : listPosts){
-			String msgTxt = JSONObjectFactory.createJSONObject(MessageFactory.newPostMessage(post, localUser.getId(), msg.getSender(), true)).toString();
+			String msgTxt = JSONObjectFactory.createJSONObject(MessageFactory.newPostMessage(post, true)).toString();
 			PublicHeader header = new PublicHeader(0, null, StatusByte.SEND.getByte(), post.getId(), localUser.getId(), msg.getSender());
 			NetworkMessage networkMsg = new NetworkMessage(msgTxt, header);
 			secureChannel.sendMessage(networkMsg);
@@ -310,12 +308,7 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 	
 	//This gets called when an request for posts on some distant wall has been answered
 	private void onSendTextReceived(Message msg) {
-		//the sender is the wall owner
-		UserId sender = msg.sender;
-		msg.setReceiver(sender);
-		//TODO set the post author : this needs to be transmitted in the JSON protocol layer
 		onPostReceived(msg);
-		//onSendReceived(msg);
 	}
 	
 	private void onSendReceived(Message msg) {
@@ -334,6 +327,9 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 		//ask to have posts that local user doesn't have in database
 		int oldMaxPostId = database.getFriendMaxPostsId(friendId);
 		int oldNumMsgs = database.getFriendPostsCount(friendId);
+		
+		Log.d(this.getClass().toString(), "maxId:"+ oldMaxPostId + ", count:" + oldNumMsgs);
+		
 		if (oldNumMsgs < numMsgs) {
 			//TODO think about if this really guarantees that no messages are lost
 			Message msgToSend = MessageFactory.newGetPostsMessage(oldMaxPostId, localUser.getId(), msg.getSender());
@@ -342,9 +338,6 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 			secureChannel.sendMessage(networkMessage);
 		}
 		
-		//update database
-		database.setFriendMaxPostsId(maxPostId, friendId);
-		database.setFriendPostsCount(numMsgs, friendId);
 	}
 	
 	private void onGetStateReceived(Message msg) {

@@ -2,6 +2,8 @@ package ch.ethz.inf.vs.android.glukas.project4.protocol.parsing;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import ch.ethz.inf.vs.android.glukas.project4.UserId;
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseAccess;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.ProtocolException;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.Message;
@@ -40,15 +42,7 @@ public class MessageParser {
 		JSONObject obj = new JSONObject(messageTxt);
 		String command = obj.getString(Cmds.CMD.getStr());
 		
-		// Server
-		if (command.equals(Args.CONNECT.getStr())){
-			//empty message, only header is important
-		} else if (command.equals(Args.DISCONNECT.getStr())){
-			//empty message, only header is important
-		}
-		
-		// Friendship
-		else if (command.equals(Args.REP_FRIEND.getStr())) {
+		if (command.equals(Args.REP_FRIEND.getStr())) {
 			parseFriendReply(msg, obj);
 		} else if (command.equals(Args.ASK_FRIEND.getStr())) {
 			parseFriendDemand(msg, obj);
@@ -136,9 +130,14 @@ public class MessageParser {
 	private static void parseSendText(Message msg, JSONObject obj) throws JSONException {
 		int id = obj.getInt(Cmds.ID.getStr());
 		String text = obj.getString(Cmds.TEXT.getStr());
+		String postAuthor = obj.getString(Cmds.FROM.getStr());
 		msg.setRequestType(MessageType.SEND_TEXT);
 		msg.setId(id);
 		msg.setMessage(text);
+		//This is a post on the sender's wall.
+		//The FROM identifies the author of the post.
+		msg.setReceiver(msg.getSender());
+		msg.setSender(new UserId(postAuthor));
 	}
 	
 	

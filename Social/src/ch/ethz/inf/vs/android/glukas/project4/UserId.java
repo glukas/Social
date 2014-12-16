@@ -35,7 +35,7 @@ public class UserId implements Comparable<UserId>{
 	
 	@Override
 	public String toString() {
-		return "userId : " + id;
+		return id.toString();
 	}
 	
 	@Override

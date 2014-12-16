@@ -184,8 +184,8 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 	 */
 	// Update the wall of the user with the given post.
 	@Override
-	public void putPost(Post post) {
-		Posts.putPost(post, this.getWritableDatabase());
+	public boolean putPost(Post post) {
+		return Posts.putPost(post, this.getWritableDatabase());
 	}
 
 	// Get all the Posts in a Wall starting from id -> id or time?

@@ -191,9 +191,9 @@ public class StaticDatabase implements DatabaseAccess {
 	}
 
 	@Override
-	public void putPost(Post post) {
+	public boolean putPost(Post post) {
 		// TODO Auto-generated method stub
-		
+		return false;
 	}
 
 }
