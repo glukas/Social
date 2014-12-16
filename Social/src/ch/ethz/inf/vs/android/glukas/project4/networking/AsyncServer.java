@@ -110,7 +110,7 @@ public class AsyncServer {
 			public void run() {
 				try {
 					comm.sendMessage(message);
-					Log.d(this.getClass().toString(), "sendMessage");
+					Log.d(this.getClass().toString(), "sentMessage");
 				} catch (IOException e) {
 					Log.e("Error delivering : " +this.getClass().toString(), e.getLocalizedMessage());
 					close();

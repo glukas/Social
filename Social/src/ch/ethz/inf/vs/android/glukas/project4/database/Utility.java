@@ -43,7 +43,7 @@ public class Utility {
 	 */
 	public static final byte[] toByteArray(Bitmap bitmapImage) {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		boolean success = bitmapImage.compress(Bitmap.CompressFormat.JPEG, 50, bos);
+		boolean success = bitmapImage.compress(Bitmap.CompressFormat.JPEG, 0, bos);
 		if (!success) throw new RuntimeException();
 		return bos.toByteArray();
 	}

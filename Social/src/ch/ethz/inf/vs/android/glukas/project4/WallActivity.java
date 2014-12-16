@@ -153,7 +153,8 @@ public class WallActivity extends Activity implements UserDelegate {
 		super.onActivityResult(requestCode, resultCode, data);
 		if (resultCode == RESULT_OK) {
 			if (requestCode == PICTURE_TAKEN) {
-				File f = new File(Environment.getExternalStorageDirectory().toString());
+				
+				File f = new File(Environment.getExternalStorageDirectory().toString());//TODO we should not use external storage as it is less safe
 				for (File temp : f.listFiles()) {
 					if (temp.getName().equals("temp.jpg")) {
 						f = temp;
@@ -166,11 +167,13 @@ public class WallActivity extends Activity implements UserDelegate {
 
 					bitmap = BitmapFactory.decodeFile(f.getAbsolutePath(),
 							bitmapOptions); 
-					currentPicture = bitmap;
+					//currentPicture = bitmap;
 					bitmap = Bitmap.createScaledBitmap(bitmap, 
 							textField.getWidth() - 40,
 							(int)(bitmap.getHeight() * ((float)((textField.getWidth() - 20))/bitmap.getWidth())), 
 							false);
+					Log.i(this.getClass().toString(), "w : " + bitmap.getWidth() + ", h: " + bitmap.getHeight());
+					currentPicture = Bitmap.createScaledBitmap(bitmap, 100, 140, false);
 
 					bitmap = getRoundedCornerBitmap(bitmap);
 
@@ -212,12 +215,12 @@ public class WallActivity extends Activity implements UserDelegate {
 				String picturePath = c.getString(columnIndex);
 				c.close();
 				Bitmap thumbnail = (BitmapFactory.decodeFile(picturePath));
-				currentPicture = thumbnail;
+				
 				thumbnail = Bitmap.createScaledBitmap(thumbnail, 
 						textField.getWidth() - 40,
 						(int)(thumbnail.getHeight() * ((float)((textField.getWidth() - 20))/thumbnail.getWidth())), 
 						false);
-
+				currentPicture = thumbnail;
 				thumbnail = getRoundedCornerBitmap(thumbnail);
 
 				addPictureToPost(thumbnail);

@@ -1,5 +1,7 @@
 package ch.ethz.inf.vs.android.glukas.project4.protocol;
 
+import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -15,6 +17,7 @@ import ch.ethz.inf.vs.android.glukas.project4.UserDelegate;
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
 import ch.ethz.inf.vs.android.glukas.project4.Wall;
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseAccess;
+import ch.ethz.inf.vs.android.glukas.project4.database.Utility;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.DatabaseException;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.UnhandledFunctionnality;
 import ch.ethz.inf.vs.android.glukas.project4.networking.MessageRelay;
@@ -150,9 +153,18 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 		Post post = new Post(getNewPostId(wallOwner), localUser.getId(), wallOwner, text, image, new Date());
 		boolean success = postLocally(post);
 		if (success) {
+			
 			Message msg = MessageFactory.newPostMessage(post, false);
-			PublicHeader header = new PublicHeader(0, null, StatusByte.POST.getByte(), post.getId(), localUser.getId(), post.getWallOwner());
-			secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg).toString(), header));
+			
+			byte[] protocolMessageBytes = JSONObjectFactory.createJSONObject(msg).toString().getBytes();
+			
+			PublicHeader header = new PublicHeader(0, (short)protocolMessageBytes.length, StatusByte.POST.getByte(), post.getId(), localUser.getId(), post.getWallOwner());
+			
+			ByteBuffer assembledMessage = ByteBuffer.allocate(protocolMessageBytes.length+msg.getPayload().length);
+			assembledMessage.put(protocolMessageBytes);
+			assembledMessage.put(msg.getPayload());
+			
+			secureChannel.sendMessage(new NetworkMessage(assembledMessage.array(), header));
 		}
 	}
 	
@@ -181,12 +193,13 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 	
 	@Override
 	public void getUserPosts(UserId userId, int postId) {
+		throw new UnhandledFunctionnality();
 		//ask distant user if already all messages are in database
-		Message msg = MessageFactory.newTypeMessage(MessageType.GET_STATE);
+		/*Message msg = MessageFactory.newTypeMessage(MessageType.GET_STATE);
 		PublicHeader header = new PublicHeader(0, null, StatusByte.DATA.getByte(), 0, localUser.getId(), userId);
 		secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg, 0).toString(), header));
 		//retrieve data already known from database
-		database.getAllFriendPostsFrom(userId, postId);
+		database.getAllFriendPostsFrom(userId, postId);*/
 	}
 	
 	@Override
@@ -226,29 +239,28 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 		if (message.text.length == 0) {
 			onHeaderReceived(message.header);
 		} else {
+			//The header tells us how much of the data is is JSON protocol, and how much is image payload (the rest)
 
-			Message msg = MessageParser.parseMessage(message.getText(), message.header);
+			Message msg = MessageParser.parseMessage(message.text , message.header);
 			MessageType type = msg.getRequestType();
 			
-			if (type.equals(MessageType.POST_PICTURE)) {// Post new messages
-				onPostPictureReceived(msg);
-			} else if (type.equals(MessageType.POST_TEXT)) {
-				onPostTextReceived(msg);
+			if (type.equals(MessageType.POST_TEXT)) {
+				onPostReceived(msg);
 			} else if (type.equals(MessageType.ACK_POST)) {
 				onAckPostReceived(msg);
 				
 			} else if (type.equals(MessageType.GET_POSTS)) {// Retrieve data
 				onGetPostsReceived(msg);
-			} else if (type.equals(MessageType.SHOW_IMAGE)) {
-				onShowImageReceived(msg);
-			} else if (type.equals(MessageType.SEND_PICTURE)) {
-				onSendPictureReceived(msg);
+				
 			} else if (type.equals(MessageType.SEND_TEXT)) {
-				onSendTextReceived(msg);
+				onPostReceived(msg);
+				
 			} else if (type.equals(MessageType.SEND_STATE)) {
 				onSendStateReceived(msg);
+				
 			} else if (type.equals(MessageType.GET_STATE)) {
 				onGetStateReceived(msg);
+				
 			} else {
 				Log.e(this.getClass().toString(), this.unexpectedMsg);
 			}
@@ -261,16 +273,6 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 		}
 	}
 
-	private void onPostPictureReceived(Message msg) {
-		//for the moment, we react exactly the same as on text received
-		onPostReceived(msg);
-	}
-	
-	private void onPostTextReceived(Message msg) {
-		//for the moment, we react exactly the same as on picture received
-		onPostReceived(msg);
-	}
-	
 	private void onPostReceived(Message msg) {
 		if (!msg.sender.equals(localUser.getId())) {
 			Post post = new Post(msg);
@@ -289,33 +291,17 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 	private void onGetPostsReceived(Message msg) {
 		List<Post> listPosts = database.getAllFriendPostsFrom(localUser.getId(), msg.getId());
 		for (Post post : listPosts){
-			String msgTxt = JSONObjectFactory.createJSONObject(MessageFactory.newPostMessage(post, true)).toString();
-			PublicHeader header = new PublicHeader(0, null, StatusByte.SEND.getByte(), post.getId(), localUser.getId(), msg.getSender());
-			NetworkMessage networkMsg = new NetworkMessage(msgTxt, header);
+			Message postMessage = MessageFactory.newPostMessage(post, true);
+			byte[] msgTxt = JSONObjectFactory.createJSONObject(postMessage).toString().getBytes();
+			PublicHeader header = new PublicHeader(0, (short)msgTxt.length, StatusByte.SEND.getByte(), post.getId(), localUser.getId(), msg.getSender());
+			
+			ByteBuffer assembledMessage = ByteBuffer.allocate(msgTxt.length + postMessage.getPayload().length);
+			assembledMessage.put(msgTxt);
+			assembledMessage.put(postMessage.getPayload());
+			
+			NetworkMessage networkMsg = new NetworkMessage(assembledMessage.array(), header);
 			secureChannel.sendMessage(networkMsg);
 		}
-	}
-	
-	private void onShowImageReceived(Message msg) {
-		//TODO : future use
-	}
-	
-	private void onSendPictureReceived(Message msg) {
-		//for the moment, we react exactly the same as on text received
-		throw new UnhandledFunctionnality();
-		//onSendReceived(msg);
-	}
-	
-	//This gets called when an request for posts on some distant wall has been answered
-	private void onSendTextReceived(Message msg) {
-		onPostReceived(msg);
-	}
-	
-	private void onSendReceived(Message msg) {
-		//A friend send a post to the local user
-		Post post = new Post(msg);
-		database.putPost(post);
-		userHandler.onPostReceived(post);
 	}
 	
 	private void onSendStateReceived(Message msg) {

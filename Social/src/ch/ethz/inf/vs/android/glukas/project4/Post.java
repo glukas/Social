@@ -1,6 +1,8 @@
 package ch.ethz.inf.vs.android.glukas.project4;
 
 import java.util.Date;
+
+import ch.ethz.inf.vs.android.glukas.project4.database.Utility;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.UnknowRequestType;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.Message;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.Message.MessageType;
@@ -16,7 +18,6 @@ public class Post implements Comparable<Post> {
 	// It would be nice if we can manage to have multiple images per post. But maybe it make things to 
 	// complicate
 	private Bitmap image;
-	private String imageLink;
 	//the id is crucial for sorting.
 	private final int id;
 	//date will not be used for sorting, but can provide friendly user content
@@ -25,7 +26,6 @@ public class Post implements Comparable<Post> {
 	private final UserId poster;
 	// Id of the user that owns the wall where the post is
 	private final UserId wallOwner;
-	private final PostType type;
 	
 	/**
 	 * Database and user interface point of view.
@@ -41,11 +41,6 @@ public class Post implements Comparable<Post> {
 		this.wallOwner = wallOwner;
 		this.poster = Poster;
 		this.text = text;
-		if (image == null) {
-			type = PostType.TEXT;
-		} else {
-			type = PostType.PICTURE;
-		}
 		this.image = image;
 		this.datetime = datetime;
 	}
@@ -56,27 +51,15 @@ public class Post implements Comparable<Post> {
 	 * @param msg
 	 */
 	public Post(Message msg) {
-		MessageType type = msg.getRequestType();
 		this.poster = msg.getSender();
 		this.wallOwner = msg.getReceiver();
 		this.id = msg.getId();
 		this.text = msg.getMessage();
-		if (type.equals(MessageType.POST_PICTURE)) {
+		if (msg.getPayload().length == 0) {
 			this.image = null;
-			this.type = PostType.PICTURE;
-			this.imageLink = msg.getHttpLink();
-		} else if (type.equals(MessageType.POST_TEXT) || type.equals(MessageType.SEND_TEXT)) {
-			this.image = null;
-			this.type = PostType.TEXT;
-			this.imageLink = "";
 		} else {
-			throw new UnknowRequestType(type);
+			this.image = Utility.toBitmap(msg.getPayload());
 		}
-	}
-	
-	// Getters.
-	public String getImageLink() {
-		return this.imageLink;
 	}
 	
 	public int getId() {
@@ -88,11 +71,7 @@ public class Post implements Comparable<Post> {
 	}
 	
 	public Bitmap getImage() {
-		if (type.equals(PostType.TEXT)){
-			return null;
-		} else {
-			return image;
-		}
+		return image;
 	}
 	
 	public Date getDateTime() {
@@ -105,18 +84,6 @@ public class Post implements Comparable<Post> {
 	
 	public UserId getWallOwner() {
 		return this.wallOwner;
-	}
-	
-	public PostType getType() {
-		return type;
-	}
-
-	/**
-	 * Used to differentiate between different kinds of posts
-	 */
-	public enum PostType{
-		PICTURE,
-		TEXT;
 	}
 	
 	/**

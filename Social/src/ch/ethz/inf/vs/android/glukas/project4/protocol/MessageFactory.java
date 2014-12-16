@@ -2,8 +2,8 @@ package ch.ethz.inf.vs.android.glukas.project4.protocol;
 
 import ch.ethz.inf.vs.android.glukas.project4.BasicUser;
 import ch.ethz.inf.vs.android.glukas.project4.Post;
-import ch.ethz.inf.vs.android.glukas.project4.Post.PostType;
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
+import ch.ethz.inf.vs.android.glukas.project4.database.Utility;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.Message.MessageType;
 
 /**
@@ -34,19 +34,18 @@ public class MessageFactory {
 	 * @return
 	 */
 	public static Message newPostMessage(Post post, boolean isSend) {
+		Message msg;
 		if (isSend) {
-			if (post.getType().equals(PostType.PICTURE)){
-				return new Message(post.getPoster(), post.getWallOwner(), post.getId(), MessageType.SEND_PICTURE, post.getImageLink(), post.getText(), "", post.getId(), 0);
-			} else {
-				return new Message(post.getPoster(), post.getWallOwner(), post.getId(), MessageType.SEND_TEXT, "", post.getText(), "", post.getId(), 0);
-			}
+			msg = new Message(post.getPoster(), post.getWallOwner(), post.getId(), MessageType.SEND_TEXT, post.getText(), "", post.getId(), 0);
 		} else {
-			if (post.getType().equals(PostType.PICTURE)){
-				return new Message(post.getPoster(), post.getWallOwner(), post.getId(), MessageType.POST_PICTURE, post.getImageLink(), post.getText(), "", post.getId(), 0);
-			} else {
-				return new Message(post.getPoster(), post.getWallOwner(), post.getId(), MessageType.POST_TEXT, "", post.getText(), "", post.getId(), 0);
-			}
+			msg = new Message(post.getPoster(), post.getWallOwner(), post.getId(), MessageType.POST_TEXT, post.getText(), "", post.getId(), 0);
 		}
+		if (post.getImage() != null) {
+			msg.setPayload(Utility.toByteArray(post.getImage()));
+		} else {
+			msg.setPayload(new byte[0]);
+		}
+		return msg;
 	}
 	
 	/**
@@ -58,7 +57,7 @@ public class MessageFactory {
 	 * @return
 	 */
 	public static Message newSendStateMessage(UserId sender, UserId receiver, int id, int numM) {
-		return new Message(sender, receiver, 0, MessageType.SEND_STATE, "", "", "", id, numM);
+		return new Message(sender, receiver, 0, MessageType.SEND_STATE, "", "", id, numM);
 	}
 	
 	/**
@@ -68,7 +67,7 @@ public class MessageFactory {
 	 * @return
 	 */
 	public static Message newGetStateMessage(UserId sender, UserId receiver) {
-		return new Message(sender, receiver, 0, MessageType.GET_STATE, "", "", "", 0, 0);
+		return new Message(sender, receiver, 0, MessageType.GET_STATE, "", "", 0, 0);
 	}
 	
 	/**
@@ -78,7 +77,7 @@ public class MessageFactory {
 	 * @return
 	 */
 	public static Message newAckMessage(UserId sender, UserId receiver) {
-		return new Message(sender, receiver, 0, MessageType.ACK_POST, "", "", "", 0, 0);
+		return new Message(sender, receiver, 0, MessageType.ACK_POST, "", "", 0, 0);
 	}
 	
 	/**
@@ -89,7 +88,7 @@ public class MessageFactory {
 	 * @return
 	 */
 	public static Message newGetPostsMessage(int oldCountPost, UserId sender, UserId receiver) {
-		return new Message(sender, receiver, 0, MessageType.GET_POSTS, "", "", "", oldCountPost, 0);
+		return new Message(sender, receiver, 0, MessageType.GET_POSTS, "", "", oldCountPost, 0);
 	}
 	
 	/**
@@ -97,7 +96,7 @@ public class MessageFactory {
 	 * @return
 	 */
 	public static Message newEmptyMessage() {
-		return new Message(null, null, 0, MessageType.UNKOWN, "", "", "", 0, 0);
+		return new Message(null, null, 0, MessageType.UNKOWN, "", "", 0, 0);
 	}
 	
 	/**
@@ -106,6 +105,6 @@ public class MessageFactory {
 	 * @return
 	 */
 	public static Message newTypeMessage(MessageType type) {
-		return new Message(null, null, 0, type, "", "", "", 0, 0);
+		return new Message(null, null, 0, type, "", "", 0, 0);
 	}
 }

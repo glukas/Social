@@ -35,12 +35,14 @@ public class PublicHeader {
 		} else {
 			this.future = future;
 		}
-
 		this.consistency = consistency;
 		this.messageId = messageId;
 		this.sender = sender;
 		this.receiver = receiver;
-
+	}
+	
+	public PublicHeader(int length, short JSONTextLength, byte consistency, int messageId, UserId sender, UserId receiver) {
+		this(length, ByteBuffer.allocate(3).putShort(JSONTextLength).put((byte)0).array(), consistency, messageId, sender, receiver);
 	}
 
 	/**
@@ -105,6 +107,11 @@ public class PublicHeader {
 		return length;
 	}
 	
+	public short getJSONTextLength() {
+		ByteBuffer protocolLengthBuffer = ByteBuffer.wrap(getFuture());
+		return protocolLengthBuffer.getShort();
+	}
+	
 	
 	///
 	//Setters
@@ -147,6 +154,6 @@ public class PublicHeader {
 	
 	
 	public String toString() {
-		return "PublicHeader [ type : " + StatusByte.constructStatusByte(this.consistency).name()  + ",sender " + this.sender.getId().toString() + ", receiver : " + this.receiver.getId() + "]";  
+		return "PublicHeader [ length: " + this.length + ", type : " + StatusByte.constructStatusByte(this.consistency).name()  + ",sender " + this.sender.getId().toString() + ", receiver : " + this.receiver.getId() + " textLength: " + getJSONTextLength() + "]";  
 	}
 }

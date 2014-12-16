@@ -60,7 +60,7 @@ public class SecureChannel implements AsyncServerDelegate {
 		result.put(message.text);
 		encrypted = result.array();*/
 		
-		Log.d(this.getClass().toString(), "send : " + message.header.toString() + " || " + message.getText());
+		Log.d(this.getClass().toString(), "send : " + message.header.toString() + " || " + message.getText().subSequence(0, message.header.getJSONTextLength()));
 		
 		this.asyncServer.sendMessage(encrypted);
 	}
@@ -104,10 +104,11 @@ public class SecureChannel implements AsyncServerDelegate {
 			this.secureChannelDelegate.onMessageReceived(new NetworkMessage(text, header));
 		}*/
 		//decrypt
+		Log.d(this.getClass().toString(), "onReceive");
 		NetworkMessage decrypted = crypto.decryptPost(message);
 		if (decrypted != null) {//For now, ignore all corrupted messages
 			//forward to delegate
-			Log.d(this.getClass().toString(), "received : " + decrypted.header.toString() + " || " + new String(decrypted.text));
+			Log.d(this.getClass().toString(), "received : " + decrypted.header.toString() + " || " + new String(decrypted.text).subSequence(0, decrypted.header.getJSONTextLength()));
 			if (this.secureChannelDelegate != null) {
 				this.secureChannelDelegate.onMessageReceived(decrypted);
 			} else {
