@@ -130,16 +130,16 @@ class Posts {
 								PostsEntry.DATE_TIME};
 		
 		// SQL WHERE clause.
-		String selection = PostsEntry.WALL_ID + " == ? AND " + PostsEntry.DATE_TIME + " > ?";
+		String selection = PostsEntry.WALL_ID + " == ? AND " + PostsEntry._ID + " > ?";
 		
 		// Arguments for selection.
 		String[] selectionArgs = {Utility.toSQLiteId(friendid), Integer.toString(from)};
 		
 		// ORDER BY clause.
-		String order = PostsEntry._ID + " DESC";
+		//String order = PostsEntry._ID + " DESC";
 		
 		// Execute query.
-		Cursor cursor = db.query(PostsEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, order);
+		Cursor cursor = db.query(PostsEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, null);
 		
 		// Instantiate list of post.
 		List<Post> posts = new ArrayList<Post>();
@@ -150,16 +150,9 @@ class Posts {
 				posts.add(Utility.buildPost(cursor));
 				cursor.moveToNext();
 			}
-			
-			// Close cursor
-			cursor.close();
-			return posts;
 		}
-		else {
-			// Close cursor.
-			cursor.close();
-			return null;
-		}	
+		cursor.close();
+		return posts;
 	}
 	
 	// Get numberPosts older than postId

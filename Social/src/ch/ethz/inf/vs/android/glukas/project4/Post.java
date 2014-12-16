@@ -54,13 +54,12 @@ public class Post implements Comparable<Post> {
 	 * Network point of view
 	 * Create a new Post
 	 * @param msg
-	 * @param id the local lamport time stamp
 	 */
-	public Post(Message msg, int id) {
+	public Post(Message msg) {
 		MessageType type = msg.getRequestType();
 		this.poster = msg.getSender();
 		this.wallOwner = msg.getReceiver();
-		this.id = Math.max(id+1, msg.getId());//Lamport time stamps, TODO: this way we always set the new post on top, this may not be what we want
+		this.id = msg.getId();
 		this.text = msg.getMessage();
 		if (type.equals(MessageType.POST_PICTURE)) {
 			this.image = null;
@@ -143,5 +142,10 @@ public class Post implements Comparable<Post> {
 	@Override
 	public int hashCode() {
 		return this.id ^ poster.getId().intValue();
+	}
+	
+	@Override
+	public String toString() {
+		return "post: " + this.text + ", " + this.id;
 	}
 }

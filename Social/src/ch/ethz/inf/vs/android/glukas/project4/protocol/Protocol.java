@@ -86,7 +86,6 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 
 	//caching
 	private User localUser;
-	private UserId currentWall;
 	private Map<UserId, User> userMapping;
 	
 	//exceptional behaviors
@@ -203,10 +202,10 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 		}
 		
 		//ask for update
-		this.currentWall = userId;
-		//Message msg = MessageFactory.newTypeMessage(MessageType.GET_STATE);
-		//PublicHeader header = new PublicHeader(PublicHeader.BYTES_LENGTH_HEADER, null, StatusByte.DATA.getByte(), 0, localUser.getId(), userId);
-		//secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg).toString(), header));
+		
+		Message msg = MessageFactory.newTypeMessage(MessageType.GET_STATE);
+		PublicHeader request = new PublicHeader(PublicHeader.BYTES_LENGTH_HEADER, null, StatusByte.DATA.getByte(), 0, localUser.getId(), userId);
+		secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg).toString(), request));
 	}
 
 	@Override
@@ -220,19 +219,14 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 
 	@Override
 	public void onMessageReceived(NetworkMessage message) {
-		
-		StatusByte status = StatusByte.constructStatusByte(message.header.getConsistency());
-		//Log.d(this.getClass().toString(), "header received : " + status.name());
 		//react to an incoming message
-		
 		if (message.text.length == 0) {
 			onHeaderReceived(message.header);
 		} else {
 
 			Message msg = MessageParser.parseMessage(message.getText(), message.header);
-
 			MessageType type = msg.getRequestType();
-
+			
 			if (type.equals(MessageType.POST_PICTURE)) {// Post new messages
 				onPostPictureReceived(msg);
 			} else if (type.equals(MessageType.POST_TEXT)) {
@@ -252,28 +246,15 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 				onSendStateReceived(msg);
 			} else if (type.equals(MessageType.GET_STATE)) {
 				onGetStateReceived(msg);
+			} else {
+				Log.e(this.getClass().toString(), this.unexpectedMsg);
 			}
 		}
-
-		/*	// Friends
-		if (type.equals(MessageType.SEARCH_USER)) {
-			onSearchUserReceived(msg);
-		} else if (type.equals(MessageType.ACCEPT_FRIENDSHIP)) {
-			onAcceptFriendshipReceived(msg);
-		} else if (type.equals(MessageType.REFUSE_FRIENDSHIP)) {
-			onRefuseFriendshipReceived(msg);
-		} else if (type.equals(MessageType.ASK_FRIENDSHIP)) {
-			onAskFriendshipReceived(msg);
-		}*/
-	
 
 	}
 	
 	private void onHeaderReceived(PublicHeader header) {
 		if (header.getConsistency() == StatusByte.CONNECT.getByte()) {
-			Message msg = MessageFactory.newTypeMessage(MessageType.GET_STATE);
-			PublicHeader request = new PublicHeader(PublicHeader.BYTES_LENGTH_HEADER, null, StatusByte.DATA.getByte(), 0, localUser.getId(), currentWall);
-			secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg).toString(), request));
 		}
 	}
 
@@ -288,12 +269,14 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 	}
 	
 	private void onPostReceived(Message msg) {
-		//A friend posted a post onto the wall's local user
-		if (!msg.sender.equals(localUser.getId()) && msg.receiver.equals(localUser.getId())) {
-			int msgId = database.getFriendMaxPostsId(localUser.getId());
-			Post post = new Post(msg, msgId);
+		if (!msg.sender.equals(localUser.getId())) {
+			Post post = new Post(msg);
+			Log.d(this.getClass().toString(), "post : " + post.toString());
 			database.putPost(post);
-			database.setUserMaxPostsId(post.getId());
+			int localTimestamp = database.getFriendMaxPostsId(post.getWallOwner());
+			database.setUserMaxPostsId(Math.max(post.getId(), localTimestamp));//TODO this may still not be quite right
+			int localNumberOfPosts = database.getFriendPostsCount(post.getWallOwner());
+			database.setFriendPostsCount(localNumberOfPosts, post.getWallOwner());
 			userHandler.onPostReceived(post);
 		}
 	}
@@ -303,6 +286,8 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 		//it can be silently ignored
 	}
 	
+	//This gets called if some user wants to get the wall of the local user
+	//the msg specifies what the last seen id is.
 	private void onGetPostsReceived(Message msg) {
 		List<Post> listPosts = database.getAllFriendPostsFrom(localUser.getId(), msg.getId());
 		for (Post post : listPosts){
@@ -319,17 +304,23 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 	
 	private void onSendPictureReceived(Message msg) {
 		//for the moment, we react exactly the same as on text received
-		onSendReceived(msg);
+		throw new UnhandledFunctionnality();
+		//onSendReceived(msg);
 	}
 	
+	//This gets called when an request for posts on some distant wall has been answered
 	private void onSendTextReceived(Message msg) {
-		//for the moment, we react exactly the same as on picture received
-		onSendReceived(msg);
+		//the sender is the wall owner
+		UserId sender = msg.sender;
+		msg.setReceiver(sender);
+		//TODO set the post author : this needs to be transmitted in the JSON protocol layer
+		onPostReceived(msg);
+		//onSendReceived(msg);
 	}
 	
 	private void onSendReceived(Message msg) {
 		//A friend send a post to the local user
-		Post post = new Post(msg, msg.getPostId());
+		Post post = new Post(msg);
 		database.putPost(post);
 		userHandler.onPostReceived(post);
 	}
@@ -344,6 +335,7 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 		int oldMaxPostId = database.getFriendMaxPostsId(friendId);
 		int oldNumMsgs = database.getFriendPostsCount(friendId);
 		if (oldNumMsgs < numMsgs) {
+			//TODO think about if this really guarantees that no messages are lost
 			Message msgToSend = MessageFactory.newGetPostsMessage(oldMaxPostId, localUser.getId(), msg.getSender());
 			PublicHeader header = new PublicHeader(0, null, StatusByte.SEND.getByte(), 0, localUser.getId(), friendId);
 			NetworkMessage networkMessage = new NetworkMessage(JSONObjectFactory.createJSONObject(msgToSend).toString(), header);
@@ -371,27 +363,4 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 		//send reply
 		secureChannel.sendMessage(new NetworkMessage(msgToSend, header));
 	}
-	
-	//unexpected messages
-	
-	private void onAcceptFriendshipReceived(Message msg) {
-		//We use NFC for the moment
-		Log.d(getClass().toString(), unexpectedMsg+msg.toString());
-	}
-	
-	private void onRefuseFriendshipReceived(Message msg) {
-		//We use NFC for the moment
-		Log.d(getClass().toString(), unexpectedMsg+msg.toString());
-	}
-	
-	private void onAskFriendshipReceived(Message msg) {
-		//We use NFC for the moment
-		Log.d(getClass().toString(), unexpectedMsg+msg.toString());
-	}
-	
-	private void onSearchUserReceived(Message msg) {
-		//User should not be targeted by these kind of messages
-		Log.d(getClass().toString(), unexpectedMsg+msg.toString());
-	}
-
 }
