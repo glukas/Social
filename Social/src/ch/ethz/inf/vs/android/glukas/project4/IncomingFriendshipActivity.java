@@ -9,6 +9,7 @@ import ch.ethz.inf.vs.android.glukas.project4.security.ZeroCredentialStorage;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
 import android.nfc.NfcAdapter.OnNdefPushCompleteCallback;
@@ -121,6 +122,7 @@ OnNdefPushCompleteCallback, RegistrationDialogFragmentDelegate {
 
 	private void displayRequest(FriendshipRequest request) {
 		usernameTextView.setText(request.getSender().getUsername());
+		usernameTextView.setTextColor(Color.parseColor(request.getSender().getColor()));
 		Log.d(this.getClass().toString(), "Friend request "
 				+ request.getSender().getUsername() + " id : "
 				+ request.getSender().getId());
