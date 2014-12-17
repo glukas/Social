@@ -81,6 +81,8 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 	// Members
 	////
 
+	private boolean isConnected = false;
+	
 	// Communications with other components
 	private SecureChannel secureChannel;
 	private MessageRelay messageRelay;
@@ -151,6 +153,15 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 	@Override
 	public void post(UserId wallOwner, String text, Bitmap image) {
 		Post post = new Post(getNewPostId(wallOwner), localUser.getId(), wallOwner, text, image, new Date());
+		
+		//if there is no connection, we should prevent posting on other's walls.
+		/*if (!wallOwner.getId().equals(localUser)) {
+			if (!isConnected) {
+				//this.userHandler.onSendFailed(post);
+				return;
+			}
+		}*/
+		
 		boolean success = postLocally(post);
 		if (success) {
 			
@@ -270,6 +281,10 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 	
 	private void onHeaderReceived(PublicHeader header) {
 		if (header.getConsistency() == StatusByte.CONNECT.getByte()) {
+			this.isConnected = true;
+		}
+		if (header.getConsistency() == StatusByte.DISCONNECT.getByte()) {
+			this.isConnected = false;
 		}
 	}
 
