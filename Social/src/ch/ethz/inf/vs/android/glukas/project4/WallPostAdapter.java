@@ -3,11 +3,10 @@ package ch.ethz.inf.vs.android.glukas.project4;
 import java.util.ArrayList;
 import java.util.Map;
 
-import ch.ethz.inf.vs.android.glukas.project4.Post.PostType;
-
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,12 +30,18 @@ public class WallPostAdapter extends SortedSetAdapter<Post> {
 
 		View rowView = null;
 		// Inflate the views from XML
-		if (currentPost.getType() == PostType.PICTURE) {
+		if (currentPost.getImage() != null) {
 			rowView = inflater.inflate(R.layout.my_wall_list_row_picture, parent, false);
 			
 			// Load the image and set it on the ImageView
 			ImageView imageView = (ImageView) rowView.findViewById(R.id.image);
-			imageView.setImageDrawable(new BitmapDrawable(null, currentPost.getImage()));
+			@SuppressWarnings("deprecation")
+			BitmapDrawable bitmap = new BitmapDrawable(currentPost.getImage());
+			DisplayMetrics displayMetrics = new DisplayMetrics();
+			displayMetrics.setToDefaults();
+			bitmap.setTargetDensity(displayMetrics);
+			imageView.setImageDrawable(bitmap);
+			
 		} else {
 			rowView = inflater.inflate(R.layout.my_wall_list_row_text, parent, false);
 		}

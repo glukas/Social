@@ -1,9 +1,6 @@
 package ch.ethz.inf.vs.android.glukas.project4;
 
 import java.util.List;
-
-import ch.ethz.inf.vs.android.glukas.project4.Post.PostType;
-
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;

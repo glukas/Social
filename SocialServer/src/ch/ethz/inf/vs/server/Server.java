@@ -33,7 +33,7 @@ public class Server implements Runnable {
 	// The buffer into which we'll read data when it's available
 	private ByteBuffer headerBuffer = ByteBuffer.allocate(PublicHeader.BYTES_LENGTH_HEADER);
 	//Max message size 1MB
-	private ByteBuffer messageBuffer = ByteBuffer.allocate(1024);
+	private ByteBuffer messageBuffer = ByteBuffer.allocate(102400);
 	
 	//The worker to handle connections
 	private ConnectionWorker worker;

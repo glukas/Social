@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.android.glukas.project4.protocol;
 
+import android.graphics.Bitmap;
 import ch.ethz.inf.vs.android.glukas.project4.BasicUser;
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
 
@@ -21,12 +22,11 @@ public class Message {
 	 * @param id
 	 * @param numM
 	 */
-	public Message(UserId sender, UserId receiver, int postId, MessageType type, String link, String msg, String username, int id, int numM){
+	public Message(UserId sender, UserId receiver, int postId, MessageType type, String msg, String username, int id, int numM){
 		this.sender = sender;
 		this.receiver = receiver;
 		this.postId = postId;
 		this.requestType = type;
-		this.httpLink = link;
 		this.message = msg;
 		this.username = username;
 		this.id = id;
@@ -39,12 +39,14 @@ public class Message {
 	protected int postId;
 	protected MessageType requestType;
 	
+	
 	//content
-	protected String httpLink;
 	protected String message;
 	protected String username;
 	protected int id;
 	protected int numM;
+	protected Bitmap image;
+	protected byte[] payload;
 	
 	////
 	//Getters and Setters
@@ -81,15 +83,7 @@ public class Message {
 	public void setRequestType(MessageType requestType) {
 		this.requestType = requestType;
 	}
-
-	public String getHttpLink() {
-		return httpLink;
-	}
-
-	public void setHttpLink(String httpLink) {
-		this.httpLink = httpLink;
-	}
-
+	
 	public String getMessage() {
 		return message;
 	}
@@ -122,6 +116,14 @@ public class Message {
 		this.numM = numM;
 	}
 	
+	public void setPayload(byte[] byteArray) {
+		this.payload = byteArray;
+	}
+	
+	public byte[] getPayload() {
+		return payload;
+	}
+	
 	////
 	//Public Methods
 	////
@@ -131,21 +133,21 @@ public class Message {
 		if (sender != null) {
 			if (receiver != null){
 				return "Message of "+" ("+sender.getId()+") received by "+" ("+receiver.getId()+
-						" )"+" with content : "+"(LINK)"+httpLink+" (MESSAGE) "+message+" (USERNAME)"+username+" (ID)"+id+
+						" )"+" with content : "+" (MESSAGE) "+message+" (USERNAME)"+username+" (ID)"+id+
 						" (NUM_M)"+numM;
 			} else {
 				return "Message of "+" ("+sender.getId()+") received by UNKNOWN with content : "
-						+"(LINK)"+httpLink+" (MESSAGE) "+message+" (USERNAME)"+username+" (ID)"+id+
+						+ "(MESSAGE) "+message+" (USERNAME)"+username+" (ID)"+id+
 						" (NUM_M)"+numM;
 			}
 		} else {
 			if (receiver != null){
 				return "Message of UNKNOWN received by "+" ("+receiver.getId()+
-						" )"+" with content : "+"(LINK)"+httpLink+" (MESSAGE) "+message+" (USERNAME)"+username+" (ID)"+id+
+						" )"+" with content : "+" (MESSAGE) "+message+" (USERNAME)"+username+" (ID)"+id+
 						" (NUM_M)"+numM;
 			} else {
 				return "Message of UNKNOWN received by UNKNOWN"+
-						" with content : "+"(LINK)"+httpLink+" (MESSAGE) "+message+" (USERNAME)"+username+" (ID)"+id+
+						" with content : "+" (MESSAGE) "+message+" (USERNAME)"+username+" (ID)"+id+
 						" (NUM_M)"+numM;
 			}
 		}
@@ -178,4 +180,5 @@ public class Message {
 		//unknown
 		UNKOWN;
 	}
+	
 }

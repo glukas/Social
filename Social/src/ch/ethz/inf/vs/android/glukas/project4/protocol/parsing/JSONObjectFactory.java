@@ -123,7 +123,7 @@ public class JSONObjectFactory {
 		obj.put(Cmds.CMD.getStr(), Args.POST_PIC.getStr());
 		obj.put(Cmds.ID.getStr(), request.getPostId());
 		obj.put(Cmds.TEXT.getStr(), request.getMessage());
-		obj.put(Cmds.PIC.getStr(), request.getHttpLink());
+		//obj.put(Cmds.PIC.getStr(), request.getHttpLink());
 	}
 
 	private static void setPostTextObj(Message request, JSONObject obj) throws JSONException {
@@ -152,7 +152,7 @@ public class JSONObjectFactory {
 		obj.put(Cmds.CMD.getStr(), Args.POST_PIC.getStr());
 		obj.put(Cmds.ID.getStr(), request.getPostId());
 		obj.put(Cmds.TEXT.getStr(), request.getMessage());
-		obj.put(Cmds.PIC.getStr(), request.getHttpLink());
+		//obj.put(Cmds.PIC.getStr(), request.getHttpLink());
 	}
 	
 	private static void setGetStateObj(Message request, JSONObject obj) throws JSONException {

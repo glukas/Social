@@ -12,21 +12,21 @@ import ch.ethz.inf.vs.server.Message;
 public class DummyClient implements Runnable {
 	
 	//Connection data
-	private int port = 9000;
-	private final int clientId;
-	private final int clients;
-	private TCPCommunicator comm;
-	private UserId me;
-	private UserId server;
-	private Thread receiveThread;
-	private boolean running = false;
+	protected int port = 9000;
+	protected final int clientId;
+	protected final int clients;
+	protected TCPCommunicator comm;
+	protected UserId me;
+	protected UserId server;
+	protected Thread receiveThread;
+	protected boolean running = false;
 	
 	
 	public DummyClient(int port, int id, int clients){
 		this.port = port;
 		this.clientId = id;
 		this.clients = clients;
-		this.comm = new TCPCommunicator("localhost", this.port);
+		this.comm = new TCPCommunicator("winti.mooo.com", this.port);
 		this.me = new UserId(Integer.toString(clientId));
 		this.server = new UserId("0");
 		running = true;
@@ -35,7 +35,7 @@ public class DummyClient implements Runnable {
 	}
 	
 
-	private void setReceiveHandling(){
+	protected void setReceiveHandling(){
 		receiveThread = new Thread() {
 			@Override
 			public void run() {
@@ -77,13 +77,13 @@ public class DummyClient implements Runnable {
 	    return new String(text);
 	}
 	
-	private UserId randomUser(){
+	protected UserId randomUser(){
 		Random rnd = new Random();
 		int i = rnd.nextInt(clients) + 1;
 		return new UserId(Integer.toString(i));
 	}
 	
-	private void onMessageReceive(byte[] m){
+	protected void onMessageReceive(byte[] m){
 		Message received = new Message(m);
 		
 		//is ACK
@@ -95,33 +95,33 @@ public class DummyClient implements Runnable {
 		System.out.println("Client " + clientId + " received message: //STATUS//" + received.getHeader().getConsistency() + "//MESSAGE//" + message);
 	}
 	
-	private void sendConnect() throws IOException{
+	protected void sendConnect() throws IOException{
 		PublicHeader header = new PublicHeader(PublicHeader.BYTES_LENGTH_HEADER, null, StatusByte.CONNECT.getByte(), 0, me, server );
 		System.out.println("Client " + clientId + " sends message: //STATUS//" + header.getConsistency() + "//MESSAGE//<empty>");
 		comm.sendMessage(createPacket(header, null));
 	}
 	
-	private void sendDisconnect() throws IOException{
+	protected void sendDisconnect() throws IOException{
 		PublicHeader header = new PublicHeader(PublicHeader.BYTES_LENGTH_HEADER, null, StatusByte.DISCONNECT.getByte(), 0, me, server );
 		System.out.println("Client " + clientId + " sends message: //STATUS//" + header.getConsistency() + "//MESSAGE//<empty>");
 		comm.sendMessage(createPacket(header, null));
 	}
 	
-	private void sendPost() throws IOException{
+	protected void sendPost() throws IOException{
 		byte[] m = (generateString(new Random(), "abcdefghijklmnopqrstuvwxyz0123456789", 20)).getBytes();
 		PublicHeader header = new PublicHeader(PublicHeader.BYTES_LENGTH_HEADER + m.length, null, StatusByte.POST.getByte(), 0, me, randomUser() );
 		System.out.println("Client " + clientId + " sends POST: //STATUS//" + header.getConsistency() + "//MESSAGE//" + new String(m) + "//TO//" + header.getReceiver());
 		comm.sendMessage(createPacket(header, m));
 	}
 	
-	private void sendData() throws IOException{
+	protected void sendData() throws IOException{
 		//Fetch all my data
 		PublicHeader header = new PublicHeader(PublicHeader.BYTES_LENGTH_HEADER, null, StatusByte.DATA.getByte(), 0, me, me );
 		System.out.println("Client " + clientId + " sends DATA: //STATUS//" + header.getConsistency() + "//MESSAGE//<empty>");
 		comm.sendMessage(createPacket(header, null));
 	}
 	
-	private void sendMessage() throws IOException{
+	protected void sendMessage() throws IOException{
 		//Send message to myself
 		byte[] m = (generateString(new Random(), "abcdefghijklmnopqrstuvwxyz0123456789", 20)).getBytes();
 		PublicHeader header = new PublicHeader(PublicHeader.BYTES_LENGTH_HEADER + m.length, null, StatusByte.SEND.getByte(), 0, me, randomUser());
@@ -129,11 +129,11 @@ public class DummyClient implements Runnable {
 		comm.sendMessage(createPacket(header, m));
 	}
 	
-	private void sendUnknown(){
+	protected void sendUnknown(){
 		
 	}
 	
-	private void reconnect() throws IOException, InterruptedException{
+	protected void reconnect() throws IOException, InterruptedException{
 			System.out.println("Client " + Integer.toString(clientId) + " performs a reconnect!");
 			sendDisconnect();
 			Thread.sleep((int)Math.floor(Math.random()*10000));

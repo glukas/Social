@@ -26,9 +26,12 @@ public class AsyncServer {
 		this.port = port;
 		this.delegate = delegate;
 		
+		restart();
+	}
+	
+	private void restart() {
 		//Start the handlers
 		setRequestHandling();
-		
 		
 		//Start communicator, do this on separate thread because it's network task
 		requestHandler.post(new Runnable(){
@@ -63,7 +66,8 @@ public class AsyncServer {
 						byte[] message = comm.receiveMessage();
 						postReceivedToDelegate(message);
 					}
-				} catch (IOException e) {
+				} catch (Exception e) {
+					running = false;
 					if (running){
 						e.printStackTrace();
 						Log.e(this.getClass().toString(), "exception + " + e.getMessage());
@@ -95,24 +99,20 @@ public class AsyncServer {
 		requestThread.quit();
 		noConnection = true;
 	}
-
+	
+	// TODO new thread
 	public void sendMessage(final byte[] message) {
 		if (noConnection){
-			requestHandler.post(new Runnable() {
-				@Override
-				public void run() {
-					start();
-				}
-			});
+			restart();
 		}
 		requestHandler.post(new Runnable() {
 			@Override
 			public void run() {
 				try {
 					comm.sendMessage(message);
-					Log.d(this.getClass().toString(), "sendMessage");
-				} catch (IOException e) {
-					Log.e("Error delivering : " +this.getClass().toString(), e.getLocalizedMessage());
+					Log.d(this.getClass().toString(), "sentMessage");
+				} catch (Exception e) {
+					Log.e("Error delivering : " +this.getClass().toString(), "in SendMessage: "+e.getLocalizedMessage());
 					close();
 					delegate.getCallbackHandler().post(new Runnable() {
 						@Override
