@@ -51,14 +51,18 @@ public class SecureChannel implements AsyncServerDelegate {
 	public void sendMessage(NetworkMessage message) {
 		byte[] encrypted;
 		
-		//encrypted = crypto.encryptPost(message);
+		encrypted = crypto.encryptPost(message);
 		
-		int length = message.text.length+PublicHeader.BYTES_LENGTH_HEADER;
+		/*int length = message.text.length+PublicHeader.BYTES_LENGTH_HEADER;
 		message.header.setLength(length);
 		ByteBuffer result = ByteBuffer.allocate(length);
 		result.put(message.header.getbytes());
 		result.put(message.text);
-		encrypted = result.array();
+		encrypted = result.array();*/
+		
+		/*if (encrypted.length != length) {
+			throw new RuntimeException();//This would mean a bug
+		}*/
 		
 		Log.d(this.getClass().toString(), "send : " + message.header.toString() + " || " + message.getText().subSequence(0, message.header.getJSONTextLength()));
 		
@@ -87,9 +91,13 @@ public class SecureChannel implements AsyncServerDelegate {
 
 	@Override
 	public void onReceive(byte[] message) {
+
+		/*
 		ByteBuffer messageBuffer = ByteBuffer.wrap(message);
 		
 		PublicHeader header = new PublicHeader(messageBuffer);
+		
+		
 		byte[] text;
 		if (messageBuffer.capacity() > PublicHeader.BYTES_LENGTH_HEADER) {
 			messageBuffer.position(PublicHeader.BYTES_LENGTH_HEADER);
@@ -100,12 +108,13 @@ public class SecureChannel implements AsyncServerDelegate {
 		}
 		Log.d(this.getClass().toString(), "received : " + header.toString() + " || " + new String(text));
 		
+
 		if (this.secureChannelDelegate != null) {
 			this.secureChannelDelegate.onMessageReceived(new NetworkMessage(text, header));
 		}
+		*/
 		//decrypt
 		
-		/*
 		Log.d(this.getClass().toString(), "onReceive");
 		NetworkMessage decrypted = crypto.decryptPost(message);
 		if (decrypted != null) {//For now, ignore all corrupted messages
@@ -118,7 +127,7 @@ public class SecureChannel implements AsyncServerDelegate {
 			}
 		} else {
 			Log.e(this.getClass().toString(), "received invalid message");
-		}*/
+		}
 	}
 
 	@Override
