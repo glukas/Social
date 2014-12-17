@@ -172,7 +172,7 @@ class Posts {
 		String[] selectionArgs = {Integer.toString(postId), Utility.toSQLiteId(id)};
 		
 		// SQL ORDER BY clause.
-		String orderBy = null; //PostsEntry._ID + " DESC";
+		String orderBy = PostsEntry._ID + " DESC";
 		
 		// SQL LIMIT clause.
 		String limit = Integer.toString(numberPosts);

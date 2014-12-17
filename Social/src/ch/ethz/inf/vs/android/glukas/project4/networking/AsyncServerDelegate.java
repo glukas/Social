@@ -8,6 +8,8 @@ public interface AsyncServerDelegate {
 	
 	public void onReceive(byte[] message);
 	
-	public void onSendFailed();
+	public void onSendFailed(byte[] message);
+	
+	public void onSendSucceeded(byte[] message);
 
 }

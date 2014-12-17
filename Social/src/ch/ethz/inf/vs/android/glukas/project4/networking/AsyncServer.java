@@ -111,13 +111,14 @@ public class AsyncServer {
 				try {
 					comm.sendMessage(message);
 					Log.d(this.getClass().toString(), "sentMessage");
+					delegate.onSendSucceeded(message);
 				} catch (Exception e) {
 					Log.e("Error delivering : " +this.getClass().toString(), "in SendMessage: "+e.getLocalizedMessage());
 					close();
 					delegate.getCallbackHandler().post(new Runnable() {
 						@Override
 						public void run() {
-							delegate.onSendFailed();
+							delegate.onSendFailed(message);
 						}
 					});
 				}
