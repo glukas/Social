@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.util.Log;
 import ch.ethz.inf.vs.android.glukas.project4.Post;
 import ch.ethz.inf.vs.android.glukas.project4.BasicUser;
@@ -230,11 +231,8 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 	public void getSomeUserPosts(UserId userId, int numberPosts, int postId) {
 		//retrieve posts already in the database
 		Log.d(this.getClass().toString(), "getSomeUserPosts " + userId.toString());
-		List<Post> listPosts = database.getSomeLatestPosts(userId, numberPosts, postId);
 		
-		for (Post p : listPosts) {
-			userHandler.onPostReceived(p);
-		}
+		new AsyncGetSomeLatestPostsDatabaseQuery(numberPosts, postId).execute(userId);
 		
 		//ask for update
 		
@@ -387,6 +385,38 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 		
 		//send reply
 		secureChannel.sendMessage(new NetworkMessage(msgToSend, header));
+	}
+	
+	
+	///
+	//ASYNCHRONOUS DATABASE QUERIES
+	///
+	
+	private class AsyncGetSomeLatestPostsDatabaseQuery extends AsyncTask<UserId, Void, List<Post>> {
+
+		public final int numberOfPosts;
+		public final int postId;
+		
+		public AsyncGetSomeLatestPostsDatabaseQuery(int numberOfPosts, int postId) {
+			this.numberOfPosts = numberOfPosts;
+			this.postId = postId;
+		}
+		
+		@Override
+		protected List<Post> doInBackground(UserId...  userId) {
+			
+			List<Post> listPosts = database.getSomeLatestPosts(userId[0], numberOfPosts, postId);
+			
+			return listPosts;
+		}
+		
+		@Override
+		protected void onPostExecute(List<Post> listPosts) {
+			for (Post p : listPosts) {
+				userHandler.onPostReceived(p);
+			}
+		}
+		
 	}
 	
 }

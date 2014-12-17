@@ -99,7 +99,7 @@ public class WallActivity extends Activity implements UserDelegate {
 	
 	protected void updateWall() {
 		if (wallOwner != null) {
-			mProtocol.getSomeUserPosts(wallOwner.id, 30);
+			mProtocol.getSomeUserPosts(wallOwner.id, Integer.MAX_VALUE);
 		}
 	}
 	
