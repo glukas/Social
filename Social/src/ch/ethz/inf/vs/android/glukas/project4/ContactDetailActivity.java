@@ -38,6 +38,13 @@ public class ContactDetailActivity extends WallActivity {
 		fragmentTransaction.add(R.id.friendWallContainer, fragment);
 		fragmentTransaction.commit();
 	}
+	
+	@Override
+	protected void onStop() {
+		super.onStop();
+		
+		this.userWallAdapter.clear();
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

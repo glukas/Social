@@ -213,13 +213,13 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 	
 	@Override
 	public void getUserPosts(UserId userId, int postId) {
-		throw new UnhandledFunctionnality();
-		//ask distant user if already all messages are in database
-		/*Message msg = MessageFactory.newTypeMessage(MessageType.GET_STATE);
-		PublicHeader header = new PublicHeader(0, null, StatusByte.DATA.getByte(), 0, localUser.getId(), userId);
-		secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg, 0).toString(), header));
-		//retrieve data already known from database
-		database.getAllFriendPostsFrom(userId, postId);*/
+		List<Post> newPosts = database.getAllFriendPostsFrom(userId, postId);
+		
+		for (Post post : newPosts) {
+			this.userHandler.onPostReceived(post);
+		}
+		
+		getState(userId);
 	}
 	
 	@Override
@@ -235,7 +235,10 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 		new AsyncGetSomeLatestPostsDatabaseQuery(numberPosts, postId).execute(userId);
 		
 		//ask for update
-		
+		getState(userId);
+	}
+	
+	private void getState(UserId userId) {
 		Message msg = MessageFactory.newTypeMessage(MessageType.GET_STATE);
 		PublicHeader request = new PublicHeader(PublicHeader.BYTES_LENGTH_HEADER, null, StatusByte.DATA.getByte(), 0, localUser.getId(), userId);
 		secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg).toString(), request));
