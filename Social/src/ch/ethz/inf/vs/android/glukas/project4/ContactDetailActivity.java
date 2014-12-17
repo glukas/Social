@@ -18,6 +18,7 @@ import android.os.Parcelable;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AbsListView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -37,6 +38,8 @@ public class ContactDetailActivity extends WallActivity {
 		WallFragment fragment = new WallFragment();
 		fragmentTransaction.add(R.id.friendWallContainer, fragment);
 		fragmentTransaction.commit();
+		
+		
 	}
 	
 	@Override
@@ -129,5 +132,16 @@ public class ContactDetailActivity extends WallActivity {
 		showFriend(response.getSender());
 
 		Log.d(this.getClass().toString(), "Friend request accepted : " + response.getSender().getUsername() + " id " + response.getSender().getId());
+	}
+	
+	////
+	//OnScrollListener
+	////
+	
+	@Override
+	public void onScrollStateChanged (AbsListView view, int scrollState) {
+		if (scrollState == SCROLL_STATE_IDLE && view.getFirstVisiblePosition() == 0) {
+			updateWall();
+		}
 	}
 }

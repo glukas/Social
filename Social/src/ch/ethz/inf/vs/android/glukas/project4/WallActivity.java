@@ -31,6 +31,8 @@ import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -40,7 +42,7 @@ import ch.ethz.inf.vs.android.glukas.project4.exceptions.FailureReason;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.Protocol;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.ProtocolInterface;
 
-public class WallActivity extends Activity implements UserDelegate {
+public class WallActivity extends Activity implements UserDelegate, OnScrollListener {
 
 	private static final int PICTURE_GALLERY = 1;
 	private static final int PICTURE_TAKEN = 2;
@@ -245,8 +247,22 @@ public class WallActivity extends Activity implements UserDelegate {
 	///
 
 	public class WallFragment extends ListFragment {
+		
+		@Override
+		public void onCreate(Bundle savedInstanceState) {
+			super.onCreate(savedInstanceState);
+		}
+		
+		@Override
+		public void onActivityCreated(Bundle savedInstanceState) {
+			super.onActivityCreated(savedInstanceState);
+			this.getListView().setOnScrollListener(WallActivity.this);
+		}
+		
+		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 			this.setListAdapter(userWallAdapter);
+			
 			View view = inflater.inflate(R.layout.my_wall_tab, container, false);
 			textField = (EditText) view.findViewById(R.id.text);
 			textField.setOnFocusChangeListener(new OnFocusChangeListener() {          
@@ -353,6 +369,19 @@ public class WallActivity extends Activity implements UserDelegate {
 	private void removePictureFromPost() {
 		postPicture.setPadding(0, 0, 0, 0);
 		postPicture.setImageDrawable(null);
+	}
+	
+	////
+	//OnScrollListener
+	////
+
+	@Override
+	public void onScrollStateChanged(AbsListView view, int scrollState) {
+	}
+
+	@Override
+	public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+		
 	}
 	
 }
