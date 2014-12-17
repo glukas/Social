@@ -23,7 +23,7 @@ public class ConnectionWorker implements Runnable {
 		  System.out.println("Status: " + Integer.toHexString(received.getHeader().getConsistency()));
 		  String s = (received.isEmpty ? "<empty>" : new String(received.getMessage(), StandardCharsets.UTF_8));
 
-		  System.out.println("Server read: " + s);
+		  //System.out.println("Server read: " + s);
 
 		  synchronized(queue) {
 			  queue.add(new ServerEvent(server, socket, received));
@@ -62,7 +62,6 @@ public class ConnectionWorker implements Runnable {
 	      UserId receiver = dataEvent.message.getHeader().getReceiver();
 	      
 	      //Choose what to do, based on the status of the message
-	      // TODO Add all possible status
 	      System.out.println("Handle message");
 	      //StatusByte s = StatusByte.constructStatusByte(dataEvent.message.getHeader().getConsistency());
 	      byte b = dataEvent.message.getHeader().getConsistency();
@@ -99,9 +98,14 @@ public class ConnectionWorker implements Runnable {
 	      			if(isConnected(sender)){
 	      				SocketChannel socket = connectedUsers.get(sender.getId());
 	      				//Send all messages
-	      				for(Message m : data){
-	      					dataEvent.server.send(socket, m);
+	      				while(isConnected(sender) && !data.isEmpty()){
+	      					dataEvent.server.send(socket, data.remove(0));
 	      				}
+	      				
+//	      				
+//	      				for(Message m : data){
+//	      					dataEvent.server.send(socket, m);
+//	      				}
 	      			}
 	      		} else {
 	      			if(isConnected(receiver)){
@@ -121,10 +125,12 @@ public class ConnectionWorker implements Runnable {
 	      		System.out.println("POST request from User: " + sender.getId().toString());
 	      		if(isConnected(receiver)){
 	      			//User is online, forward Post
+	      			System.out.println("---- User is connected");
 	      			SocketChannel socket = connectedUsers.get(receiver.getId());
 	      			dataEvent.server.send(socket, dataEvent.message);
 	      		} else {
 	      			//User not online, cache the message
+	      			System.out.println("---- User is not connected");
 	      			cache.addMessage(dataEvent.message);
 	      		}
 	      		break;

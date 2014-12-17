@@ -20,7 +20,7 @@ public class TestClient {
 		for(int i = 0; i < clients; i++){
 			threadPool.execute(
 					//client ids from 1...clients, 0 is the server
-					new DummyClient(9000, i+1, clients)
+					new DummyClient_3(9000, i+1, clients, i + 2, i%2 == 0)
 					);
 		}
 		

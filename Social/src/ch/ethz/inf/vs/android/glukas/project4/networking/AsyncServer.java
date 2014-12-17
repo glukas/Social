@@ -95,7 +95,8 @@ public class AsyncServer {
 		requestThread.quit();
 		noConnection = true;
 	}
-
+	
+	// TODO new thread
 	public void sendMessage(final byte[] message) {
 		if (noConnection){
 			requestHandler.post(new Runnable() {
