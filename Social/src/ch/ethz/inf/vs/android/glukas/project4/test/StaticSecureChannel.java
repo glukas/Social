@@ -59,7 +59,14 @@ public class StaticSecureChannel implements AsyncServerDelegate {
 	}
 
 	@Override
-	public void onSendFailed() {
-		Log.i("DEBUG", Data.tag+"onSendFailed");
+	public void onSendFailed(byte[] message) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onSendSucceeded(byte[] message) {
+		// TODO Auto-generated method stub
+		
 	}
 }

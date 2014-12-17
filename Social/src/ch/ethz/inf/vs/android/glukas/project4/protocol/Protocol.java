@@ -81,6 +81,7 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 	// Members
 	////
 
+	private Map<NetworkMessage, Post> outgoingPosts = new HashMap<NetworkMessage, Post>();
 	private boolean isConnected = false;
 	
 	// Communications with other components
@@ -152,36 +153,42 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 	
 	@Override
 	public void post(UserId wallOwner, String text, Bitmap image) {
+		
+		if (wallOwner.getId().equals(localUser.getId())) {
+			post(text, image);
+			return;
+		}
+		
 		Post post = new Post(getNewPostId(wallOwner), localUser.getId(), wallOwner, text, image, new Date());
 		
-		//if there is no connection, we should prevent posting on other's walls.
-		/*if (!wallOwner.getId().equals(localUser)) {
-			if (!isConnected) {
-				//this.userHandler.onSendFailed(post);
-				return;
-			}
-		}*/
+		NetworkMessage message = assembleNetworkMessage(post);
 		
-		boolean success = postLocally(post);
-		if (success) {
-			
-			Message msg = MessageFactory.newPostMessage(post, false);
-			
-			byte[] protocolMessageBytes = JSONObjectFactory.createJSONObject(msg).toString().getBytes();
-			
-			PublicHeader header = new PublicHeader(0, (short)protocolMessageBytes.length, StatusByte.POST.getByte(), post.getId(), localUser.getId(), post.getWallOwner());
-			
-			ByteBuffer assembledMessage = ByteBuffer.allocate(protocolMessageBytes.length+msg.getPayload().length);
-			assembledMessage.put(protocolMessageBytes);
-			assembledMessage.put(msg.getPayload());
-			
-			secureChannel.sendMessage(new NetworkMessage(assembledMessage.array(), header));
-		}
+		this.outgoingPosts.put(message, post);
+		
+		secureChannel.sendMessage(message);
+	}
+	
+	private NetworkMessage assembleNetworkMessage(Post post) {
+		Message msg = MessageFactory.newPostMessage(post, false);
+		
+		byte[] protocolMessageBytes = JSONObjectFactory.createJSONObject(msg).toString().getBytes();
+		
+		PublicHeader header = new PublicHeader(0, (short)protocolMessageBytes.length, StatusByte.POST.getByte(), post.getId(), post.getPoster(), post.getWallOwner());
+		ByteBuffer assembledMessage = ByteBuffer.allocate(protocolMessageBytes.length+msg.getPayload().length);
+		assembledMessage.put(protocolMessageBytes);
+		assembledMessage.put(msg.getPayload());
+		
+		return new NetworkMessage(assembledMessage.array(), header);
 	}
 	
 	@Override
 	public void post(String text, Bitmap image) {
-		post(localUser.getId(), text, image);
+		//Local post: first post locally, then send over the network
+		Post post = new Post(getNewPostId(localUser.getId()), localUser.getId(), localUser.getId(), text, image, new Date());
+		boolean success = postLocally(post);
+		if (success) {
+			//secureChannel.sendMessage(assembleNetworkMessage(post));
+		}
 	}
 	
 	private boolean postLocally(Post post) {
@@ -279,6 +286,25 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 
 	}
 	
+	@Override
+	public void onSendFailed(NetworkMessage message) {
+		Post post = this.outgoingPosts.get(message);
+		this.outgoingPosts.remove(post);
+		this.userHandler.onPostReceived(new Post(post.getId(), post.getPoster(), post.getWallOwner(), "Delivery Failed", post.getImage(), post.getDateTime()));
+	}
+
+	@Override
+	public void onSendSucceeded(NetworkMessage message) {
+		// TODO Auto-generated method stub
+		Post post = this.outgoingPosts.get(message);
+		postLocally(post);
+		this.outgoingPosts.remove(post);
+	}
+	
+	////
+	//IMPLEMENTATION
+	////
+	
 	private void onHeaderReceived(PublicHeader header) {
 		if (header.getConsistency() == StatusByte.CONNECT.getByte()) {
 			this.isConnected = true;
@@ -357,4 +383,5 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 		//send reply
 		secureChannel.sendMessage(new NetworkMessage(msgToSend, header));
 	}
+	
 }

@@ -1,6 +1,8 @@
 package ch.ethz.inf.vs.android.glukas.project4.security;
 
 import java.nio.ByteBuffer;
+import java.util.HashMap;
+import java.util.Map;
 
 import android.os.Handler;
 import android.util.Log;
@@ -21,6 +23,8 @@ public class SecureChannel implements AsyncServerDelegate {
 	private final MessageCryptography crypto;
 	private AsyncServer asyncServer;
 	private final Handler asyncNetworkHandler;
+	
+	private final Map<byte[], NetworkMessage> outgoingMessages = new HashMap<byte[], NetworkMessage>();
 	
 	/**
 	 * Note that any secureChannelDelegate calls are made on the (handler-)thread that constructs this object.
@@ -65,7 +69,7 @@ public class SecureChannel implements AsyncServerDelegate {
 		}*/
 		
 		Log.d(this.getClass().toString(), "send : " + message.header.toString() + " || " + message.getText().subSequence(0, message.header.getJSONTextLength()));
-		
+		outgoingMessages.put(encrypted, message);
 		this.asyncServer.sendMessage(encrypted);
 	}
 	
@@ -131,23 +135,17 @@ public class SecureChannel implements AsyncServerDelegate {
 	}
 
 	@Override
-	public void onSendFailed() {
-		Log.e(this.getClass().toString(), "sendFailed");
-		// TODO Notify secureChannelDelegate or ignore?
+	public void onSendFailed(byte[] message) {
+		NetworkMessage networkMessage = outgoingMessages.get(message);
+		outgoingMessages.remove(message);
+		this.secureChannelDelegate.onSendFailed(networkMessage);
 	}
-	
-	//TODO: this should probably be on a higher level.
-	/**
-	 * Precondition: user was discovered by onPeersDiscovered
-	 * @param user
-	 */
-	//void requestFriendship(User user);
-	
-	/**
-	 * Start looking for peers.
-	 * Will asynchronously trigger onPeersDiscovered(List<String> peers)
-	 * or onPeerDiscoveryFailed(FailureReason reason) to be called on the delegate
-	 */
-	//void startPeerDiscovery();
+
+	@Override
+	public void onSendSucceeded(byte[] message) {
+		NetworkMessage networkMessage = outgoingMessages.get(message);
+		outgoingMessages.remove(message);
+		this.secureChannelDelegate.onSendSucceeded(networkMessage);
+	}
 	
 }

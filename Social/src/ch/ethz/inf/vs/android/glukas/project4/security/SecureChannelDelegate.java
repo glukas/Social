@@ -17,6 +17,10 @@ public interface SecureChannelDelegate {
 	 */
 	public void onMessageReceived(NetworkMessage message);
 	
+	public void onSendFailed(NetworkMessage message);
+	
+	public void onSendSucceeded(NetworkMessage message);
+	
 	/**
 	 * The previous search for peers is successful
 	 * @param peers
