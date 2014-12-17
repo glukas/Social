@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.util.Log;
 import ch.ethz.inf.vs.android.glukas.project4.Post;
 import ch.ethz.inf.vs.android.glukas.project4.BasicUser;
@@ -81,7 +82,9 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 	// Members
 	////
 
+	private Map<NetworkMessage, Post> outgoingPosts = new HashMap<NetworkMessage, Post>();
 	private boolean isConnected = false;
+	private int numFailed = 0;
 	
 	// Communications with other components
 	private SecureChannel secureChannel;
@@ -152,36 +155,42 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 	
 	@Override
 	public void post(UserId wallOwner, String text, Bitmap image) {
+		
+		if (wallOwner.getId().equals(localUser.getId())) {
+			post(text, image);
+			return;
+		}
+		
 		Post post = new Post(getNewPostId(wallOwner), localUser.getId(), wallOwner, text, image, new Date());
 		
-		//if there is no connection, we should prevent posting on other's walls.
-		/*if (!wallOwner.getId().equals(localUser)) {
-			if (!isConnected) {
-				//this.userHandler.onSendFailed(post);
-				return;
-			}
-		}*/
+		NetworkMessage message = assembleNetworkMessage(post);
 		
-		boolean success = postLocally(post);
-		if (success) {
-			
-			Message msg = MessageFactory.newPostMessage(post, false);
-			
-			byte[] protocolMessageBytes = JSONObjectFactory.createJSONObject(msg).toString().getBytes();
-			
-			PublicHeader header = new PublicHeader(0, (short)protocolMessageBytes.length, StatusByte.POST.getByte(), post.getId(), localUser.getId(), post.getWallOwner());
-			
-			ByteBuffer assembledMessage = ByteBuffer.allocate(protocolMessageBytes.length+msg.getPayload().length);
-			assembledMessage.put(protocolMessageBytes);
-			assembledMessage.put(msg.getPayload());
-			
-			secureChannel.sendMessage(new NetworkMessage(assembledMessage.array(), header));
-		}
+		this.outgoingPosts.put(message, post);
+		
+		secureChannel.sendMessage(message);
+	}
+	
+	private NetworkMessage assembleNetworkMessage(Post post) {
+		Message msg = MessageFactory.newPostMessage(post, false);
+		
+		byte[] protocolMessageBytes = JSONObjectFactory.createJSONObject(msg).toString().getBytes();
+		
+		PublicHeader header = new PublicHeader(0, (short)protocolMessageBytes.length, StatusByte.POST.getByte(), post.getId(), post.getPoster(), post.getWallOwner());
+		ByteBuffer assembledMessage = ByteBuffer.allocate(protocolMessageBytes.length+msg.getPayload().length);
+		assembledMessage.put(protocolMessageBytes);
+		assembledMessage.put(msg.getPayload());
+		
+		return new NetworkMessage(assembledMessage.array(), header);
 	}
 	
 	@Override
 	public void post(String text, Bitmap image) {
-		post(localUser.getId(), text, image);
+		//Local post: first post locally, then send over the network
+		Post post = new Post(getNewPostId(localUser.getId()), localUser.getId(), localUser.getId(), text, image, new Date());
+		boolean success = postLocally(post);
+		if (success) {
+			//secureChannel.sendMessage(assembleNetworkMessage(post));
+		}
 	}
 	
 	private boolean postLocally(Post post) {
@@ -204,13 +213,13 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 	
 	@Override
 	public void getUserPosts(UserId userId, int postId) {
-		throw new UnhandledFunctionnality();
-		//ask distant user if already all messages are in database
-		/*Message msg = MessageFactory.newTypeMessage(MessageType.GET_STATE);
-		PublicHeader header = new PublicHeader(0, null, StatusByte.DATA.getByte(), 0, localUser.getId(), userId);
-		secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg, 0).toString(), header));
-		//retrieve data already known from database
-		database.getAllFriendPostsFrom(userId, postId);*/
+		List<Post> newPosts = database.getAllFriendPostsFrom(userId, postId);
+		
+		for (Post post : newPosts) {
+			this.userHandler.onPostReceived(post);
+		}
+		
+		getState(userId);
 	}
 	
 	@Override
@@ -222,14 +231,14 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 	public void getSomeUserPosts(UserId userId, int numberPosts, int postId) {
 		//retrieve posts already in the database
 		Log.d(this.getClass().toString(), "getSomeUserPosts " + userId.toString());
-		List<Post> listPosts = database.getSomeLatestPosts(userId, numberPosts, postId);
 		
-		for (Post p : listPosts) {
-			userHandler.onPostReceived(p);
-		}
+		new AsyncGetSomeLatestPostsDatabaseQuery(numberPosts, postId).execute(userId);
 		
 		//ask for update
-		
+		getState(userId);
+	}
+	
+	private void getState(UserId userId) {
 		Message msg = MessageFactory.newTypeMessage(MessageType.GET_STATE);
 		PublicHeader request = new PublicHeader(PublicHeader.BYTES_LENGTH_HEADER, null, StatusByte.DATA.getByte(), 0, localUser.getId(), userId);
 		secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg).toString(), request));
@@ -278,6 +287,29 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 		}
 
 	}
+	
+	@Override
+	public void onSendFailed(NetworkMessage message) {
+		Post post = this.outgoingPosts.get(message);
+		if (post != null) {
+			numFailed += 1;
+			this.outgoingPosts.remove(post);
+			this.userHandler.onPostReceived(new Post(post.getId()+numFailed, post.getPoster(), post.getWallOwner(), post.getText()+" - Delivery Failed", post.getImage(), post.getDateTime()));
+		}
+	}
+
+	@Override
+	public void onSendSucceeded(NetworkMessage message) {
+		Post post = this.outgoingPosts.get(message);
+		if (post != null) {
+			postLocally(post);
+			this.outgoingPosts.remove(post);
+		}
+	}
+	
+	////
+	//IMPLEMENTATION
+	////
 	
 	private void onHeaderReceived(PublicHeader header) {
 		if (header.getConsistency() == StatusByte.CONNECT.getByte()) {
@@ -357,4 +389,37 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 		//send reply
 		secureChannel.sendMessage(new NetworkMessage(msgToSend, header));
 	}
+	
+	
+	///
+	//ASYNCHRONOUS DATABASE QUERIES
+	///
+	
+	private class AsyncGetSomeLatestPostsDatabaseQuery extends AsyncTask<UserId, Void, List<Post>> {
+
+		public final int numberOfPosts;
+		public final int postId;
+		
+		public AsyncGetSomeLatestPostsDatabaseQuery(int numberOfPosts, int postId) {
+			this.numberOfPosts = numberOfPosts;
+			this.postId = postId;
+		}
+		
+		@Override
+		protected List<Post> doInBackground(UserId...  userId) {
+			
+			List<Post> listPosts = database.getSomeLatestPosts(userId[0], numberOfPosts, postId);
+			
+			return listPosts;
+		}
+		
+		@Override
+		protected void onPostExecute(List<Post> listPosts) {
+			for (Post p : listPosts) {
+				userHandler.onPostReceived(p);
+			}
+		}
+		
+	}
+	
 }

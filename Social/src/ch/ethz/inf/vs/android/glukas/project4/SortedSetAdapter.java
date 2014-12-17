@@ -26,6 +26,11 @@ public abstract class SortedSetAdapter<T extends Comparable<T>> extends BaseAdap
 		}
 	}
 	
+	public void clear() {
+		this.items.clear();
+		this.notifyDataSetChanged();
+	}
+	
 	public SortedSetAdapter(Context context, List<T> objects) {
 		mContext = context;
 		for (T item : objects) {

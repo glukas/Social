@@ -97,9 +97,20 @@ public class WallActivity extends Activity implements UserDelegate {
 		
 	}
 	
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		this.userWallAdapter.clear();
+	}
+	
 	protected void updateWall() {
 		if (wallOwner != null) {
-			mProtocol.getSomeUserPosts(wallOwner.id, 30);
+			if (this.userWallAdapter.isEmpty()) {
+				mProtocol.getSomeUserPosts(wallOwner.id, Integer.MAX_VALUE);
+			} else {
+				mProtocol.getUserPosts(wallOwner.id, userWallAdapter.getItem(0).getId());
+			}
+			
 		}
 	}
 	
