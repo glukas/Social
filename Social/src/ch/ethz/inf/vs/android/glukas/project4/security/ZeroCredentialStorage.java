@@ -23,14 +23,6 @@ public class ZeroCredentialStorage implements CredentialStorage {
 		return auth;
 	}
 	
-	public SecretKey getPublicEncryptionKey(UserId user) {
-		return null;
-	}
-	
-	public SecretKey getPublicAuthenticationKey(UserId user) {
-		return null;
-	}
-
 	@Override
 	public UserCredentials getUserCredentials(UserId user) {
 		return new UserCredentials(user, enc.getEncoded(), auth.getEncoded());

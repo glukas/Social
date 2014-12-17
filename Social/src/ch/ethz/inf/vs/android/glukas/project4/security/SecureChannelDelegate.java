@@ -17,26 +17,18 @@ public interface SecureChannelDelegate {
 	 */
 	public void onMessageReceived(NetworkMessage message);
 	
+	/**
+	 * The message failed to be sent to the server.
+	 * @param message
+	 */
 	public void onSendFailed(NetworkMessage message);
 	
+	/**
+	 * The message succeeded to be sent to the server.
+	 * This does not mean that the receiver of the message has received the message yet.
+	 * @param message
+	 */
 	public void onSendSucceeded(NetworkMessage message);
 	
-	/**
-	 * The previous search for peers is successful
-	 * @param peers
-	 */
-	//public void onPeersDiscovered(List<User> peers);
-	
-	/**
-	 * The previous search has failed
-	 * @param reason
-	 */
-	//public void onPeerDiscoveryFailed(FailureReason reason);
-	
-	/**
-	 * The user accepted the friendship.
-	 * @param user
-	 */
-	//public void onFriendshipAccepted(User user);
 
 }

@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.android.glukas.project4.security;
 
+import android.annotation.SuppressLint;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
@@ -16,9 +17,9 @@ public class CryptographyParameters {
 	private static final String authenticationAlgorithm = "HmacSHA256";
 	private static final String encryptionMode = "CBC";
 	private static final String encryptionPadding = "PKCS7Padding";
-	private static final String asymmetricEncryptionAlgorithm = "RSA";
-	private static final String asymmetricEncryptionMode = "ECB";
-	private static final String asymmetricEncryptionPadding = "OAEPWithSHA-256AndMGF1Padding";
+	//private static final String asymmetricEncryptionAlgorithm = "RSA";
+	//private static final String asymmetricEncryptionMode = "ECB";
+	//private static final String asymmetricEncryptionPadding = "OAEPWithSHA-256AndMGF1Padding";
 	
 	public SecretKey decodeAuthenticationKey(byte[] authenticationKey) {
 		SecretKeySpec spec = new SecretKeySpec(authenticationKey, authenticationAlgorithm);
@@ -30,7 +31,10 @@ public class CryptographyParameters {
 		return spec;
 	}
 	
+	//The patch has been applied.
+	@SuppressLint("TrulyRandom")
 	public static SecureRandom getRandom() {
+		PRNGFixes.apply();
 		return new SecureRandom();
 	}
 	
@@ -38,18 +42,6 @@ public class CryptographyParameters {
 		Cipher c = null;
 		try {
 			c = Cipher.getInstance(encryptionAlgorithm+"/"+encryptionMode+"/"+encryptionPadding);
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		} catch (NoSuchPaddingException e) {
-			e.printStackTrace();
-		}
-		return c;
-	}
-	
-	public static Cipher getAsymmetricCipher() {
-		Cipher c = null;
-		try {
-			c = Cipher.getInstance(asymmetricEncryptionAlgorithm+"/"+asymmetricEncryptionMode+"/"+asymmetricEncryptionPadding);
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 		} catch (NoSuchPaddingException e) {
@@ -90,7 +82,4 @@ public class CryptographyParameters {
 		return macKeyGenerator;
 	}
 	
-	public static KeyGenerator getAsymmetricEncryptionKeyGenerator() {
-		return null;//TODO
-	}
 }
