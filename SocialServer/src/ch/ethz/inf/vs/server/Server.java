@@ -34,6 +34,7 @@ public class Server implements Runnable {
 	private ByteBuffer headerBuffer = ByteBuffer.allocate(PublicHeader.BYTES_LENGTH_HEADER);
 	//Max message size 1MB
 	private ByteBuffer messageBuffer = ByteBuffer.allocate(102400);
+	private ByteBuffer outBuffer = ByteBuffer.allocate(102400);
 	
 	//The worker to handle connections
 	private ConnectionWorker worker;
@@ -163,6 +164,11 @@ public class Server implements Runnable {
 		headerBuffer.rewind();
 		int messageLength = headerBuffer.getInt();
 		
+		if(messageLength < 0){
+			System.out.println("Bad message lenght: " + messageLength);
+			return;
+		}
+		
 		//create packet and save header in it
 		byte[] packet = new byte[messageLength];
 		System.arraycopy(headerBuffer.array(), 0, packet, 0, PublicHeader.BYTES_LENGTH_HEADER);
@@ -178,6 +184,10 @@ public class Server implements Runnable {
 
 			try {
 				numRead = socketChannel.read(this.messageBuffer);
+				while(numRead != messageLength - PublicHeader.BYTES_LENGTH_HEADER){
+					System.out.println("Long message!");
+					numRead += socketChannel.read(this.messageBuffer);
+				}
 				System.out.println(numRead + "bytes read! (Message)");
 			} catch (IOException e) {
 				// Connection got closed
@@ -191,6 +201,11 @@ public class Server implements Runnable {
 				// Remote shut down connection cleanly
 				key.channel().close();
 				key.cancel();
+				return;
+			} 
+			
+			if(messageLength - PublicHeader.BYTES_LENGTH_HEADER < 0){
+				System.out.println("Bad message lenght: " + messageLength);
 				return;
 			}
 
@@ -212,14 +227,20 @@ public class Server implements Runnable {
 
 			// Write until there's not more data ...
 			while (!queue.isEmpty()) {
-				ByteBuffer buf = (ByteBuffer) queue.get(0);
-				System.out.println("Server writes " + buf.remaining() + " bytes");
-				socketChannel.write(buf);
-				if (buf.remaining() > 0) {
-					// ... or the socket's buffer fills up
-					System.out.println("Socket Buffer filled up...");
-					break;
+				outBuffer.clear();
+				//ByteBuffer buf = (ByteBuffer) queue.get(0);
+				outBuffer = (ByteBuffer) queue.get(0);
+				System.out.println("Server writes " + outBuffer.remaining() + " bytes");
+				
+				while(outBuffer.remaining() > 0){
+					socketChannel.write(outBuffer);
 				}
+//				socketChannel.write(outBuffer);
+//				if (outBuffer.remaining() > 0) {
+//					// ... or the socket's buffer fills up
+//					System.out.println("Socket Buffer filled up...");
+//					break;
+//				}
 				queue.remove(0);
 			}
 
