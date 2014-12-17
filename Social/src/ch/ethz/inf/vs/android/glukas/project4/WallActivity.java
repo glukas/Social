@@ -167,13 +167,14 @@ public class WallActivity extends Activity implements UserDelegate {
 
 					bitmap = BitmapFactory.decodeFile(f.getAbsolutePath(),
 							bitmapOptions); 
-					//currentPicture = bitmap;
+					
 					bitmap = Bitmap.createScaledBitmap(bitmap, 
 							textField.getWidth() - 40,
 							(int)(bitmap.getHeight() * ((float)((textField.getWidth() - 20))/bitmap.getWidth())), 
 							false);
 					Log.i(this.getClass().toString(), "w : " + bitmap.getWidth() + ", h: " + bitmap.getHeight());
-					currentPicture = Bitmap.createScaledBitmap(bitmap, 100, 140, false);
+					currentPicture = bitmap;
+					//currentPicture = Bitmap.createScaledBitmap(bitmap, 100, 140, false);
 
 					bitmap = getRoundedCornerBitmap(bitmap);
 
