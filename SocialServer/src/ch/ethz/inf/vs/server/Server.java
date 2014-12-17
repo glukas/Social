@@ -23,6 +23,10 @@ public class Server implements Runnable {
 
 	private InetAddress hostAddress;
 	private int port;
+	
+	// Used to recover from failures
+	private long lastFailure = 0;
+	private boolean restart = false;
 
 	// The channel for accepting connections
 	private ServerSocketChannel serverChannel;
@@ -33,23 +37,30 @@ public class Server implements Runnable {
 	// The buffer into which we'll read data when it's available
 	private ByteBuffer headerBuffer = ByteBuffer.allocate(PublicHeader.BYTES_LENGTH_HEADER);
 	//Max message size 1MB
-	private ByteBuffer messageBuffer = ByteBuffer.allocate(102400);
-	private ByteBuffer outBuffer = ByteBuffer.allocate(102400);
+	private ByteBuffer messageBuffer = ByteBuffer.allocate(1000000);
+	private ByteBuffer outBuffer = ByteBuffer.allocate(1000000);
 	
 	//The worker to handle connections
 	private ConnectionWorker worker;
+	private Thread workerThread;
 	
 	//Indicates whether server is running
 	protected volatile boolean isStopped    = false;
 
 	public Server(InetAddress hostAddress, int port){
+		setup(hostAddress, port);
+	}
+	
+	private void setup(InetAddress hostAdress, int port){
 		try{
 			this.hostAddress = hostAddress;
 			this.port = port;
 			this.selector = this.initSelector();
 			//Dispatch worker
 			this.worker = new ConnectionWorker();
-			new Thread(worker).start();
+			this.workerThread = new Thread(worker);
+			workerThread.start();
+			
 		} catch(IOException e){
 			e.printStackTrace();
 		}
@@ -73,6 +84,11 @@ public class Server implements Runnable {
 						switch(change.type) {
 						case ChangeRequest.CHANGEOPS:
 							SelectionKey key = change.socket.keyFor(this.selector);
+							if(key == null){
+								System.out.println("key is null");
+								break;
+							}
+								
 							key.interestOps(change.ops);
 						}
 					}
@@ -102,7 +118,17 @@ public class Server implements Runnable {
 					}
 				}
 			} catch (Exception e) {
+				if(this.lastFailure + 1000 > System.currentTimeMillis()){
+					//Something is really wrong, perform reset
+					System.out.println("###### RESET #######");
+					workerThread.interrupt();
+					setup(this.hostAddress, this.port);
+				} else {
+					this.lastFailure = System.currentTimeMillis();
+				}
+				
 				e.printStackTrace();
+				
 			}
 		}
 
@@ -113,8 +139,6 @@ public class Server implements Runnable {
 	public void send(SocketChannel socket, Message m) {
 		byte[] data = m.getOriginal();
 		synchronized (this.changeRequests) {
-			// Deploy change request
-			this.changeRequests.add(new ChangeRequest(socket, ChangeRequest.CHANGEOPS, SelectionKey.OP_WRITE));
 			System.out.println("Added message with length " + m.getHeader().getLength() + " to write queue");
 			System.out.println("---Actual size " + data.length + " bytes");
 			// Add data to write to queue
@@ -126,6 +150,9 @@ public class Server implements Runnable {
 				}
 				queue.add(ByteBuffer.wrap(data));
 			}
+			
+			// Deploy change request
+			this.changeRequests.add(new ChangeRequest(socket, ChangeRequest.CHANGEOPS, SelectionKey.OP_WRITE));
 		}
 
 		// wake up selector
@@ -231,16 +258,10 @@ public class Server implements Runnable {
 				//ByteBuffer buf = (ByteBuffer) queue.get(0);
 				outBuffer = (ByteBuffer) queue.get(0);
 				System.out.println("Server writes " + outBuffer.remaining() + " bytes");
-				
 				while(outBuffer.remaining() > 0){
 					socketChannel.write(outBuffer);
 				}
-//				socketChannel.write(outBuffer);
-//				if (outBuffer.remaining() > 0) {
-//					// ... or the socket's buffer fills up
-//					System.out.println("Socket Buffer filled up...");
-//					break;
-//				}
+
 				queue.remove(0);
 			}
 

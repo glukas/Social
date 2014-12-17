@@ -15,6 +15,9 @@ public class ConnectionWorker implements Runnable {
 	  private List<ServerEvent> queue = new LinkedList<ServerEvent>();
 	  private HashMap<BigInteger, SocketChannel> connectedUsers = new HashMap<BigInteger, SocketChannel>();
 	  private MessageBuffer cache = new MessageBuffer();
+	  // Used to store the latest wall updates
+	  private MessageBuffer wallCache = new MessageBuffer();
+	  private final int POSTS = 100;
 	  
 	  public void processData(Server server, SocketChannel socket, byte[] data, int count) {
 		  //Create Message out of the byte array
@@ -33,6 +36,10 @@ public class ConnectionWorker implements Runnable {
 	  
 	  private boolean isConnected(UserId user){
 		  return connectedUsers.containsKey(user.getId());
+	  }
+	  
+	  private void cachePost(Message m, BigInteger user){
+		  //if()
 	  }
 	  
 	  private void sendACK(ServerEvent event){
@@ -101,11 +108,12 @@ public class ConnectionWorker implements Runnable {
 	      				while(isConnected(sender) && !data.isEmpty()){
 	      					dataEvent.server.send(socket, data.remove(0));
 	      				}
-	      				
-//	      				
-//	      				for(Message m : data){
-//	      					dataEvent.server.send(socket, m);
-//	      				}
+	      				// In case not all messages could be sent
+	      				if(!data.isEmpty()){
+	      					for(Message m : data){
+	      						cache.addMessage(m);
+	      					}
+	      				}
 	      			}
 	      		} else {
 	      			if(isConnected(receiver)){
@@ -123,6 +131,10 @@ public class ConnectionWorker implements Runnable {
 	      	case 0x03:
 	      		//POST
 	      		System.out.println("POST request from User: " + sender.getId().toString());
+	      		if(sender.getId().equals(receiver.getId())){
+	      			//Update to his own wall
+	      			
+	      		}
 	      		if(isConnected(receiver)){
 	      			//User is online, forward Post
 	      			System.out.println("---- User is connected");
