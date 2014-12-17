@@ -60,9 +60,13 @@ public class SecureChannel implements AsyncServerDelegate {
 		result.put(message.text);
 		encrypted = result.array();
 		
+		/*if (encrypted.length != length) {
+			throw new RuntimeException();//This would mean a bug
+		}*/
+		
 		Log.d(this.getClass().toString(), "send : " + message.header.toString() + " || " + message.getText().subSequence(0, message.header.getJSONTextLength()));
 		
-		//this.asyncServer.sendMessage(encrypted);
+		this.asyncServer.sendMessage(encrypted);
 	}
 	
 	/**
@@ -90,6 +94,11 @@ public class SecureChannel implements AsyncServerDelegate {
 		ByteBuffer messageBuffer = ByteBuffer.wrap(message);
 		
 		PublicHeader header = new PublicHeader(messageBuffer);
+		
+		/*if (header.getLength() != message.length) {
+			throw new RuntimeException("onReceive");
+		}*/
+		
 		byte[] text;
 		if (messageBuffer.capacity() > PublicHeader.BYTES_LENGTH_HEADER) {
 			messageBuffer.position(PublicHeader.BYTES_LENGTH_HEADER);
@@ -99,6 +108,8 @@ public class SecureChannel implements AsyncServerDelegate {
 			text = new byte[0];
 		}
 		Log.d(this.getClass().toString(), "received : " + header.toString() + " || " + new String(text));
+		
+
 		
 		if (this.secureChannelDelegate != null) {
 			this.secureChannelDelegate.onMessageReceived(new NetworkMessage(text, header));

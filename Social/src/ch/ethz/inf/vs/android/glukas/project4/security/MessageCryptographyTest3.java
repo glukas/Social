@@ -39,7 +39,7 @@ public class MessageCryptographyTest3 extends TestCase {
 	}
 	
 	public void correctnessTest(String text) {
-		PublicHeader header = new PublicHeader(0, new byte[3], StatusByte.POST.getByte() , 0, new UserId("0"), new UserId("1"));
+		PublicHeader header = new PublicHeader(text.length(), new byte[3], StatusByte.POST.getByte() , 0, new UserId("0"), new UserId("1"));
 		assertTrue(header.getbytes().length == PublicHeader.BYTES_LENGTH_HEADER);
 		assertTrue(new PublicHeader(ByteBuffer.wrap(header.getbytes())).getbytes().length == PublicHeader.BYTES_LENGTH_HEADER);
 		assertTrue(Arrays.equals(new PublicHeader(ByteBuffer.wrap(header.getbytes())).getbytes(), header.getbytes()));

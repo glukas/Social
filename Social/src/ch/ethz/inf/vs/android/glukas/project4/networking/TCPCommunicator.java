@@ -88,7 +88,7 @@ public class TCPCommunicator {
 	/**
 	 * This function should be used to send a message to the server
 	 * @param message The message as byte array
-	 * @throws IOException 
+	 * @throws Exception if any error occurs, like there is no network
 	 */
 	public void sendMessage(byte[] message) throws IOException {
 		out.write(message);
