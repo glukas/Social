@@ -62,7 +62,7 @@ public class SecureChannel implements AsyncServerDelegate {
 		
 		Log.d(this.getClass().toString(), "send : " + message.header.toString() + " || " + message.getText().subSequence(0, message.header.getJSONTextLength()));
 		
-		//this.asyncServer.sendMessage(encrypted);
+		this.asyncServer.sendMessage(encrypted);
 	}
 	
 	/**
