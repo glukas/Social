@@ -137,15 +137,19 @@ public class SecureChannel implements AsyncServerDelegate {
 	@Override
 	public void onSendFailed(byte[] message) {
 		NetworkMessage networkMessage = outgoingMessages.get(message);
-		outgoingMessages.remove(message);
-		this.secureChannelDelegate.onSendFailed(networkMessage);
+		if (networkMessage != null) {
+			outgoingMessages.remove(message);
+			this.secureChannelDelegate.onSendFailed(networkMessage);
+		}
 	}
 
 	@Override
 	public void onSendSucceeded(byte[] message) {
 		NetworkMessage networkMessage = outgoingMessages.get(message);
-		outgoingMessages.remove(message);
-		this.secureChannelDelegate.onSendSucceeded(networkMessage);
+		if (networkMessage != null) {
+			outgoingMessages.remove(message);
+			this.secureChannelDelegate.onSendSucceeded(networkMessage);
+		}
 	}
 	
 }

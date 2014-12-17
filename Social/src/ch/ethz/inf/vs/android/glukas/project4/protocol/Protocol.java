@@ -83,6 +83,7 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 
 	private Map<NetworkMessage, Post> outgoingPosts = new HashMap<NetworkMessage, Post>();
 	private boolean isConnected = false;
+	private int numFailed = 0;
 	
 	// Communications with other components
 	private SecureChannel secureChannel;
@@ -289,16 +290,20 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 	@Override
 	public void onSendFailed(NetworkMessage message) {
 		Post post = this.outgoingPosts.get(message);
-		this.outgoingPosts.remove(post);
-		this.userHandler.onPostReceived(new Post(post.getId(), post.getPoster(), post.getWallOwner(), "Delivery Failed", post.getImage(), post.getDateTime()));
+		if (post != null) {
+			numFailed += 1;
+			this.outgoingPosts.remove(post);
+			this.userHandler.onPostReceived(new Post(post.getId()+numFailed, post.getPoster(), post.getWallOwner(), post.getText()+" - Delivery Failed", post.getImage(), post.getDateTime()));
+		}
 	}
 
 	@Override
 	public void onSendSucceeded(NetworkMessage message) {
-		// TODO Auto-generated method stub
 		Post post = this.outgoingPosts.get(message);
-		postLocally(post);
-		this.outgoingPosts.remove(post);
+		if (post != null) {
+			postLocally(post);
+			this.outgoingPosts.remove(post);
+		}
 	}
 	
 	////
