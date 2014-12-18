@@ -274,10 +274,25 @@ Analoguos functions for Post objects are part of the posts category, and handle 
 
 
 \subsection{Protocol}
-Finally we have the protocol layer, which is responsible for maintaining the consistency of the system. To achieve that certain structures are implemented which will now be explained in detail.
-Each user has their own wall object, which contains all the information about the posts made on that wall. Important for the consistency are the number of posts of on the wall and the respective ids of each post. The ids act as a lamport timestamp to guarantee the right order of posts. Regarding the implementation it was only of significance that if one user makes multiple posts on a certain wall that this user's posts will be in the right order. That means that it could be indeed possible that different users have the same post id since they are not necesarrily unique.
 
-To communicate between different users / with the server we use messages which contain information about the content, sender and receiver. That information is distributed to three parts which make up following layout.
+Finally we have the protocol layer, which is responsible for maintaining the consistency of the system. To achieve that, the post count of the wall and the respective virtual clock values of each post are of importance. The clock values will then guarantee the right order of posts. Regarding the implementation it was only of significance that if one user makes multiple posts on a certain wall that this user's posts will be in the right order, since every wall has its own virtual clock and uniqueness of values between walls is not assured.
+
+Crucial for the consistency are following kind of events:\newline
+\textbf{Request of data:} This happens when a peer comes back online and wants to access a certain wall.  
+In case the target is the own wall it requests all buffered posts the server stored in its absence.
+If it wants to access an other wall, there are following two cases:\newline
+Case 1 : Wall owner is online
+Responding to the data request, the target peer will send a message containing its wall's post count and maximum virtual clock value. If the local clock value is $\seq$ the reported value, a request for all posts with value $\geq$ the reported virtual clock value is sent.\newline
+Case 2: Wall owner is offline
+In this case the server will send the peer all cached posts of the target peer's wall.\newline
+\textbf{Making a post:}
+To keep the virtual clock values up to date the outgoing post's value is the wall's most recent clock value incremented by 1.\newline
+To maintain consistency on what posts are really in the system, in case the target is the own wall, the instant of commit to the local database is decisive.
+Else if the target is an other wall, the instant the server receives the post message is crucial. Our assumption here is that the server does not crash before properly delivering the posts it received. TCP guarantees that each post send is also received.\newline
+\textbf{Receiving a post:}
+Whenever a post message is received the maximum clock value gets set to the maximum of the received value and itself.  The wall's post count increases by one after each receiving.
+
+To communicate between different peers we use messages which contain information about the content, sender and receiver. That information is distributed to three parts which make up following layout.
 
 \begin{figure}[H]
 
@@ -286,30 +301,15 @@ To communicate between different users / with the server we use messages which c
     \lfig{Layout}
     \vspace{-5mm} % use negative white space to fix too large gaps
 \end{figure}
-
-Crucial for the consistency are following kind of events:\newline
-\textbf{Request of data:} This happens when a user comes back online and wants to access a certain wall.  
-In case the target is the own wall we request all puffered posts the server stored in our absence.
-If we want to access an other wall, there are following two cases:\newline
-Case 1 : Wall owner is online
-Responding to our data request, the wall owner will send a message containing his wall's number of posts and maximum post id. After comparing this received information with the own, a request for all posts with ids $\geq$ own-max-id is sent.\newline
-Case 2: Wall owner is offline
-In this case the server will send the user all cached posts the owner made on his wall before going offline.\newline
-\textbf{Making a post:}
-To keep the post ids up to date the post id of the outgoing post is the max post id of the respective wall incremented by 1.\newline
-To maintain consistency on what posts are really in the system, in case the target is the own wall, the instant of commit to the local DataBase is decisive.
-Else if the target is an other wall, the instant the Server receives the post message is crucial. Our assumption here is that the server does not crash before receiving the post, that means as soon as the post message is sent it is guaranteed to be received by the server since we are using TCP to transfer them.\newline
-\textbf{Receiving a post:}
-Whenever a post message is received we set the max post id accordingly and increment the wall's number of posts by 1.
+The information stored by the PublicHeader is used by the server for appropiate handling of the message.  
 
 
 \section{Testing}
 
-\section{Enhancements}
 
 \section{Conclusion}
 
-Give an overall conclusion that summarizes the main challenges you encountered and your lessons learned.
+
 
 % The following two commands are all you need in the
 % initial runs of your .tex file to
