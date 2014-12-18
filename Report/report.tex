@@ -238,7 +238,7 @@ The layout of the public header is as follows:
 3: status byte (1 byte)\newline
 4: virtual clock value (4 bytes)\newline
 
-Crucial for the consistency are following kind of events:\newline
+The protocol specifies the following events:\newline
 \textbf{Request of data:} This happens when a peer wants to fetch updates of a certain wall.  
 In case the target is the own wall it requests all buffered posts the server stored in its absence.
 If it wants to access an other wall, there are two cases:\newline
@@ -253,6 +253,8 @@ If the target is a friends wall, the instant the server receives the post messag
 \textbf{Receiving a post:}
 As previously outlined, whenever a post message is received the virtual clock value of the corresponding wall gets set to the maximum of the received value and the local value.  The wall's post count is incremented.
 
+Under the assumption that messages are delivered reliably, and that the server does not crash the protocol guarantees that the local views of the walls of the peeers are eventually consistent.  If someone posts on his or her own wall, then once the post has commited to the database, all friends will be able to retrieve that post by a data request at a later point. If a peer posts to some remote wall, by assumption the post will eventually be delivered to that peer. It is thus never the case that some peer thinks that its post was commited to the system, but it in fact never reaches the wall owner. This means that the local post count for an outdated wall is eventually below the post count of the post count of the wall owner, so eventually an update will be requested.
+
 \subsection{Security}
 The cryptography is peer-to-peer. The server acts as a relay for the client messages and is untrusted.
 
@@ -260,15 +262,15 @@ On first application start, every peer generates a broadcast key. A broadcast ke
 
 To establish a friendship, peers exchange their contact information and broadcast keys over Near-Field-Communication. Keys are exchanged in plain. This is reasonable under the assumption that the exchange occurs in a relatively private place.
 
-To post a message on Bob's wall, Alice encrypts and authenticates the post under Bob's key and sends the post to the server for relaying to Bob and his friends. Since all friends of Bob share Bob's key, it is possible to post a message by encrypting it only once. Encryption is done by combining AES-128 in CBC mode and an HMAC based on SHA256 in an "Encrypt-then-Authenticate" fashion. More concretely the encryption function for message $m$ with public header $h$ is \newline
+To post a message on Bob's wall, Alice encrypts and authenticates the post under Bob's key and sends the post to the server for relaying to Bob and his friends. Since all friends of Bob share Bob's key, it is possible to post a message by encrypting it only once. Encryption is done by combining AES-128 [1] in CBC mode [2] and an HMAC [3] based on SHA256 [4] in an "Encrypt-then-Authenticate" fashion. More concretely the encryption function for message $m$ with public header $h$ is: \newline
 $Enc_{(k_1, k_2)}(h|m) = h | MAC_{k_2}(h | Enc_{k_1}(m)) | Enc_{k_1}(m)$.
-%TODO footnotes for AES, CBC, HMAC, SHA256
-%AES: http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf
-%CBC William F. Ehrsam, Carl H. W. Meyer, John L. Smith, Walter L. Tuchman, "Message verification and transmission error detection by block chaining", US Patent 4074066, 1976
-% HMAC http://tools.ietf.org/html/rfc2104
-% SHA https://www.federalregister.gov/articles/2012/03/06/2012-5400/announcing-approval-of-federal-information-processing-standard-fips-publication-180-4-secure-hash
+%footnotes for AES, CBC, HMAC, SHA256
 
-\newline
+% 1 AES: http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf
+% 2 CBC William F. Ehrsam, Carl H. W. Meyer, John L. Smith, Walter L. Tuchman, "Message verification and transmission error detection by block chaining", US Patent 4074066, 1976
+% 3 HMAC http://tools.ietf.org/html/rfc2104
+% 4 SHA https://www.federalregister.gov/articles/2012/03/06/2012-5400/announcing-approval-of-federal-information-processing-standard-fips-publication-180-4-secure-hash
+
 Assuming that no friends are compromised, this gives us authenticity and secrecy for the transmission of posts. A compromised peer exposes the communication of all of his or her friends. However, it is very expensive to eavesdrop or manipulate communication on a large scale, as there is no central storage or transmission of key material.
 
 \subsection{Database}
