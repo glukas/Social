@@ -142,15 +142,20 @@ Posts user make with the knowledge of certain post should be displayed after tha
 Encryption of the posts and information in a suitable way:  \newline
 Posting on a certain wall should only require to encrypt the post once. Every friend of the owner of the wall should be able to read the post but noone else. \newline
 
+%\vspace{-20mm} % use negative white space to fix too large gaps
+
 \section{Architecture}
 
-The system consists of a set of peers. Those peers use a server to relay messages to each other. The server keeps a cache of recent posts. If a peer is not available the server can serve posts from that cache. If a peer posts to an offline peer, the server buffers that message until the recipient gets back online. When online, peers receive updates to their own walls by a "push" mechanism.
+The system consists of a set of peers. Those peers use a server to relay messages to each other. The server keeps a cache of recent posts. If a peer is not available the server can serve posts from that cache. If a peer posts to an offline peer, the server buffers that message until the recipient gets back online. When online, peers receive 
+
+updates to their own walls by a "push" mechanism.
+
 
 \section{Implementation}
 For the implementation of our project we divided it into 5 main layer corresponding the problems: User Interface, Database, Server/Networking, Security, Protocol
 
 \begin{figure}[H]
-\vspace{-2mm} % use negative white space to fix too large gaps
+
 	\centering
     \includegraphics[width=\columnwidth]{Architecture.png}
 
@@ -208,7 +213,13 @@ In the wall fragment the user can see an interface for adding new posts. There w
 
 \subsection{Protocol}
 
-To communicate between different peers we use messages which contain information about the content, sender and receiver. That information is distributed to three parts which make up following layout.
+The main responsibility of the protocol lies in maintaining the eventual consistency of the system.
+
+Each peer has a random 128-bit user id. This guarantees uniqueness of the ids with high probability without any coordination.
+Each peer stores a post count and a virtual clock for each friend. The virtual clock is a lamport time stamp. We increment it when posting, and update it on receival of posts. Posts on some wall are ordered lexicographically with respect to the virtual clock and the user id of the author.
+
+Messages have a public header, which is sent in plain and used by the server for appropiate handling of the messages. The private part of a message consists of a JSON text portion and potentially image binary payload.
+
 \begin{figure}[H]
 
 	\centering
@@ -216,9 +227,9 @@ To communicate between different peers we use messages which contain information
     \lfig{Layout}
     \vspace{-5mm} % use negative white space to fix too large gaps
 \end{figure}
-The information stored by the PublicHeader is used by the server for appropiate handling of the message.  
 
-The main responsibility of the protocol part lies in maintaining the consistency of the system. To achieve that, the post count of the wall and the respective virtual clock values of each post are of importance. The clock values will then guarantee the right order of posts. Regarding the implementation it was only of significance that if one user makes multiple posts on a certain wall that this user's posts will be in the right order, since every wall has its own virtual clock and uniqueness of values between walls is not assured.
+The layout of the public header is as follows:
+
 
 Crucial for the consistency are following kind of events:\newline
 \textbf{Request of data:} This happens when a peer comes back online and wants to access a certain wall.  
@@ -297,18 +308,14 @@ Since we do not have access to a static Public IP, we have a client in the netwo
 %Two data structures are responsible to process the messages in a meaningful way. The first is a HashMap which stores the connected users and the corresponding sockets. If a user is not connected, then the posts get buffered in a user specific PriorityQueue. The time a user connects again he or she can request all posts on his or her wall missed whilst offline.
 Alongside the core-application, a monitor thread is running. The task of the monitor thread is to periodically check the connectivity and memory usage of the application. In case of failure and/or too less memory available, the monitor thread can command the server to drop the oldest messages in the cache or to restart the server thread. 
 
-
-
-
-
-
-
-
-
-
+\textbf{Transport Protocol}\newline
+\indent Communication is performed over TCP. This allows us to rely on the correct ordering and reliable transmission messages.
 
 \section{Testing}
 
+We have implemented unit tests for the non-interactive components. This includes a dummy client testing the server and correctness tests for security, database and client protocol implementation.
+
+Integration tests where performed interactively.
 
 \section{Outlook}
 
