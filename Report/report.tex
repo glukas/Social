@@ -150,7 +150,8 @@ The system consists of a set of peers. Those peers use a server to relay message
 updates to their own walls by a "push" mechanism.
 
 \section{Implementation}
-For the implementation of our project we divided it into 5 main layer corresponding the problems: User Interface, Database, Server/Networking, Security, Protocol
+
+The implementation consist of the following components: On the client side, there is the User Interface, Database, Security, and Protocol implementation. The server is very lightweight and consists of a single component.
 
 \subsection{User Interface}
 
@@ -262,6 +263,11 @@ To establish a friendship, peers exchange their contact information and broadcas
 To post a message on Bob's wall, Alice encrypts and authenticates the post under Bob's key and sends the post to the server for relaying to Bob and his friends. Since all friends of Bob share Bob's key, it is possible to post a message by encrypting it only once. Encryption is done by combining AES-128 in CBC mode and an HMAC based on SHA256 in an "Encrypt-then-Authenticate" fashion. More concretely the encryption function for message $m$ with public header $h$ is \newline
 $Enc_{(k_1, k_2)}(h|m) = h | MAC_{k_2}(h | Enc_{k_1}(m)) | Enc_{k_1}(m)$.
 %TODO footnotes for AES, CBC, HMAC, SHA256
+%AES: http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf
+%CBC William F. Ehrsam, Carl H. W. Meyer, John L. Smith, Walter L. Tuchman, "Message verification and transmission error detection by block chaining", US Patent 4074066, 1976
+% HMAC http://tools.ietf.org/html/rfc2104
+% SHA https://www.federalregister.gov/articles/2012/03/06/2012-5400/announcing-approval-of-federal-information-processing-standard-fips-publication-180-4-secure-hash
+
 \newline
 Assuming that no friends are compromised, this gives us authenticity and secrecy for the transmission of posts. A compromised peer exposes the communication of all of his or her friends. However, it is very expensive to eavesdrop or manipulate communication on a large scale, as there is no central storage or transmission of key material.
 
@@ -302,7 +308,7 @@ All core methods are implemented using the functions already provided by the SQL
 - friend, to manage data about all his or her friends;
 - post, to manage data about all posts saved in the device.
 
-\subsection{Server/Networking}
+\subsection{Server and Networking}
 \textbf{Hardware and Setup}\newline
 \indent The server in our project is only responsible for forwarding, buffering and caching the messages. It doesn't store the user data in a permanent way and also cannot read the user messages, since the data is encrypted. 
 Because of these circumstances we decided on having a small, lightweight server. Therefore we used a Raspberry Pi Modell B [1]. The R-Pi runs an ARM 700 MHz processor and 512 MB of RAM. It is connected with an Ethernet cable to the network.
