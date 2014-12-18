@@ -1,0 +1,13 @@
+Abstract
+- tasks: become friends using nfc, exchange messages with friends
+- enhancements: common social networks/chats are client-server, our app is distributed
+
+1) social network/chats evolution
+2) distributed systems course -> distributed social network/chat
+3) many new problems: 
+
+Abstract
+?? is an Android application that allows users to register other users as friends using the nfc technology, which enables proximity communication between smartphones, and afterwards let's them exchange messages containing text and/or images can be exchanged through an Internet connection.
+The distinctive feature of ?? is that instead of using a client-server architecture like todays well known social networks, which store all data on a server, it uses a peer-to-peer approach and only stores data on users' devices, giving them a better control over their own data.
+
+The idea to provide a useful communication service that focus on privacy and security comes from the invasive privacy policies that such communication services nowadays have.

@@ -1,0 +1,32 @@
+Database report
+
+Structure
+In order to store persistently the user's data on his/hers device it tourned out that the most suitable approach between the ones offered by the Android operating system [1], was to use a SQLite database [2]. This decision was mainly based on the two following application requirements:
+1) the user data need to be structured in some not necessarly trivial way;
+2) it shouldn't be possible to access the data from outside the application.
+The structure of the database is simple and consists of only two tables: one storing the users' data and the other storing the posts.
+In the users table are stored informations about the user, like id and username. Other informations needed by different layers are also stored here, e.g. informations about the user's number of messages for the protocol layer and the keys for the cryptographic layer. The primary key is the id, since it's unique between all users.
+
+figure ??: users table with example data.
+
+The posts table stores the single posts that are part of the user's wall or one of his/hers friend's wall. A post contains an id, the id of who posted it, the id of the user on whose wall it was posted, date and time when it was recieved, text and/or image content. Id, poster_id and wall_id form the primary key, while both poster_id and wall_id are foreign key references to the users table.
+
+figure ??: posts table with example data.
+
+Implementation
+An interface provides access to the functionalities of the database for the other layers, which don't have another way to access the data. This allows a better control over the state of the database, in particular for assuring consistency to the whole system, and made easier the implementation process, because the structure and the methods evolved through time.
+Extending the SQLiteOpenHelper class [3] helped to make database creation and version control easier to manage.
+All core methods are implemented using the functions already provided by the SQLiteDatabase class [4], in particular insert(), update(), delete() and query(). This methods are divided in three categories that correspond to the different data context:
+- user, to manage data about the owner of the device;
+- friend, to manage data about all his/hers friends;
+- post, to manage data about all posts saved in the device.
+Both the user and friend categories supports actions on the users table and have methods to insert and delete User objects, as well as methods to query for the whole User object or only for some particular informations about it.
+Analoguos functions for Post objects are part of the posts category, and handle the data of the posts table.
+
+
+
+References
+[1]: http://developer.android.com/guide/topics/data/data-storage.html
+[2]: http://developer.android.com/training/basics/data-storage/databases.html
+[3]: http://developer.android.com/reference/android/database/sqlite/SQLiteOpenHelper.html
+[4]: http://developer.android.com/reference/android/database/sqlite/SQLiteDatabase.html
