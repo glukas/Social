@@ -187,35 +187,14 @@ public class WallActivity extends Activity implements UserDelegate, OnScrollList
 							false);
 					Log.i(this.getClass().toString(), "w : " + bitmap.getWidth() + ", h: " + bitmap.getHeight());
 					currentPicture = bitmap;
-					//currentPicture = Bitmap.createScaledBitmap(bitmap, 100, 140, false);
-
+					
 					bitmap = getRoundedCornerBitmap(bitmap);
 
 					addPictureToPost(bitmap);
 					postPicture.setImageBitmap(bitmap);
 					postPicture.setPadding(0, 30, 0, 0);
-					//bitmap.recycle();
-
+					
 					f.delete();
-					// left out for now, we simply delete the taken picture.
-					//					String path = android.os.Environment
-					//							.getExternalStorageDirectory()
-					//							+ File.separator
-					//							+ "Phoenix" + File.separator + "default";
-					//					OutputStream outFile = null;
-					//					File file = new File(path, String.valueOf(System.currentTimeMillis()) + ".jpg");
-					//					try {
-					//						outFile = new FileOutputStream(file);
-					//						bitmap.compress(Bitmap.CompressFormat.JPEG, 85, outFile);
-					//						outFile.flush();
-					//						outFile.close();
-					//					} catch (FileNotFoundException e) {
-					//						e.printStackTrace();
-					//					} catch (IOException e) {
-					//						e.printStackTrace();
-					//					} catch (Exception e) {
-					//						e.printStackTrace();
-					//					}
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
