@@ -17,7 +17,6 @@ import ch.ethz.inf.vs.android.glukas.project4.Post;
 import ch.ethz.inf.vs.android.glukas.project4.User;
 import ch.ethz.inf.vs.android.glukas.project4.UserCredentials;
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
-import ch.ethz.inf.vs.android.glukas.project4.Wall;
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseAccess;
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseManager;
 import ch.ethz.inf.vs.android.glukas.project4.database.Utility;
@@ -114,34 +113,6 @@ public class DatabaseTest extends AndroidTestCase{
 	
 	// POSTS
 
-	/*public void testInsertFriendPost() {
-		DatabaseManager db = cleanDB();
-		
-		db.putUser(Data.alice);
-		db.putFriend(Data.bob);
-		
-		db.putPost(Data.post2);
-		
-		Post returned = db.getFriendPost(Data.post2.getId(), Data.post2.getPoster());
-
-		assertEquals(Data.post2, returned);
-//		Log.d("TEST DATABASE", Data.tag+" Post 2 id : "+post2.getId()+ ", PostId : "+post2.getPoster()+ ", OwnerWallId : "+post2.getWallOwner()+", content : "+post2.getText());
-	}*/
-	
-	/*
-	@Test
-	public void testDeleteUserPost() {
-		DatabaseManager db = cleanDB();
-		
-		db.putUser(Data.alice);
-		
-		db.putPost(Data.post1);
-		
-		db.deleteUserPost(Data.post1.getId());
-		
-		assertTrue(db.getUserPost(Data.post1.getId()) == null);
-	}*/
-
 	@Test
 	public void testGetSomePosts() {
 		DatabaseManager db = cleanDB();
@@ -170,40 +141,6 @@ public class DatabaseTest extends AndroidTestCase{
 		}
 	}
 	
-	// WALLS
-	
-	@Test
-	public void testWall() {
-		DatabaseManager db = cleanDB();
-		
-		db.putUser(Data.alice);
-		
-		List<Post> posts = new ArrayList<Post>();
-		posts.add(Data.post1);
-		posts.add(Data.post3);
-		
-		for(Post post : posts)
-			db.putPost(post);
-	
-		Wall returned = db.getUserWall();
-		List<Post> returnedPosts = returned.getPosts();
-		Collections.sort(returnedPosts, new postIdComparator());
-		
-		int i = 0;
-		for(Post post : returned.getPosts()) {
-			Post inserted = posts.get(i);
-			assertEquals(post.getId(), inserted.getId());
-			assertEquals(post.getText(), inserted.getText());
-			assertEquals(post.getPoster(), inserted.getPoster());
-			i++;
-		}
-		
-		db.deleteUserWall();
-		
-		assertTrue(db.getUserWall() != null);
-		assertTrue(db.getUserWall().getPosts().isEmpty());
-	}
-	
 	// FRIENDS
 	
 	@Test
@@ -214,19 +151,6 @@ public class DatabaseTest extends AndroidTestCase{
 		
 		assertEquals(Data.bob.getUsername(), db.getFriendUsername(Data.bob.getId()));
 	}
-	
-	/*
-	@Test
-	public void testDeleteFriend() {
-		DatabaseManager db = cleanDB();
-		
-		db.putFriend(Data.bob);
-		
-		db.deleteFriend(Data.bob.getId());
-		
-		assertTrue(db.getFriend(Data.bob.getId()) == null);
-	}*/
-	
 	
 	
 	// UTILITY

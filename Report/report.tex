@@ -162,7 +162,8 @@ For the implementation of our project we divided it into 5 main layer correspond
 
 \subsection{User Interface}
 
-Regarding the user interface we implemented three different activities. One as the main activity holding a navigation bar to switch between the friends list and the user's own wall (Figure 1).
+The main activity holds a navigation bar to switch between the friends list and the user's own wall (Figure 1).
+
 \begin{figure}[H]
 	\centering
 	\subfigure[Figure 1]{
@@ -182,13 +183,13 @@ Regarding the user interface we implemented three different activities. One as t
 	
 \end{figure}
 
- A second one for viewing a friend's wall when clicking one of the friends (Figure 2), which opens up the same fragment implementation the user sees when looking at his own wall.\newline
- 
+A second activity is for viewing a friend's wall. This activity is started when clicking one of the friends (Figure 2) or immediately after establishing a new friendship. The wall is implmented using the same fragment the user sees when looking at his or her own wall.\newline
 
-Then a final activity for accepting incoming friend requests which pops up when the NFCAdapter is used, meaning two phones are held close together to exchange friend requests (Figure 3).
+The last activity is for displaying incoming friendship requests. It pops up when two phones are held close together and one of the users taps the screen, initiating a friendship request (Figure 3).
 
-In the wall fragment the user can see a interface for adding new posts either to his own wall or the wall of a friend he's looking at. There we have a button for adding a picture from our local gallery or take a new picture which then is added to the top of our post (Figures 4 and 5). A send button allows posting the content the user entered in the textView. Upon first opening the application, the user is prompted to choose a username for registration which then gets saved in the local database for all further application starts (Figure 6).
-\begin{figure}[H]
+Upon first opening the application, the user is prompted to choose a username for registration which then gets saved in the local database (Figure 6).
+
+In the wall fragment the user can see an interface for adding new posts. There we have a button for adding pictures to a post. Pictures can be taken from the gallery or a new picture can be taken (Figures 4 and 5). A send button allows posting the content the user entered in the textView. \begin{figure}[H]
 	\centering
 	\subfigure[Figure 4]{
 	    \includegraphics[height=4cm]{Figure_4}
@@ -209,17 +210,15 @@ In the wall fragment the user can see a interface for adding new posts either to
 
 \subsection{Server/Networking}
 \textbf{Hardware and Setup}\newline
-\indent The server in our project is only responsible for forwarding and, if the user is not connected, buffering the messages. It doesn't store the user data in a permanent way and also cannot read the user messages, since the data is encrypted. 
+\indent The server in our project is only responsible for forwarding, buffering and caching the messages. It doesn't store the user data in a permanent way and also cannot read the user messages, since the data is encrypted. 
 Because of these circumstances we decided on having a small, lightweight server. Therefore we used a Raspberry Pi Modell B [1]. The R-Pi runs an ARM 700 MHz processor and 512 MB of RAM. It is connected with an Ethernet cable to the network.
 The R-Pi is running Raspbian, a linux distribution, adapted for Raspberry Pi devices. The whole installation is headless and accessed through SSH. This setup is very energy efficient. 
 Since we do not have access to a static Public IP, we have a client in the network, that updates a DNS entry [2] every minute and guarantees, that our server is always reachable over the same address. 
 
 \textbf{Software}\newline
-\indent Because of the limited resources the hardware is offering. The server application also needs to be very lightweight. To avoid too much thread-switching overhead, to efficiently use the resources and offer good scalability, we decided on a Non-blocking I/O (NIO) [3][4] approach to design the server application. The core-application consists of two threads running in parallel. The server thread, which implements the NIO server and a worker thread which processes the incoming data and decides what to do with the messages. Based on the public header, the worker thread reads the sender, the recipient and the kind of message and then handles the message accordingly.
-Two data structures are responsible to process the messages in a meaningful way. The first is a simple HashMap which stores the connected users and the corresponding sockets. If a user is not connected, then the message gets buffered in a user specific PriorityQueue. The time a user connects again, he can request all messages he missed when he was offline. Since the hardware has not too much memory available, the server does not guarantee to store all messages until the user connects again. In those cases, the user needs to rerequest the data from his friends.
-Alongside the core-application, a monitor thread is running. The task of the monitor thread is to periodically check the connectivity and memory usage of the application. In case of failure and/or too less memory available, the monitor thread can command the server to drop the oldest messages or even to restart the whole server thread. 
-
-
+\indent Because of the limited resources the hardware is offering the server application needs to be very lightweight. To avoid too much thread-switching overhead, to efficiently use the resources and offer good scalability, we decided on a Non-blocking I/O (NIO) [3][4] approach to design the server application. The core-application consists of two threads running in parallel. The server thread, which implements the NIO server and a worker thread which processes the incoming data and decides what to do with the messages. Based on the public header the worker thread handles the message accordingly.
+%Two data structures are responsible to process the messages in a meaningful way. The first is a HashMap which stores the connected users and the corresponding sockets. If a user is not connected, then the posts get buffered in a user specific PriorityQueue. The time a user connects again he or she can request all posts on his or her wall missed whilst offline.
+Alongside the core-application, a monitor thread is running. The task of the monitor thread is to periodically check the connectivity and memory usage of the application. In case of failure and/or too less memory available, the monitor thread can command the server to drop the oldest messages in the cache or to restart the server thread. 
 
 \subsection{Security}
 The cryptography is peer-to-peer. The server acts as a relay for the client messages and is untrusted.
@@ -228,28 +227,30 @@ On first application start, every peer generates a broadcast key. A broadcast ke
 
 To establish a friendship, peers exchange their contact information and broadcast keys over Near-Field-Communication. Keys are exchanged in plain. This is reasonable under the assumption that the exchange occurs in a relatively private place.
 
-To post a message on Bob's wall, Alice encrypts and authenticates the post under Bob's key and broadcasts it to all friends of Bob. Since all friends of Bob share Bob's key, it is possible to post a message by encrypting it only once. Encryption is done by combining AES-128 in CBC mode and an HMAC based on SHA256 in an "Encrypt-then-Authenticate" fashion. More concretely the encryption function for message $m$ with public header $h$ is \newline
+To post a message on Bob's wall, Alice encrypts and authenticates the post under Bob's key and sends the post to the server for relaying to Bob and his friends. Since all friends of Bob share Bob's key, it is possible to post a message by encrypting it only once. Encryption is done by combining AES-128 in CBC mode and an HMAC based on SHA256 in an "Encrypt-then-Authenticate" fashion. More concretely the encryption function for message $m$ with public header $h$ is \newline
 $Enc_{(k_1, k_2)}(h|m) = h | MAC_{k_2}(h | Enc_{k_1}(m)) | Enc_{k_1}(m)$.
+%TODO footnotes for AES, CBC, HMAC, SHA256
 \newline
-Assuming that no friends are compromised, this gives us authenticity and chosen plaintext security for the transmission of posts. A compromised peer exposes the communication of all of his or her friends. However, it is very expensive to eavesdrop or manipulate communication on a large scale, as there is no central storage or transmission of key material.
+Assuming that no friends are compromised, this gives us authenticity and secrecy for the transmission of posts. A compromised peer exposes the communication of all of his or her friends. However, it is very expensive to eavesdrop or manipulate communication on a large scale, as there is no central storage or transmission of key material.
 
 \subsection{Database}
-Structure
-In order to store persistently the user's data on his/hers device it tourned out that the most suitable approach between the ones offered by the Android operating system [1], was to use a SQLite database [2]. This decision was mainly based on the two following application requirements:
-1) the user data need to be structured in some not necessarly trivial way;
+%Structure
+In order to store persistently the user's data on his or her device it tourned out that the most suitable approach between the ones offered by the Android operating system [1], was to use a SQLite database [2]. This decision was mainly based on the two following application requirements:
+1) the user data needs to be structured;
 2) it shouldn't be possible to access the data from outside the application.
 The structure of the database is simple and consists of only two tables: one storing the users' data and the other storing the posts.
-In the users table are stored informations about the user, like id and username. Other informations needed by different layers are also stored here, e.g. informations about the user's number of messages for the protocol layer and the keys for the secutity layer. The primary key is the id, since it's unique between all users.
+
+The user table stores id, username and other information needed by different layers, e.g. the number of messages on the user's wall for the protocol layer and the keys for the secutity layer. The primary key is the id, since it's unique with high probability among all users.
 
 \begin{figure}[H]
 	\centering
     \includegraphics[width=\columnwidth]{users_table_example.png}
     \lfig{users_table_example}
     \vspace{-5mm} % use negative white space to fix too large gaps
-	\caption{users table with example data ("..." means that the data is too long to fit).}
+	\caption{user table with example data ("..." means that the data is too long to fit).}
 \end{figure}
 
-The posts table stores the single posts that are part of the user's wall or one of his/hers friend's wall. 
+The post table stores the single posts that are part of the user's wall or one of his/hers friend's wall. 
 A post contains an id, the id of who posted it, the id of the user on whose wall it was posted, date and time when it was received, text and/or image content.Id, poster$\_$id and wall$\_$id form the primary key, while both poster$\_$id and wall$\_$id are foreign key references to the users table.
 
 \begin{figure}[H]
@@ -257,21 +258,17 @@ A post contains an id, the id of who posted it, the id of the user on whose wall
     \includegraphics[width=\columnwidth]{post_table_example.png}
     \lfig{post_table_example}
     \vspace{-5mm} % use negative white space to fix too large gaps
-	\caption{posts table with example data.}
+	\caption{post table with example data.}
 \end{figure}
 
-Implementation
-An interface provides access to the functionalities of the database for the other layers, which don't have another way to access the data. This allows a better control over the state of the database, in particular for assuring consistency to the whole system, and made easier the implementation process, because the structure and the methods evolved through time.
+%Implementation
+
+An interface provides access to the functionalities of the database for the other layers, which don't have another way to access the data. This allows a better control over the state of the database, in particular for assuring consistency to the whole system, and made easier throughout the implementation process, because the structure and the methods evolved over time.
 Extending the SQLiteOpenHelper class [3] helped to make database creation and version control easier to manage.
-All core methods are implemented using the functions already provided by the SQLiteDatabase class [4], in particular insert(), update(), delete() and query(). This methods are divided in three categories that correspond to the different data context:
+All core methods are implemented using the functions already provided by the SQLiteDatabase class [4], in particular insert(), update(), delete() and query(). This methods are divided into three categories:
 - user, to manage data about the owner of the device;
-- friend, to manage data about all his/hers friends;
+- friend, to manage data about all his or her friends;
 - post, to manage data about all posts saved in the device.
-Both the user and friend categories supports actions on the users table and have methods to insert and delete User objects, as well as methods to query for the whole User object or only for some particular informations about it.
-Analoguos functions for Post objects are part of the posts category, and handle the data of the posts table.
-
-
-
 
 \subsection{Protocol}
 
@@ -307,7 +304,19 @@ The information stored by the PublicHeader is used by the server for appropiate 
 \section{Testing}
 
 
+\section{Outlook}
+
+The reliance on a message relaying server could be further reduced by enabling peers to directly communicate. The main issue in implementing this is NAT-traversal, though solutions to achieve this exist.
+
+The security of the key exchange mechanism could be improved by first exchanging some public keys, and then exchanging the broadcast keys encrypted under those public keys.
+
+One issue is that current monetization models seem hard to apply to our approach, as no information about the content users are sharing is available. To provide userful advertisement, the pseudo-anonymous network information available to the server might prove to be sufficient. 
+
 \section{Conclusion}
+
+Mobile devices are powerful enough to implement a mostly peer-to-peer social network. Our architecture might provide reduced infrastructure costs compared to centralized systems, as little or no permanent storage is required. Availability is acceptable: Users can always access content they have seen before, and eventually they will receive all updates. 
+The system should scale well, as the server component could be very easily replicated without the need for complex synchronisation mechanisms.
+
 
 
 

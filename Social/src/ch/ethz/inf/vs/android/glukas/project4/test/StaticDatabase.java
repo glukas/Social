@@ -7,7 +7,6 @@ import ch.ethz.inf.vs.android.glukas.project4.Post;
 import ch.ethz.inf.vs.android.glukas.project4.User;
 import ch.ethz.inf.vs.android.glukas.project4.UserCredentials;
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
-import ch.ethz.inf.vs.android.glukas.project4.Wall;
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseAccess;
 
 public class StaticDatabase implements DatabaseAccess {
@@ -131,23 +130,11 @@ public class StaticDatabase implements DatabaseAccess {
 	}
 
 	@Override
-	public Wall getUserWall() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public void deleteUserWall() {
 		// TODO Auto-generated method stub
 		
 	}
-
-	@Override
-	public Wall getFriendWall(UserId id) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+	
 	@Override
 	public void deleteFriendWall(UserId id) {
 		// TODO Auto-generated method stub

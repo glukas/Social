@@ -9,7 +9,6 @@ import ch.ethz.inf.vs.android.glukas.project4.R;
 import ch.ethz.inf.vs.android.glukas.project4.User;
 import ch.ethz.inf.vs.android.glukas.project4.UserCredentials;
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
-import ch.ethz.inf.vs.android.glukas.project4.Wall;
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseContract.PostsEntry;
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseContract.UsersEntry;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.DatabaseException;
@@ -210,24 +209,12 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 	 * WALLS MANAGEMENT
 	 */
 
-	// Get the whole wall of the user.
-	@Override
-	public Wall getUserWall() {
-		return Walls.getUserWall(this.getReadableDatabase());
-	}
-
 	// Delete user's wall.
 	@Override
 	public void deleteUserWall() {
 		Walls.deleteUserWall(this.getWritableDatabase());
 	}
-
-	// Get the whole Wall of a certain friend
-	@Override
-	public Wall getFriendWall(UserId friendid) {
-		return Walls.getFriendWall(friendid, this.getReadableDatabase());
-	}
-
+	
 	// Delete the whole saved Wall of a certain friend
 	@Override
 	public void deleteFriendWall(UserId friendid) {
