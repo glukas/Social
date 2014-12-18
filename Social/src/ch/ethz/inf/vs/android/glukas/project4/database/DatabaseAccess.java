@@ -11,10 +11,7 @@ import ch.ethz.inf.vs.android.glukas.project4.Wall;
 
 /**
  * Abstract list of all functionalities offered by the database.
- * Please refer to this and add new functions you need.
- * Please consider all methods with a TODO as still having a non 
- * (complete) meaningful declaration.
- * All methods are performed atomically. (TODO : is this true?)
+ * All methods are performed atomically.
  */
 public interface DatabaseAccess {
 

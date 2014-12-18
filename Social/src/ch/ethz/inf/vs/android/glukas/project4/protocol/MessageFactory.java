@@ -1,6 +1,5 @@
 package ch.ethz.inf.vs.android.glukas.project4.protocol;
 
-import ch.ethz.inf.vs.android.glukas.project4.BasicUser;
 import ch.ethz.inf.vs.android.glukas.project4.Post;
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
 import ch.ethz.inf.vs.android.glukas.project4.database.Utility;
@@ -10,20 +9,6 @@ import ch.ethz.inf.vs.android.glukas.project4.protocol.Message.MessageType;
  * Helper to create Messages
  */
 public class MessageFactory {
-	
-	/*
-	 * Fields in Message (in order of creation)
-	protected User sender;
-	protected User receiver;
-	protected int postId;
-	protected MessageType requestType;
-	
-	protected String httpLink;
-	protected String message;
-	protected String username;
-	protected int id;
-	protected int numM;
-	 */
 	
 	/**
 	 * New post Message

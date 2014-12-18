@@ -7,10 +7,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 import java.text.*;
-
 import ch.ethz.inf.vs.android.glukas.project4.Post;
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
-import ch.ethz.inf.vs.android.glukas.project4.protocol.ImageParser;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;

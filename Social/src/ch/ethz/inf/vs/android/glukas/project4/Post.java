@@ -3,9 +3,7 @@ package ch.ethz.inf.vs.android.glukas.project4;
 import java.util.Date;
 
 import ch.ethz.inf.vs.android.glukas.project4.database.Utility;
-import ch.ethz.inf.vs.android.glukas.project4.exceptions.UnknowRequestType;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.Message;
-import ch.ethz.inf.vs.android.glukas.project4.protocol.Message.MessageType;
 import android.graphics.Bitmap;
 
 /**

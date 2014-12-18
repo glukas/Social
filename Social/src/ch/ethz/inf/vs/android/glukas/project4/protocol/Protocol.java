@@ -372,7 +372,6 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 		Log.d(this.getClass().toString(), "maxId:"+ oldMaxPostId + ", count:" + oldNumMsgs);
 		
 		if (oldNumMsgs < numMsgs) {
-			//TODO think about if this really guarantees that no messages are lost
 			Message msgToSend = MessageFactory.newGetPostsMessage(oldMaxPostId, localUser.getId(), msg.getSender());
 			PublicHeader header = new PublicHeader(0, null, StatusByte.SEND.getByte(), 0, localUser.getId(), friendId);
 			NetworkMessage networkMessage = new NetworkMessage(JSONObjectFactory.createJSONObject(msgToSend).toString(), header);

@@ -1,7 +1,6 @@
 package ch.ethz.inf.vs.android.glukas.project4.protocol;
 
 import android.graphics.Bitmap;
-import ch.ethz.inf.vs.android.glukas.project4.BasicUser;
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
 
 /**

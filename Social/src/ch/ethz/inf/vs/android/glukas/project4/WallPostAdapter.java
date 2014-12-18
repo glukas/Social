@@ -2,12 +2,10 @@ package ch.ethz.inf.vs.android.glukas.project4;
 
 import java.util.ArrayList;
 import java.util.Map;
-
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

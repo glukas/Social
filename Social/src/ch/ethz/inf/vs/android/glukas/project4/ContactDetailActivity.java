@@ -1,13 +1,7 @@
 package ch.ethz.inf.vs.android.glukas.project4;
 
-import java.util.ArrayList;
-
-import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseAccess;
-import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseManager;
 import ch.ethz.inf.vs.android.glukas.project4.networking.FriendshipRequest;
 import ch.ethz.inf.vs.android.glukas.project4.networking.FriendshipResponse;
-import ch.ethz.inf.vs.android.glukas.project4.protocol.Protocol;
-import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
@@ -19,8 +13,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AbsListView;
-import android.widget.ListView;
-import android.widget.TextView;
 
 public class ContactDetailActivity extends WallActivity {
 
@@ -128,9 +120,7 @@ public class ContactDetailActivity extends WallActivity {
 	}
 
 	private void displayRequest(FriendshipResponse response) {
-		// TODO (Samuel) could be nicer
 		showFriend(response.getSender());
-
 		Log.d(this.getClass().toString(), "Friend request accepted : " + response.getSender().getUsername() + " id " + response.getSender().getId());
 	}
 	

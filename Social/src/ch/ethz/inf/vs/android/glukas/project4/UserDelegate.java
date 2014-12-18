@@ -1,7 +1,5 @@
 package ch.ethz.inf.vs.android.glukas.project4;
 
-import java.util.List;
-
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.FailureReason;
 
 /**

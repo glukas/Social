@@ -5,9 +5,7 @@ import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseManager;
 import ch.ethz.inf.vs.android.glukas.project4.networking.FriendshipRequest;
 import ch.ethz.inf.vs.android.glukas.project4.networking.FriendshipResponse;
 import ch.ethz.inf.vs.android.glukas.project4.protocol.Protocol;
-import ch.ethz.inf.vs.android.glukas.project4.security.ZeroCredentialStorage;
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.nfc.NdefMessage;
@@ -16,7 +14,6 @@ import android.nfc.NfcAdapter.OnNdefPushCompleteCallback;
 import android.nfc.NfcEvent;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.v4.app.NavUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -96,8 +93,7 @@ OnNdefPushCompleteCallback, RegistrationDialogFragmentDelegate {
 
 		nfcAdapter = NfcAdapter.getDefaultAdapter(this);
 
-		// TODO better error handling
-		if (nfcAdapter == null) {
+		if (nfcAdapter == null) {//this should not happen, as this activity can only be started through NFC
 			Toast.makeText(this, "NFC is not available", Toast.LENGTH_LONG).show();
 			finish();
 			return;
@@ -157,7 +153,7 @@ OnNdefPushCompleteCallback, RegistrationDialogFragmentDelegate {
 		saveFriend(request);
 		
 		//Navigate to the friend's Wall, with the parent activity being 
-		NavUtils.navigateUpFromSameTask(this);
+		finish();
 		
 		Intent contactDetail = new Intent(this, ContactDetailActivity.class);
 		contactDetail.putExtra(ContactDetailActivity.USERID_EXTRA, request.getSender().id.getBytes());

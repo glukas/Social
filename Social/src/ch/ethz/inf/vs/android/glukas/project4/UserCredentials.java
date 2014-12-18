@@ -1,7 +1,5 @@
 package ch.ethz.inf.vs.android.glukas.project4;
 
-import javax.crypto.KeyGenerator;
-
 import ch.ethz.inf.vs.android.glukas.project4.security.CryptographyParameters;
 
 public class UserCredentials {

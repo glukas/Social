@@ -300,7 +300,6 @@ public class WallActivity extends Activity implements UserDelegate, OnScrollList
 	@Override
 	public void onConnectionFailed(FailureReason reason) {
 		Log.e(this.getClass().toString(), reason.toString());
-		// TODO @Samuel, from Vincent Is it of any use for you?	
 	}
 
 	////

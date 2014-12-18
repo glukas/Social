@@ -10,7 +10,6 @@ import android.graphics.Bitmap;
 import ch.ethz.inf.vs.android.glukas.project4.Post;
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseContract.*;
-import ch.ethz.inf.vs.android.glukas.project4.protocol.ImageParser;
 
 /**
  * Helper class that implements all functionalities of table Posts.
