@@ -115,9 +115,9 @@
  	\affaddr{ETH ID XX-XXX-XXX}\\
  	\email{five@student.ethz.ch}
 % 6th. author
-\alignauthor Student Six\\
- 	\affaddr{ETH ID XX-XXX-XXX}\\
- 	\email{six@student.ethz.ch}
+\alignauthor Samuel Schmid\\
+ 	\affaddr{ETH ID 10-919-991}\\
+ 	\email{schmisam@student.ethz.ch}
 }
 
 
@@ -142,8 +142,7 @@ For the implementation of our project we divided it into 5 main layers : User In
 
 \subsection{User Interface}
 
-
-
+Regarding the user interface we implemented three different activities. One as the main activity holding a navigation bar to switch between the friends list and the user's own wall (Figure 1). A second one for viewing a friend's wall when clicking one of the friends from the friend list (Figure 2), which opens up the same fragment implementation the user sees when looking at his own wall. Then a final activity for accepting incoming friend requests which pops up when the NFCAdapter is used, meaning two phones are held close together to exchange friend requests (Figure 3). In the wall fragment the user can see a interface for adding new posts either to his own wall or the wall of a friend he's looking at. There we have a button for adding a picture from our local gallery or take a new picture which then is added to the top of our post (Figures 4 and 5). A send button allows posting the content the user entered in the textView. Upon first opening the application, the user is prompted to choose a username for registration which then gets saved in the local database for all further application starts (Figure 6).
 
 \subsection{Server/Networking}
 \textbf{Hardware and Setup}\newline
@@ -173,7 +172,29 @@ Assuming that no friends are compromised, this gives us authenticity and chosen 
 \subsection{Database}
 
 \subsection{Protocol}
-Finally we have the protocol layer which is responsible for connecting the layers mentioned above, that means the task to provide appropriate interfaces, methods and structures for communicating between each layer.
+Finally we have the protocol layer, which is responsible for maintaining the consistency of the system. To achieve that certain structures are implemented which will now be explained in detail.
+Each user has their own wall object, which contains all the information about the posts made on that wall. Important for the consistency are the number of posts of on the wall and the respective ids of each post. The ids act as a lamport timestamp to guarantee the right order of posts. Regarding the implementation it was only of significance that if one user makes multiple posts on a certain wall that this user's posts will be in the right order. That means that it could be indeed possible that different users have the same post id since they are not necesarrily unique.
+
+To communicate between different users / with the server we use messages which contain information about the content, sender and receiver. That information is distributed to three parts which make up following layout.
+
+% img here
+
+Crucial for the consistency are following kind of events:\newline
+\textbf{Request of data:} This happens when a user comes back online and wants to access a certain wall.  
+In case the target is the own wall we request all puffered posts the server stored in our absence.
+If we want to access an other wall, there are following two cases:\newline
+Case 1 : Wall owner is online
+Responding to our data request, the wall owner will send a message containing his wall's number of posts and maximum post id. After comparing this received information with the own, a request for all posts with ids $\geq$ own-max-id is sent.\newline
+Case 2: Wall owner is offline
+In this case the server will send the user all cached posts the owner made on his wall before going offline.\newline
+\textbf{Making a post:}
+To keep the post ids up to date the post id of the outgoing post is the max post id of the respective wall incremented by 1.\newline
+To maintain consistency on what posts are really in the system, in case the target is the own wall, the instant of commit to the local DataBase is decisive.
+Else if the target is an other wall, the instant the Server receives the post message is crucial. Our assumption here is that the server does not crash before receiving the post, that means as soon as the post message is sent it is guaranteed to be received by the server.\newline
+\textbf{Receiving a post:}
+Whenever a post message is received we set the max post id accordingly and increment the wall's number of posts by 1.
+
+
 
 
 
