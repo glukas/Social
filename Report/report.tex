@@ -240,17 +240,17 @@ In order to store persistently the user's data on his or her device it tourned o
 2) it shouldn't be possible to access the data from outside the application.
 The structure of the database is simple and consists of only two tables: one storing the users' data and the other storing the posts.
 
-The users table stores id and username and other information needed by different layers is also stored here, e.g. the user's number of messages for the protocol layer and the keys for the secutity layer. The primary key is the id, since it's unique between all users.
+The user table stores id, username and other information needed by different layers, e.g. the number of messages on the user's wall for the protocol layer and the keys for the secutity layer. The primary key is the id, since it's unique with high probability among all users.
 
 \begin{figure}[H]
 	\centering
     \includegraphics[width=\columnwidth]{users_table_example.png}
     \lfig{users_table_example}
     \vspace{-5mm} % use negative white space to fix too large gaps
-	\caption{users table with example data ("..." means that the data is too long to fit).}
+	\caption{user table with example data ("..." means that the data is too long to fit).}
 \end{figure}
 
-The posts table stores the single posts that are part of the user's wall or one of his/hers friend's wall. 
+The post table stores the single posts that are part of the user's wall or one of his/hers friend's wall. 
 A post contains an id, the id of who posted it, the id of the user on whose wall it was posted, date and time when it was received, text and/or image content.Id, poster$\_$id and wall$\_$id form the primary key, while both poster$\_$id and wall$\_$id are foreign key references to the users table.
 
 \begin{figure}[H]
@@ -258,7 +258,7 @@ A post contains an id, the id of who posted it, the id of the user on whose wall
     \includegraphics[width=\columnwidth]{post_table_example.png}
     \lfig{post_table_example}
     \vspace{-5mm} % use negative white space to fix too large gaps
-	\caption{posts table with example data.}
+	\caption{post table with example data.}
 \end{figure}
 
 %Implementation
@@ -302,11 +302,20 @@ Whenever a post message is received we set the max post id accordingly and incre
 
 \section{Testing}
 
-\section{Enhancements}
+\section{Outlook}
+
+The reliance on a message relaying server could be further reduced by enabling peers to directly communicate. The main issue in implementing this is NAT-traversal, though solutions to achieve this exist.
+
+The security of the key exchange mechanism could be improved by first exchanging some public keys, and then exchanging the broadcast keys encrypted under those public keys.
+
+One issue is that current monetization models seem hard to apply to our approach, as no information about the content users are sharing is available. To provide userful advertisement, the pseudo-anonymous network information available to the server might prove to be sufficient. 
 
 \section{Conclusion}
 
-Give an overall conclusion that summarizes the main challenges you encountered and your lessons learned.
+Mobile devices are powerful enough to implement a mostly peer-to-peer social network. Our architecture might provide reduced infrastructure costs compared to centralized systems, as little or no permanent storage is required. Availability is acceptable: Users can always access content they have seen before, and eventually they will receive all updates. 
+The system should scale well, as the server component could be very easily replicated without the need for complex synchronisation mechanisms.
+
+
 
 % The following two commands are all you need in the
 % initial runs of your .tex file to
