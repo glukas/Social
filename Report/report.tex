@@ -147,9 +147,7 @@ Posting on a certain wall should only require to encrypt the post once. Every fr
 \section{Architecture}
 
 The system consists of a set of peers. Those peers use a server to relay messages to each other. The server keeps a cache of recent posts. If a peer is not available the server can serve posts from that cache. If a peer posts to an offline peer, the server buffers that message until the recipient gets back online. When online, peers receive 
-
 updates to their own walls by a "push" mechanism.
-
 
 \section{Implementation}
 For the implementation of our project we divided it into 5 main layer corresponding the problems: User Interface, Database, Server/Networking, Security, Protocol
@@ -188,7 +186,7 @@ The main activity holds a navigation bar to switch between the friends list and 
 
 A second activity is for viewing a friend's wall. This activity is started when clicking one of the friends (Figure 2) or immediately after establishing a new friendship. The wall is implmented using the same fragment the user sees when looking at his or her own wall.\newline
 
-The last activity is for displaying incoming friendship requests. It pops up when two phones are held close together and one of the users taps the screen, initiating a friendship request (Figure 3) over Near-Field-Communication (NFC).
+The last activity is for displaying incoming friendship requests. It pops up when two phones are held close together and one of the users taps the screen, initiating a friendship request (Figure 3).
 
 Upon first opening the application, the user is prompted to choose a username for registration which then gets saved in the local database (Figure 6).
 
@@ -228,8 +226,22 @@ Messages have a public header, which is sent in plain and used by the server for
     \vspace{-5mm} % use negative white space to fix too large gaps
 \end{figure}
 
+
 The layout of the public header is as follows:
 
+
+\begin{figure}[H]
+
+	\centering
+    \includegraphics[height = 1cm]{PublicHeader.png}
+    \lfig{PublicHeader}
+    \vspace{-5mm} % use negative white space to fix too large gaps
+\end{figure}
+
+1: length of the message (4 bytes) \newline
+2: length of Text (2 bytes)\newline
+3: status byte (1 byte)\newline
+4: virtual clock value (4 bytes)\newline
 
 Crucial for the consistency are following kind of events:\newline
 \textbf{Request of data:} This happens when a peer comes back online and wants to access a certain wall.  
@@ -247,7 +259,7 @@ Else if the target is an other wall, the instant the server receives the post me
 Whenever a post message is received the maximum clock value gets set to the maximum of the received value and itself.  The wall's post count increases by one after each receiving.
 
 \subsection{Security}
-The cryptography is entirely peer-to-peer. The server has no role in the cryptography and is untrusted.
+The cryptography is peer-to-peer. The server acts as a relay for the client messages and is untrusted.
 
 On first application start, every peer generates a broadcast key. A broadcast key is a pair $(k_1, k_2)$ where $k_1$ is used for encryption and $k_2$ for message authentication.
 
@@ -257,7 +269,7 @@ To post a message on Bob's wall, Alice encrypts and authenticates the post under
 $Enc_{(k_1, k_2)}(h|m) = h | MAC_{k_2}(h | Enc_{k_1}(m)) | Enc_{k_1}(m)$.
 %TODO footnotes for AES, CBC, HMAC, SHA256
 \newline
-Assuming that no friends are compromised, this gives us authenticity and secrecy for the content of posts. A compromised peer exposes the communication of all of his or her friends. However, it is very expensive to eavesdrop or manipulate communication on a large scale, as there is no central storage or transmission of key material.
+Assuming that no friends are compromised, this gives us authenticity and secrecy for the transmission of posts. A compromised peer exposes the communication of all of his or her friends. However, it is very expensive to eavesdrop or manipulate communication on a large scale, as there is no central storage or transmission of key material.
 
 \subsection{Database}
 %Structure
@@ -327,8 +339,9 @@ One issue is that current monetization models seem hard to apply to our approach
 
 \section{Conclusion}
 
-Mobile devices are powerful enough to implement a mostly peer-to-peer social network. Our architecture might provide reduced infrastructure costs compared to centralized systems, as little or no permanent storage is required. Availability is acceptable: Users can always access content they have seen before, and eventually they will receive all updates. Our approach has advantages in terms of security, as large-scale eavesdropping attacks require many peers to be compromised.
+Mobile devices are powerful enough to implement a mostly peer-to-peer social network. Our architecture might provide reduced infrastructure costs compared to centralized systems, as little or no permanent storage is required. Availability is acceptable: Users can always access content they have seen before, and eventually they will receive all updates. 
 The system should scale well, as the server component could be very easily replicated without the need for complex synchronisation mechanisms.
+
 
 
 
