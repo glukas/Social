@@ -16,6 +16,7 @@ import android.nfc.NfcAdapter.OnNdefPushCompleteCallback;
 import android.nfc.NfcEvent;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.v4.app.NavUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -151,18 +152,17 @@ OnNdefPushCompleteCallback, RegistrationDialogFragmentDelegate {
 
 	@Override
 	public void onNdefPushComplete(NfcEvent event) {
-		// Note: we would actually have to make sure that the correct recipient was reached
-		//       we just know SOME recipient got the response
-
 		//NOTE: we only save the friend once someone (hopefully the same person) received the reply.
 		//This means that the request was accepted. (by doing an exchange in the other direction)
 		saveFriend(request);
-		Log.d(this.getClass().toString(), "successfully friended");
+		
+		//Navigate to the friend's Wall, with the parent activity being 
+		NavUtils.navigateUpFromSameTask(this);
+		
+		Intent contactDetail = new Intent(this, ContactDetailActivity.class);
+		contactDetail.putExtra(ContactDetailActivity.USERID_EXTRA, request.getSender().id.getBytes());
+		startActivity(contactDetail);
 	}
 
-	/*
-	 * @Override public void onClick(View v) { //Ask user to invoke android beam
-	 * (this can be done automatically since API version 21) }
-	 */
 
 }
