@@ -122,6 +122,8 @@ public class Server implements Runnable {
 					//Something is really wrong, perform reset
 					System.out.println("###### RESET #######");
 					workerThread.interrupt();
+					stop();
+					this.isStopped = false;
 					setup(this.hostAddress, this.port);
 				} else {
 					this.lastFailure = System.currentTimeMillis();

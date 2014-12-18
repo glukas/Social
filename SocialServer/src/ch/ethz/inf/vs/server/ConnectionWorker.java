@@ -38,8 +38,15 @@ public class ConnectionWorker implements Runnable {
 		  return connectedUsers.containsKey(user.getId());
 	  }
 	  
-	  private void cachePost(Message m, BigInteger user){
-		  //if()
+	  private void cachePost(Message m){
+		  
+		  // Restrict wallCache in size
+		  if(wallCache.size() >= POSTS){
+			  wallCache.removeOldestMessages(5);
+		  }
+		  
+		  //Add message to WallCache
+		  wallCache.addMessage(m);
 	  }
 	  
 	  private void sendACK(ServerEvent event){
@@ -123,7 +130,14 @@ public class ConnectionWorker implements Runnable {
 		      			dataEvent.server.send(socket, dataEvent.message);
 		      		} else {
 		      			//User not online, drop the request
-		      			System.out.println("---- User offline, drop request");
+		      			System.out.println("---- User offline, look in cache");
+		      			SocketChannel socket = connectedUsers.get(sender.getId());
+		      			List<Message> posts = wallCache.getMessagesSince(receiver, 0);
+		      			System.out.println("---- Found " + posts.size() + " posts in Cache!");
+		      			// Send messages
+		      			for(Message m: posts){
+		      				dataEvent.server.send(socket, m);
+		      			}
 		      		}
 	      		}
 	      		
@@ -131,10 +145,6 @@ public class ConnectionWorker implements Runnable {
 	      	case 0x03:
 	      		//POST
 	      		System.out.println("POST request from User: " + sender.getId().toString());
-	      		if(sender.getId().equals(receiver.getId())){
-	      			//Update to his own wall
-	      			
-	      		}
 	      		if(isConnected(receiver)){
 	      			//User is online, forward Post
 	      			System.out.println("---- User is connected");
@@ -145,6 +155,9 @@ public class ConnectionWorker implements Runnable {
 	      			System.out.println("---- User is not connected");
 	      			cache.addMessage(dataEvent.message);
 	      		}
+	      		//Add to wallCache
+	      		cachePost(dataEvent.message);
+	      		
 	      		break;
 	      	case 0x04:
 	      		//SEND
@@ -159,7 +172,7 @@ public class ConnectionWorker implements Runnable {
 	      		} else {
 	      			//Cache the message
 	      			System.out.println("---- User is not connected");
-	      			cache.addMessage(dataEvent.message);
+	      			//cache.addMessage(dataEvent.message);
 	      		}
 	      		break;
 	      	default:

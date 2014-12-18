@@ -35,6 +35,7 @@ public class MessageBuffer {
 	public void addMessage(byte[] bytes){
 		Message m = new Message(bytes);
 		this.addMessage(m);
+		this.inserted.push(m);
 		this.size++;
 	}
 	
@@ -54,8 +55,24 @@ public class MessageBuffer {
 		return list;
 	}
 	
+	public List<Message> getAllMessages(UserId recipient){
+		BigInteger id = recipient.getId();
+		ArrayList<Message> list = new ArrayList<Message>();
+		if(buffer.containsKey(id)){
+			list = buffer.get(id).getMessagesSince(0);
+		}
+		return list;
+	}
+	
 	public int size(){
 		return this.size;
+	}
+	
+	public void removeOldestMessages(int count){
+		for(int i = 0; i < count; i++){
+			Message m = inserted.removeLast();
+			buffer.get(m.getHeader().getReceiver().getId()).removeMessages(m);
+		}
 	}
 
 }

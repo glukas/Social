@@ -35,6 +35,13 @@ public class UserMessageQueue {
 		
 	}
 	
+	public void removeMessages(Message toRemove){
+		synchronized(this.messages){
+			this.messages.remove(toRemove);
+		}
+		
+	}
+	
 	
 	public ArrayList<Message> getMessagesSince(int clock){
 		Message since = new Message(clock);
