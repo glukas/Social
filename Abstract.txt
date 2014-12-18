@@ -1,11 +1,4 @@
 Abstract
-Social is an Android application that allows users to register other users as friends using the nfc technology, which enables proximity communication between smartphones, and afterwards let's them exchange messages containing text and/or images can be exchanged through an Internet connection.
-The distinctive feature of Social is that instead of using a client-server architecture like todays well known social networks, which store all data on a server, it uses a peer-to-peer approach and only stores data on users' devices, giving them a better control over their own data.
-
-/*
-either
-- insert smthg about security
-or
-- the following:
-The idea to provide a useful communication service that focus on privacy and security comes from the invasive privacy policies that such communication services nowadays have.
-*/
+Social is an Android application that allows users to share thoughts and impressions with their friends by posting text or image messages on their profiles.
+The distinctive feature of Social is that instead of using a client-server architecture like todays well known social networks, which store all data on a server, it uses a peer-to-peer approach and only stores data on user devices, giving them a better control over their own data.
+The motivation to provide a social netwroking service that focuses on privacy and security comes from the invasive privacy policies that such communication services nowadays have.
