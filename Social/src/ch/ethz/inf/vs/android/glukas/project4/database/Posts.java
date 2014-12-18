@@ -136,10 +136,10 @@ class Posts {
 		String[] selectionArgs = {Utility.toSQLiteId(friendid), Integer.toString(from)};
 		
 		// ORDER BY clause.
-		//String order = PostsEntry._ID + " DESC";
+		String order = PostsEntry._ID + " ASC";
 		
 		// Execute query.
-		Cursor cursor = db.query(PostsEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, null);
+		Cursor cursor = db.query(PostsEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, order);
 		
 		// Instantiate list of post.
 		List<Post> posts = new ArrayList<Post>();

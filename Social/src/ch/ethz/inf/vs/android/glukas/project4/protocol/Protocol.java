@@ -167,7 +167,7 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 		
 		this.outgoingPosts.put(message, post);
 		
-		secureChannel.sendMessage(message);
+		sendMessage(message);
 	}
 	
 	private NetworkMessage assembleNetworkMessage(Post post) {
@@ -189,7 +189,7 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 		Post post = new Post(getNewPostId(localUser.getId()), localUser.getId(), localUser.getId(), text, image, new Date());
 		boolean success = postLocally(post);
 		if (success) {
-			//secureChannel.sendMessage(assembleNetworkMessage(post));
+			sendMessage(assembleNetworkMessage(post));
 		}
 	}
 	
@@ -241,12 +241,19 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 	private void getState(UserId userId) {
 		Message msg = MessageFactory.newTypeMessage(MessageType.GET_STATE);
 		PublicHeader request = new PublicHeader(PublicHeader.BYTES_LENGTH_HEADER, null, StatusByte.DATA.getByte(), 0, localUser.getId(), userId);
-		secureChannel.sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg).toString(), request));
+		sendMessage(new NetworkMessage(JSONObjectFactory.createJSONObject(msg).toString(), request));
 	}
 
 	@Override
 	public void setDelegate(UserDelegate delegate) {
 		userHandler = delegate;
+	}
+	
+	private void sendMessage(NetworkMessage message) {
+		if (!isConnected) {
+			this.connect();
+		}
+		this.secureChannel.sendMessage(message);
 	}
 
 	////
