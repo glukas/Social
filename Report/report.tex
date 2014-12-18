@@ -132,19 +132,23 @@ The distinctive feature of Social is that instead of using a client-server archi
 The motivation to provide a social networking service that focuses on privacy and security comes from the invasive privacy policies that such communication services nowadays have.
 \end{abstract}
 
-\section{Tasks and Problems}
+\section{Problem Statement}
 
 Going into this project we considered following problems we would have to solve: \newline
-- Suitable UserInterface and Display \newline
-- Reliable storage/retrieval of posts and information \newline
-- Setting up the Server and Network \newline
-- Encryption of the posts and information \newline
-- Logical consistency of the posts \newline
-
-
+Consistent storage/retrieval of posts and information:  \newline
+We have to make sure that if an user posts on a wall every user able to access that wall should get it immediately if online or be able to retrieve it later. This ensures that eventually every user sees the same posts.  \newline
+Logical consistency of the posts:  \newline
+Posts user make with the knowledge of certain post should be displayed after that post.  \newline
+Encryption of the posts and information in a suitable way:  \newline
+Posting on a certain wall should only require to encrypt the post once. Every friend of the owner of the wall should be able to read the post but noone else. \newline
 
 \section{Architecture}
 
+
+
+
+
+\section{Implementation}
 For the implementation of our project we divided it into 5 main layer corresponding the problems: User Interface, Database, Server/Networking, Security, Protocol
 
 \begin{figure}[H]
@@ -156,9 +160,6 @@ For the implementation of our project we divided it into 5 main layer correspond
     \caption{Overview over the general Communication and Layers}
 \end{figure}
 
-
-
-\section{Implementation}
 \subsection{User Interface}
 
 Regarding the user interface we implemented three different activities. One as the main activity holding a navigation bar to switch between the friends list and the user's own wall (Figure 1).
@@ -302,13 +303,9 @@ Else if the target is an other wall, the instant the Server receives the post me
 Whenever a post message is received we set the max post id accordingly and increment the wall's number of posts by 1.
 
 
+\section{Testing}
 
-
-
-
-
-
-\section{Testing and Evaluation}
+\section{Enhancements}
 
 \section{Conclusion}
 
