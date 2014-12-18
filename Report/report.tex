@@ -208,17 +208,34 @@ In the wall fragment the user can see an interface for adding new posts. There w
 	
 \end{figure}
 
-\subsection{Server/Networking}
-\textbf{Hardware and Setup}\newline
-\indent The server in our project is only responsible for forwarding, buffering and caching the messages. It doesn't store the user data in a permanent way and also cannot read the user messages, since the data is encrypted. 
-Because of these circumstances we decided on having a small, lightweight server. Therefore we used a Raspberry Pi Modell B [1]. The R-Pi runs an ARM 700 MHz processor and 512 MB of RAM. It is connected with an Ethernet cable to the network.
-The R-Pi is running Raspbian, a linux distribution, adapted for Raspberry Pi devices. The whole installation is headless and accessed through SSH. This setup is very energy efficient. 
-Since we do not have access to a static Public IP, we have a client in the network, that updates a DNS entry [2] every minute and guarantees, that our server is always reachable over the same address. 
+\subsection{Protocol}
 
-\textbf{Software}\newline
-\indent Because of the limited resources the hardware is offering the server application needs to be very lightweight. To avoid too much thread-switching overhead, to efficiently use the resources and offer good scalability, we decided on a Non-blocking I/O (NIO) [3][4] approach to design the server application. The core-application consists of two threads running in parallel. The server thread, which implements the NIO server and a worker thread which processes the incoming data and decides what to do with the messages. Based on the public header the worker thread handles the message accordingly.
-%Two data structures are responsible to process the messages in a meaningful way. The first is a HashMap which stores the connected users and the corresponding sockets. If a user is not connected, then the posts get buffered in a user specific PriorityQueue. The time a user connects again he or she can request all posts on his or her wall missed whilst offline.
-Alongside the core-application, a monitor thread is running. The task of the monitor thread is to periodically check the connectivity and memory usage of the application. In case of failure and/or too less memory available, the monitor thread can command the server to drop the oldest messages in the cache or to restart the server thread. 
+To communicate between different peers we use messages which contain information about the content, sender and receiver. That information is distributed to three parts which make up following layout.
+\begin{figure}[H]
+
+	\centering
+    \includegraphics[width=\columnwidth]{Layout.png}
+    \lfig{Layout}
+    \vspace{-5mm} % use negative white space to fix too large gaps
+\end{figure}
+The information stored by the PublicHeader is used by the server for appropiate handling of the message.  
+
+The main responsibility of the protocol part lies in maintaining the consistency of the system. To achieve that, the post count of the wall and the respective virtual clock values of each post are of importance. The clock values will then guarantee the right order of posts. Regarding the implementation it was only of significance that if one user makes multiple posts on a certain wall that this user's posts will be in the right order, since every wall has its own virtual clock and uniqueness of values between walls is not assured.
+
+Crucial for the consistency are following kind of events:\newline
+\textbf{Request of data:} This happens when a peer comes back online and wants to access a certain wall.  
+In case the target is the own wall it requests all buffered posts the server stored in its absence.
+If it wants to access an other wall, there are following two cases:\newline
+Case 1 : Wall owner is online
+Responding to the data request, the target peer will send a message containing its wall's post count and maximum virtual clock value. If the local post count is $\leq$ the reported post count, a request for all posts with value $\geq$ the reported virtual clock value is sent.\newline
+Case 2: Wall owner is offline
+In this case the server will send the peer all cached posts of the target peer's wall.\newline
+\textbf{Making a post:}
+To keep the virtual clock values up to date the outgoing post's value is the wall's most recent clock value incremented by 1.\newline
+To maintain consistency on what posts are really in the system, in case the target is the own wall, the instant of commit to the local database is decisive.
+Else if the target is an other wall, the instant the server receives the post message is crucial. Our assumption here is that the server does not crash before properly delivering the posts it received. TCP guarantees that each post send is also received.\newline
+\textbf{Receiving a post:}
+Whenever a post message is received the maximum clock value gets set to the maximum of the received value and itself.  The wall's post count increases by one after each receiving.
 
 \subsection{Security}
 The cryptography is peer-to-peer. The server acts as a relay for the client messages and is untrusted.
@@ -270,35 +287,26 @@ All core methods are implemented using the functions already provided by the SQL
 - friend, to manage data about all his or her friends;
 - post, to manage data about all posts saved in the device.
 
-\subsection{Protocol}
+\subsection{Server/Networking}
+\textbf{Hardware and Setup}\newline
+\indent The server in our project is only responsible for forwarding, buffering and caching the messages. It doesn't store the user data in a permanent way and also cannot read the user messages, since the data is encrypted. 
+Because of these circumstances we decided on having a small, lightweight server. Therefore we used a Raspberry Pi Modell B [1]. The R-Pi runs an ARM 700 MHz processor and 512 MB of RAM. It is connected with an Ethernet cable to the network.
+The R-Pi is running Raspbian, a linux distribution, adapted for Raspberry Pi devices. The whole installation is headless and accessed through SSH. This setup is very energy efficient. 
+Since we do not have access to a static Public IP, we have a client in the network, that updates a DNS entry [2] every minute and guarantees, that our server is always reachable over the same address. 
 
-Finally we have the protocol layer, which is responsible for maintaining the consistency of the system. To achieve that, the post count of the wall and the respective virtual clock values of each post are of importance. The clock values will then guarantee the right order of posts. Regarding the implementation it was only of significance that if one user makes multiple posts on a certain wall that this user's posts will be in the right order, since every wall has its own virtual clock and uniqueness of values between walls is not assured.
+\textbf{Software}\newline
+\indent Because of the limited resources the hardware is offering the server application needs to be very lightweight. To avoid too much thread-switching overhead, to efficiently use the resources and offer good scalability, we decided on a Non-blocking I/O (NIO) [3][4] approach to design the server application. The core-application consists of two threads running in parallel. The server thread, which implements the NIO server and a worker thread which processes the incoming data and decides what to do with the messages. Based on the public header the worker thread handles the message accordingly.
+%Two data structures are responsible to process the messages in a meaningful way. The first is a HashMap which stores the connected users and the corresponding sockets. If a user is not connected, then the posts get buffered in a user specific PriorityQueue. The time a user connects again he or she can request all posts on his or her wall missed whilst offline.
+Alongside the core-application, a monitor thread is running. The task of the monitor thread is to periodically check the connectivity and memory usage of the application. In case of failure and/or too less memory available, the monitor thread can command the server to drop the oldest messages in the cache or to restart the server thread. 
 
-Crucial for the consistency are following kind of events:\newline
-\textbf{Request of data:} This happens when a peer comes back online and wants to access a certain wall.  
-In case the target is the own wall it requests all buffered posts the server stored in its absence.
-If it wants to access an other wall, there are following two cases:\newline
-Case 1 : Wall owner is online
-Responding to the data request, the target peer will send a message containing its wall's post count and maximum virtual clock value. If the local clock value is $\seq$ the reported value, a request for all posts with value $\geq$ the reported virtual clock value is sent.\newline
-Case 2: Wall owner is offline
-In this case the server will send the peer all cached posts of the target peer's wall.\newline
-\textbf{Making a post:}
-To keep the virtual clock values up to date the outgoing post's value is the wall's most recent clock value incremented by 1.\newline
-To maintain consistency on what posts are really in the system, in case the target is the own wall, the instant of commit to the local database is decisive.
-Else if the target is an other wall, the instant the server receives the post message is crucial. Our assumption here is that the server does not crash before properly delivering the posts it received. TCP guarantees that each post send is also received.\newline
-\textbf{Receiving a post:}
-Whenever a post message is received the maximum clock value gets set to the maximum of the received value and itself.  The wall's post count increases by one after each receiving.
 
-To communicate between different peers we use messages which contain information about the content, sender and receiver. That information is distributed to three parts which make up following layout.
 
-\begin{figure}[H]
 
-	\centering
-    \includegraphics[width=\columnwidth]{Layout.png}
-    \lfig{Layout}
-    \vspace{-5mm} % use negative white space to fix too large gaps
-\end{figure}
-The information stored by the PublicHeader is used by the server for appropiate handling of the message.  
+
+
+
+
+
 
 
 \section{Testing}
