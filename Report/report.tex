@@ -1,0 +1,315 @@
+% This is based on "sig-alternate.tex" V1.9 April 2009
+% This file should be compiled with V2.4 of "sig-alternate.cls" April 2009
+%
+\documentclass{report}
+
+\usepackage[english]{babel}
+\usepackage{graphicx}
+\usepackage{tabularx}
+\usepackage{subfigure}
+\usepackage{enumitem}
+\usepackage{url}
+\usepackage{float}
+
+\usepackage{color}
+\definecolor{orange}{rgb}{1,0.5,0}
+\definecolor{lightgray}{rgb}{.9,.9,.9}
+\definecolor{java_keyword}{rgb}{0.37, 0.08, 0.25}
+\definecolor{java_string}{rgb}{0.06, 0.10, 0.98}
+\definecolor{java_comment}{rgb}{0.12, 0.38, 0.18}
+\definecolor{java_doc}{rgb}{0.25,0.35,0.75}
+
+% code listings
+
+\usepackage{listings}
+\lstloadlanguages{Java}
+\lstset{
+	language=Java,
+	basicstyle=\scriptsize\ttfamily,
+	backgroundcolor=\color{lightgray},
+	keywordstyle=\color{java_keyword}\bfseries,
+	stringstyle=\color{java_string},
+	commentstyle=\color{java_comment},
+	morecomment=[s][\color{java_doc}]{/**}{*/},
+	tabsize=2,
+	showtabs=false,
+	extendedchars=true,
+	showstringspaces=false,
+	showspaces=false,
+	breaklines=true,
+	numbers=left,
+	numberstyle=\tiny,
+	numbersep=6pt,
+	xleftmargin=3pt,
+	xrightmargin=3pt,
+	framexleftmargin=3pt,
+	framexrightmargin=3pt,
+	captionpos=b
+}
+
+% Disable single lines at the start of a paragraph (Schusterjungen)
+
+\clubpenalty = 10000
+
+% Disable single lines at the end of a paragraph (Hurenkinder)
+
+\widowpenalty = 10000
+\displaywidowpenalty = 10000
+ 
+% allows for colored, easy-to-find todos
+
+\newcommand{\todo}[1]{\textsf{\textbf{\textcolor{orange}{[[#1]]}}}}
+
+% consistent references: use these instead of \label and \ref
+
+\newcommand{\lsec}[1]{\label{sec:#1}}
+\newcommand{\lssec}[1]{\label{ssec:#1}}
+\newcommand{\lfig}[1]{\label{fig:#1}}
+\newcommand{\ltab}[1]{\label{tab:#1}}
+\newcommand{\rsec}[1]{Section~\ref{sec:#1}}
+\newcommand{\rssec}[1]{Section~\ref{ssec:#1}}
+\newcommand{\rfig}[1]{Figure~\ref{fig:#1}}
+\newcommand{\rtab}[1]{Table~\ref{tab:#1}}
+\newcommand{\rlst}[1]{Listing~\ref{#1}}
+
+% General information
+
+\title{Distributed Systems -- Assignment 4 - Report}
+
+% Use the \alignauthor commands to handle the names
+% and affiliations for an 'aesthetic maximum' of six authors.
+
+\numberofauthors{3} %  in this sample file, there are a *total*
+% of EIGHT authors. SIX appear on the 'first-page' (for formatting
+% reasons) and the remaining two appear in the \additionalauthors section.
+%
+\author{
+% You can go ahead and credit any number of authors here,
+% e.g. one 'row of three' or two rows (consisting of one row of three
+% and a second row of one, two or three).
+%
+% The command \alignauthor (no curly braces needed) should
+% precede each author name, affiliation/snail-mail address and
+% e-mail address. Additionally, tag each line of
+% affiliation/address with \affaddr, and tag the
+% e-mail address with \email.
+%
+% 1st. author
+\alignauthor Student One\\
+	\affaddr{ETH ID XX-XXX-XXX}\\
+	\email{one@student.ethz.ch}
+% 2nd. author
+\alignauthor Student Two\\
+	\affaddr{ETH ID XX-XXX-XXX}\\
+	\email{two@student.ethz.ch}
+% 3rd. author
+\alignauthor Student Three\\
+	\affaddr{ETH ID XX-XXX-XXX}\\
+	\email{three@student.ethz.ch}
+\and  % use '\and' if you need 'another row' of author names
+% 4th. author
+\alignauthor Student Four\\
+ 	\affaddr{ETH ID XX-XXX-XXX}\\
+ 	\email{four@student.ethz.ch}
+% 5th. author
+\alignauthor Student Five\\
+ 	\affaddr{ETH ID XX-XXX-XXX}\\
+ 	\email{five@student.ethz.ch}
+% 6th. author
+\alignauthor Samuel Schmid\\
+ 	\affaddr{ETH ID 10-919-991}\\
+ 	\email{schmisam@student.ethz.ch}
+}
+
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Social is an Android application that allows users to share thoughts and impressions with their friends by posting text or image messages on their profiles.
+The distinctive feature of Social is that instead of using a client-server architecture like todays well known social networks, which store all data on a server, it uses a peer-to-peer approach and only stores data on user devices, giving them a better control over their own data.
+The motivation to provide a social networking service that focuses on privacy and security comes from the invasive privacy policies that such communication services nowadays have.
+\end{abstract}
+
+\section{Introduction}
+
+
+
+\section{Architecture}
+
+For the implementation of our project we divided it into 5 main layers : \newline
+- User Interface \newline
+- DataBase \newline
+- Server/Networking \newline 
+- Security \newline
+- Protocol \newline
+
+
+
+\section{Implementation}
+\subsection{User Interface}
+
+Regarding the user interface we implemented three different activities. One as the main activity holding a navigation bar to switch between the friends list and the user's own wall (Figure 1).
+\begin{figure}[H]
+	\centering
+	\subfigure[Figure 1]{
+	    \includegraphics[height=4cm]{Figure_1}
+
+	}
+	\hfill
+	\subfigure[Figure 2]{
+	    \includegraphics[height=4cm]{Figure_2}
+
+	}
+	\hfill
+	\subfigure[Figure 3]{
+	    \includegraphics[height=4cm]{Figure_3}
+
+	}
+	
+\end{figure}
+
+ A second one for viewing a friend's wall when clicking one of the friends from the friend list (Figure 2), which opens up the same fragment implementation the user sees when looking at his own wall.\newline
+ 
+
+Then a final activity for accepting incoming friend requests which pops up when the NFCAdapter is used, meaning two phones are held close together to exchange friend requests (Figure 3).
+
+In the wall fragment the user can see a interface for adding new posts either to his own wall or the wall of a friend he's looking at. There we have a button for adding a picture from our local gallery or take a new picture which then is added to the top of our post (Figures 4 and 5). A send button allows posting the content the user entered in the textView. Upon first opening the application, the user is prompted to choose a username for registration which then gets saved in the local database for all further application starts (Figure 6).
+\begin{figure}[H]
+	\centering
+	\subfigure[Figure 4]{
+	    \includegraphics[height=4cm]{Figure_4}
+
+	}
+	\hfill
+	\subfigure[Figure 5]{
+	    \includegraphics[height=4cm]{Figure_5}
+
+	}
+	\hfill
+	\subfigure[Figure 6]{
+	    \includegraphics[height=4cm]{Figure_6}
+
+	}
+	
+\end{figure}
+
+\subsection{Server/Networking}
+\textbf{Hardware and Setup}\newline
+\indent The server in our project is only responsible for forwarding and, if the user is not connected, buffering the messages. It doesn't store the user data in a permanent way and also cannot read the user messages, since the data is encrypted. 
+Because of these circumstances we decided on having a small, lightweight server. Therefore we used a Raspberry Pi Modell B [1]. The R-Pi runs an ARM 700 MHz processor and 512 MB of RAM. It is connected with an Ethernet cable to the network.
+The R-Pi is running Raspbian, a linux distribution, adapted for Raspberry Pi devices. The whole installation is headless and accessed through SSH. This setup is very energy efficient. 
+Since we do not have access to a static Public IP, we have a client in the network, that updates a DNS entry [2] every minute and guarantees, that our server is always reachable over the same address. 
+
+\textbf{Software}\newline
+\indent Because of the limited resources the hardware is offering. The server application also needs to be very lightweight. To avoid too much thread-switching overhead, to efficiently use the resources and offer good scalability, we decided on a Non-blocking I/O (NIO) [3][4] approach to design the server application. The core-application consists of two threads running in parallel. The server thread, which implements the NIO server and a worker thread which processes the incoming data and decides what to do with the messages. Based on the public header, the worker thread reads the sender, the recipient and the kind of message and then handles the message accordingly.
+Two data structures are responsible to process the messages in a meaningful way. The first is a simple HashMap which stores the connected users and the corresponding sockets. If a user is not connected, then the message gets buffered in a user specific PriorityQueue. The time a user connects again, he can request all messages he missed when he was offline. Since the hardware has not too much memory available, the server does not guarantee to store all messages until the user connects again. In those cases, the user needs to rerequest the data from his friends.
+Alongside the core-application, a monitor thread is running. The task of the monitor thread is to periodically check the connectivity and memory usage of the application. In case of failure and/or too less memory available, the monitor thread can command the server to drop the oldest messages or even to restart the whole server thread. 
+
+
+
+\subsection{Security}
+The cryptography is peer-to-peer. The server acts as a relay for the client messages and is untrusted.
+
+On first application start, every peer generates a broadcast key. A broadcast key is a pair $(k_1, k_2)$ where $k_1$ is used for encryption and $k_2$ for message authentication.
+
+To establish a friendship, peers exchange their contact information and broadcast keys over Near-Field-Communication. Keys are exchanged in plain. This is reasonable under the assumption that the exchange occurs in a relatively private place.
+
+To post a message on Bob's wall, Alice encrypts and authenticates the post under Bob's key and broadcasts it to all friends of Bob. Since all friends of Bob share Bob's key, it is possible to post a message by encrypting it only once. Encryption is done by combining AES-128 in CBC mode and an HMAC based on SHA256 in an "Encrypt-then-Authenticate" fashion. More concretely the encryption function for message $m$ with public header $h$ is \newline
+$Enc_{(k_1, k_2)}(h|m) = h | MAC_{k_2}(h | Enc_{k_1}(m)) | Enc_{k_1}(m)$.
+\newline
+Assuming that no friends are compromised, this gives us authenticity and chosen plaintext security for the transmission of posts. A compromised peer exposes the communication of all of his or her friends. However, it is very expensive to eavesdrop or manipulate communication on a large scale, as there is no central storage or transmission of key material.
+
+\subsection{Database}
+Structure
+In order to store persistently the user's data on his/hers device it tourned out that the most suitable approach between the ones offered by the Android operating system [1], was to use a SQLite database [2]. This decision was mainly based on the two following application requirements:
+1) the user data need to be structured in some not necessarly trivial way;
+2) it shouldn't be possible to access the data from outside the application.
+The structure of the database is simple and consists of only two tables: one storing the users' data and the other storing the posts.
+In the users table are stored informations about the user, like id and username. Other informations needed by different layers are also stored here, e.g. informations about the user's number of messages for the protocol layer and the keys for the secutity layer. The primary key is the id, since it's unique between all users.
+
+\begin{figure}[H]
+	\centering
+    \includegraphics[width=\columnwidth]{users_table_example.png}
+    \lfig{users_table_example}
+    \vspace{-5mm} % use negative white space to fix too large gaps
+	\caption{users table with example data ("..." means that the data is too long to fit).}
+\end{figure}
+
+The posts table stores the single posts that are part of the user's wall or one of his/hers friend's wall. 
+A post contains an id, the id of who posted it, the id of the user on whose wall it was posted, date and time when it was received, text and/or image content.Id, poster$\_$id and wall$\_$id form the primary key, while both poster$\_$id and wall$\_$id are foreign key references to the users table.
+
+\begin{figure}[H]
+	\centering
+    \includegraphics[width=\columnwidth]{post_table_example.png}
+    \lfig{post_table_example}
+    \vspace{-5mm} % use negative white space to fix too large gaps
+	\caption{posts table with example data.}
+\end{figure}
+
+Implementation
+An interface provides access to the functionalities of the database for the other layers, which don't have another way to access the data. This allows a better control over the state of the database, in particular for assuring consistency to the whole system, and made easier the implementation process, because the structure and the methods evolved through time.
+Extending the SQLiteOpenHelper class [3] helped to make database creation and version control easier to manage.
+All core methods are implemented using the functions already provided by the SQLiteDatabase class [4], in particular insert(), update(), delete() and query(). This methods are divided in three categories that correspond to the different data context:
+- user, to manage data about the owner of the device;
+- friend, to manage data about all his/hers friends;
+- post, to manage data about all posts saved in the device.
+Both the user and friend categories supports actions on the users table and have methods to insert and delete User objects, as well as methods to query for the whole User object or only for some particular informations about it.
+Analoguos functions for Post objects are part of the posts category, and handle the data of the posts table.
+
+
+
+
+\subsection{Protocol}
+Finally we have the protocol layer, which is responsible for maintaining the consistency of the system. To achieve that certain structures are implemented which will now be explained in detail.
+Each user has their own wall object, which contains all the information about the posts made on that wall. Important for the consistency are the number of posts of on the wall and the respective ids of each post. The ids act as a lamport timestamp to guarantee the right order of posts. Regarding the implementation it was only of significance that if one user makes multiple posts on a certain wall that this user's posts will be in the right order. That means that it could be indeed possible that different users have the same post id since they are not necesarrily unique.
+
+To communicate between different users / with the server we use messages which contain information about the content, sender and receiver. That information is distributed to three parts which make up following layout.
+
+\begin{figure}[H]
+
+	\centering
+    \includegraphics[width=\columnwidth]{Layout.png}
+    \lfig{Layout}
+    \vspace{-5mm} % use negative white space to fix too large gaps
+\end{figure}
+
+Crucial for the consistency are following kind of events:\newline
+\textbf{Request of data:} This happens when a user comes back online and wants to access a certain wall.  
+In case the target is the own wall we request all puffered posts the server stored in our absence.
+If we want to access an other wall, there are following two cases:\newline
+Case 1 : Wall owner is online
+Responding to our data request, the wall owner will send a message containing his wall's number of posts and maximum post id. After comparing this received information with the own, a request for all posts with ids $\geq$ own-max-id is sent.\newline
+Case 2: Wall owner is offline
+In this case the server will send the user all cached posts the owner made on his wall before going offline.\newline
+\textbf{Making a post:}
+To keep the post ids up to date the post id of the outgoing post is the max post id of the respective wall incremented by 1.\newline
+To maintain consistency on what posts are really in the system, in case the target is the own wall, the instant of commit to the local DataBase is decisive.
+Else if the target is an other wall, the instant the Server receives the post message is crucial. Our assumption here is that the server does not crash before receiving the post, that means as soon as the post message is sent it is guaranteed to be received by the server since we are using TCP to transfer them.\newline
+\textbf{Receiving a post:}
+Whenever a post message is received we set the max post id accordingly and increment the wall's number of posts by 1.
+
+
+
+
+
+
+
+
+\section{Testing and Evaluation}
+
+\section{Conclusion}
+
+Give an overall conclusion that summarizes the main challenges you encountered and your lessons learned.
+
+% The following two commands are all you need in the
+% initial runs of your .tex file to
+% produce the bibliography for the citations in your paper.
+\bibliographystyle{abbrv}
+\bibliography{report}  % sigproc.bib is the name of the Bibliography in this case
+% You must have a proper ".bib" file
+
+%\balancecolumns % GM June 2007
+
+\end{document}
