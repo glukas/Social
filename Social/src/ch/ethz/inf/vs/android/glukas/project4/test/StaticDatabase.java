@@ -109,12 +109,6 @@ public class StaticDatabase implements DatabaseAccess {
 	}
 
 	@Override
-	public void deleteFriend(UserId id) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public User getFriend(UserId id) {
 		// TODO Auto-generated method stub
 		if (id.equals(Data.dummyReceiverId)){
@@ -131,33 +125,9 @@ public class StaticDatabase implements DatabaseAccess {
 	}
 
 	@Override
-	public void deleteUserPost(int id) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public Post getUserPost(int id) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Post getFriendPost(int postid, UserId friendid) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public List<Post> getAllFriendPostsFrom(UserId id, int from) {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	@Override
-	public void deleteFriendPost(int postid, UserId friendid) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
@@ -192,6 +162,12 @@ public class StaticDatabase implements DatabaseAccess {
 
 	@Override
 	public boolean putPost(Post post) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean containsPost(int postid, UserId author, UserId wallOwner) {
 		// TODO Auto-generated method stub
 		return false;
 	}

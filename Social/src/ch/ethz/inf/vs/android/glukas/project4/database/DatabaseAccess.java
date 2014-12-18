@@ -121,13 +121,6 @@ public interface DatabaseAccess {
 	 */
 	public void putFriend(User friend);
 	
-	/** 
-	 * Delete a friend recursively. This means any data related to him
-	 * (data, friendships, posts) will be removed from the database.
-	 * @param id the id of the friend to delete.
-	 */
-	public void deleteFriend(UserId id);
-	
 	/**
 	 * Get a friend targeted by his / her id
 	 * @param id
@@ -156,25 +149,13 @@ public interface DatabaseAccess {
 	public List<Post> getAllUserPostsFrom(int from);
 	
 	/**
-	 * Delete a user post.
-	 * @param id the id of the post to delete 
-	 */
-	public void deleteUserPost(int id);
-	
-	/**
-	 * Get a user post.
-	 * @param id the id of the post to retrieve
-	 * @return the requested post
-	 */
-	public Post getUserPost(int id);
-	
-	/**
 	 * Get a post of a friend
 	 * @param postid the id of the post to retrieve
-	 * @param friendid the friend who owns the post
+	 * @param author the id of the author of the post
+	 * @param wallOwner the wall that the post was posted on
 	 * @return
 	 */
-	public Post getFriendPost(int postid, UserId friendid);
+	public boolean containsPost(int postid, UserId author, UserId wallOwner);
 	
 	/**
 	 * Get all post of a friend with at least 'from' as post's number
@@ -183,14 +164,7 @@ public interface DatabaseAccess {
 	 * @return a list of all matching posts (not sorted)
 	 */
 	public List<Post> getAllFriendPostsFrom(UserId id, int from);
-	
-	/**
-	 * Delete a friend's post.
-	 * @param postid the id of the post to delete
-	 * @param friendid the id of the friend
-	 */
-	public void deleteFriendPost(int postid, UserId friendid);
-	
+
 	/**
 	 * Get some latest posts
 	 * @param id, the id of the user

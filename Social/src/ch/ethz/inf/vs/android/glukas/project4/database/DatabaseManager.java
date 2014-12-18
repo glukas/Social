@@ -154,13 +154,7 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 	public void putFriend(User friend) {
 		Friends.putFriend(friend, this.getWritableDatabase());
 	}
-
-	// Remove friend from the List of friends & everything associated with him/her
-	@Override
-	public void deleteFriend(UserId id) {
-		Friends.deleteFriend(id, this.getWritableDatabase());
-	}
-
+	
 	// Update the posts count for the user with this id.
 	@Override
 	public void setFriendPostsCount(int newCount, UserId id) {
@@ -187,6 +181,11 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 	public boolean putPost(Post post) {
 		return Posts.putPost(post, this.getWritableDatabase());
 	}
+	
+	@Override
+	public boolean containsPost(int postId, UserId author, UserId wallOwner) {
+		return Posts.containsPost(postId, author, wallOwner, this.getReadableDatabase());
+	}
 
 	// Get all the Posts in a Wall starting from id -> id or time?
 	@Override
@@ -194,34 +193,10 @@ public class DatabaseManager extends SQLiteOpenHelper implements DatabaseAccess{
 		return Posts.getAllUserPostsFrom(from, this.getReadableDatabase());
 	}
 
-	// Delete a certain post from the user's wall.
-	@Override
-	public void deleteUserPost(int postid) {
-		Posts.deleteUserPost(postid, this.getWritableDatabase());
-	}
-
-	// Get a certain post from the user's wall.
-	@Override
-	public Post getUserPost(int postid) {
-		return Posts.getUserPost(postid, this.getReadableDatabase());
-	}
-
-	// Get a certain Post from a certain friend
-	@Override
-	public Post getFriendPost(int postid, UserId friendid) {
-		return Posts.getFriendPost(postid, friendid, this.getReadableDatabase());
-	}
-
 	// Get all Posts of a certain friend starting at a certain time/timestamp
 	@Override
 	public List<Post> getAllFriendPostsFrom(UserId friendid, int from) {
 		return Posts.getAllFriendPostsFrom(friendid, from, this.getReadableDatabase());
-	}
-
-	// delete a certain Post of a certain friend
-	@Override
-	public void deleteFriendPost(int postid, UserId friendid) {
-		Posts.deleteFriendPost(postid, friendid, this.getWritableDatabase());
 	}
 
 	// Get numberPosts older than postId

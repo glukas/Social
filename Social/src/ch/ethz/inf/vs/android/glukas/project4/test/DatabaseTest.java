@@ -114,7 +114,7 @@ public class DatabaseTest extends AndroidTestCase{
 	
 	// POSTS
 
-	public void testInsertFriendPost() {
+	/*public void testInsertFriendPost() {
 		DatabaseManager db = cleanDB();
 		
 		db.putUser(Data.alice);
@@ -126,8 +126,9 @@ public class DatabaseTest extends AndroidTestCase{
 
 		assertEquals(Data.post2, returned);
 //		Log.d("TEST DATABASE", Data.tag+" Post 2 id : "+post2.getId()+ ", PostId : "+post2.getPoster()+ ", OwnerWallId : "+post2.getWallOwner()+", content : "+post2.getText());
-	}
+	}*/
 	
+	/*
 	@Test
 	public void testDeleteUserPost() {
 		DatabaseManager db = cleanDB();
@@ -139,7 +140,7 @@ public class DatabaseTest extends AndroidTestCase{
 		db.deleteUserPost(Data.post1.getId());
 		
 		assertTrue(db.getUserPost(Data.post1.getId()) == null);
-	}
+	}*/
 
 	@Test
 	public void testGetSomePosts() {
@@ -214,6 +215,7 @@ public class DatabaseTest extends AndroidTestCase{
 		assertEquals(Data.bob.getUsername(), db.getFriendUsername(Data.bob.getId()));
 	}
 	
+	/*
 	@Test
 	public void testDeleteFriend() {
 		DatabaseManager db = cleanDB();
@@ -223,7 +225,7 @@ public class DatabaseTest extends AndroidTestCase{
 		db.deleteFriend(Data.bob.getId());
 		
 		assertTrue(db.getFriend(Data.bob.getId()) == null);
-	}
+	}*/
 	
 	
 	

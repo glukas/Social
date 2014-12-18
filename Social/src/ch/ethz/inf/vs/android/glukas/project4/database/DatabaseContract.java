@@ -87,29 +87,6 @@ public final class DatabaseContract {
 		}
 	}
 	
-	/**
-	 * Enumerate all projections query made by the database
-	 */
-//	public enum PROJECTIONS {
-//		
-//		POST_DATA(	PostsEntry._ID,
-//					PostsEntry.POSTER_ID, 
-//					PostsEntry.WALL_ID,
-//					PostsEntry.TEXT,
-//					PostsEntry.IMAGE,
-//					PostsEntry.DATE_TIME );
-//		
-//		private String command;
-//		
-//		PROJECTIONS(String id, String id){
-//			command = s;
-//		}
-//		
-//		public String getCommand() {
-//			return command;
-//		}
-//	}
-	
 	// Structure of table users.
 	public static abstract class UsersEntry implements BaseColumns {
 		public static final String TABLE_NAME = "users";

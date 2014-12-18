@@ -86,6 +86,21 @@ class Posts {
 		return getFriendPost(postid, Utility.userId, db);
 	}
 	
+	public static boolean containsPost(int postId, UserId author, UserId wallOwner, SQLiteDatabase db) {
+		String[] projection = { PostsEntry._ID};
+		
+		String selection = String.format("%s == ? AND %s == ? AND %s == ? ", PostsEntry._ID, PostsEntry.POSTER_ID, PostsEntry.WALL_ID);
+		
+		String[] selectionArgs = {Integer.toString(postId), Utility.toSQLiteId(author), Utility.toSQLiteId(wallOwner)};
+		
+		Cursor cursor = db.query(PostsEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, null);
+	
+		boolean nonempty = cursor.moveToFirst();
+		cursor.close();
+		
+		return nonempty;
+	}
+	
 
 	public static Post getFriendPost(int postid, UserId friendid, SQLiteDatabase db) {
 		// Columns to project.

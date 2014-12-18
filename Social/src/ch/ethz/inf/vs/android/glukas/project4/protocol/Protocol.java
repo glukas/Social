@@ -194,7 +194,8 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 	}
 	
 	private boolean postLocally(Post post) {
-		boolean success = database.putPost(post);
+		boolean alreadyContained = database.containsPost(post.getId(), post.getPoster(), post.getWallOwner());
+		boolean success = !alreadyContained && database.putPost(post);
 		if (success) {
 			Log.d(this.getClass().toString(), "postLocally : " + post.getText() + " , " + post.getPoster().getId() + " , " + post.getWallOwner().getId());
 			int localNumberOfPosts = database.getFriendPostsCount(post.getWallOwner());
