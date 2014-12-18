@@ -7,7 +7,6 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 
 import ch.ethz.inf.vs.android.glukas.project4.protocol.PublicHeader;
 

@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
 
@@ -39,6 +38,7 @@ public class MessageBuffer {
 		this.size++;
 	}
 	
+	// Retrieves messages and also removes them from the buffer
 	public List<Message> getMessagesSince(UserId recipient, int clock){
 		BigInteger id = recipient.getId();
 		ArrayList<Message> list = new ArrayList<Message>();
@@ -55,6 +55,7 @@ public class MessageBuffer {
 		return list;
 	}
 	
+	// Retrieves all messages in buffer of recipient, lets them in the buffer
 	public List<Message> getAllMessages(UserId recipient){
 		BigInteger id = recipient.getId();
 		ArrayList<Message> list = new ArrayList<Message>();
@@ -68,6 +69,8 @@ public class MessageBuffer {
 		return this.size;
 	}
 	
+	
+	// Removes the 'count' oldest messages
 	public void removeOldestMessages(int count){
 		for(int i = 0; i < count; i++){
 			Message m = inserted.removeLast();

@@ -2,7 +2,6 @@ package ch.ethz.inf.vs.server;
 
 import java.math.BigInteger;
 import java.nio.channels.SocketChannel;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,19 +13,27 @@ import ch.ethz.inf.vs.server.MessageBuffer;
 public class ConnectionWorker implements Runnable {
 	  private List<ServerEvent> queue = new LinkedList<ServerEvent>();
 	  private HashMap<BigInteger, SocketChannel> connectedUsers = new HashMap<BigInteger, SocketChannel>();
-	  private MessageBuffer cache = new MessageBuffer();
+	  protected MessageBuffer cache = new MessageBuffer();
 	  // Used to store the latest wall updates
-	  private MessageBuffer wallCache = new MessageBuffer();
+	  protected MessageBuffer wallCache = new MessageBuffer();
 	  private final int POSTS = 100;
+	  
+	  public ConnectionWorker(MessageBuffer cache, MessageBuffer wallCache){
+		  // Initialize with old caches
+		  this.cache = cache;
+		  this.wallCache = wallCache;
+	  }
+	  
+	  public ConnectionWorker(){
+		  //Do nothing
+	  }
 	  
 	  public void processData(Server server, SocketChannel socket, byte[] data, int count) {
 		  //Create Message out of the byte array
 		  Message received = new Message(data);
 		  System.out.println("Received data has size: " + data.length + " bytes");
 		  System.out.println("Status: " + Integer.toHexString(received.getHeader().getConsistency()));
-		  String s = (received.isEmpty ? "<empty>" : new String(received.getMessage(), StandardCharsets.UTF_8));
-
-		  //System.out.println("Server read: " + s);
+		  
 
 		  synchronized(queue) {
 			  queue.add(new ServerEvent(server, socket, received));

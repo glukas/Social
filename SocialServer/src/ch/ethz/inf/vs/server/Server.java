@@ -26,7 +26,6 @@ public class Server implements Runnable {
 	
 	// Used to recover from failures
 	private long lastFailure = 0;
-	private boolean restart = false;
 
 	// The channel for accepting connections
 	private ServerSocketChannel serverChannel;
@@ -51,6 +50,10 @@ public class Server implements Runnable {
 		setup(hostAddress, port);
 	}
 	
+	public Server(InetAddress hostAddress, int port, MessageBuffer cache, MessageBuffer wallCache){
+		setup(hostAddress, port, cache, wallCache);
+	}
+	
 	private void setup(InetAddress hostAdress, int port){
 		try{
 			this.hostAddress = hostAddress;
@@ -58,6 +61,21 @@ public class Server implements Runnable {
 			this.selector = this.initSelector();
 			//Dispatch worker
 			this.worker = new ConnectionWorker();
+			this.workerThread = new Thread(worker);
+			workerThread.start();
+			
+		} catch(IOException e){
+			e.printStackTrace();
+		}
+	}
+	
+	private void setup(InetAddress hostAdress, int port, MessageBuffer cache, MessageBuffer wallCache){
+		try{
+			this.hostAddress = hostAddress;
+			this.port = port;
+			this.selector = this.initSelector();
+			//Dispatch worker
+			this.worker = new ConnectionWorker(cache, wallCache);
 			this.workerThread = new Thread(worker);
 			workerThread.start();
 			
@@ -121,10 +139,12 @@ public class Server implements Runnable {
 				if(this.lastFailure + 1000 > System.currentTimeMillis()){
 					//Something is really wrong, perform reset
 					System.out.println("###### RESET #######");
+					MessageBuffer cache = worker.cache;
+					MessageBuffer wallCache = worker.wallCache;
 					workerThread.interrupt();
 					stop();
 					this.isStopped = false;
-					setup(this.hostAddress, this.port);
+					setup(this.hostAddress, this.port, cache, wallCache);
 				} else {
 					this.lastFailure = System.currentTimeMillis();
 				}
@@ -309,13 +329,21 @@ public class Server implements Runnable {
 		return socketSelector;
 	}
 	
-	public synchronized void stop(){
+	public synchronized ArrayList<MessageBuffer> stop(){
         this.isStopped = true;
+        // get the caches
+        ArrayList<MessageBuffer> caches = new ArrayList<MessageBuffer>();
+        caches.add(this.worker.cache);
+        caches.add(this.worker.wallCache);
+        //End worker thread
+        this.workerThread.interrupt();
         try {
             this.serverChannel.close();
         } catch (IOException e) {
             throw new RuntimeException("Error closing server", e);
         }
+        
+        return caches;
     }
 
 	public class ChangeRequest {

@@ -1,10 +1,8 @@
 package ch.ethz.inf.vs.server;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
 import ch.ethz.inf.vs.android.glukas.project4.networking.TCPCommunicator;
@@ -31,7 +29,7 @@ public class Monitor implements Runnable {
 		
 		//need to start the server?
 		if(!serverRunning){
-			startServer();
+			startServer(null, null);
 		}
 		
 		//Get runtime
@@ -131,17 +129,26 @@ public class Monitor implements Runnable {
 	
 	public void restartServer() throws InterruptedException{
 		//kill the running server
-		server.stop();
+		ArrayList<MessageBuffer> caches = server.stop();
 		serverThread.join(2000);
 		
 		//start the new server
-		startServer();
+		if(caches != null){
+			startServer(caches.get(0), caches.get(1));
+		} else {
+			startServer(null, null);
+		}
 		
 	}
 	
-	public void startServer(){
+	public void startServer(MessageBuffer cache, MessageBuffer wallCache){
 		//Start a new server
-		server = new Server(null, port);
+		if(cache == null || wallCache == null){
+			server = new Server(null, port);
+		} else {
+			server = new Server(null, port, cache, wallCache);
+		}
+		
 		serverThread = new Thread(server);
 		serverThread.start();
 	}

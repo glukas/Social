@@ -100,7 +100,6 @@ public class AsyncServer {
 		noConnection = true;
 	}
 	
-	// TODO new thread
 	public void sendMessage(final byte[] message) {
 		if (noConnection){
 			restart();
