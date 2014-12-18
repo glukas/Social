@@ -95,24 +95,24 @@
 % e-mail address with \email.
 %
 % 1st. author
-\alignauthor Student One\\
-	\affaddr{ETH ID XX-XXX-XXX}\\
-	\email{one@student.ethz.ch}
+\alignauthor Lukas Gianinazzi\\
+	\affaddr{ETH ID 11-719-143}\\
+	\email{glukas@student.ethz.ch}
 % 2nd. author
-\alignauthor Student Two\\
+\alignauthor Mathias Birrer\\
 	\affaddr{ETH ID XX-XXX-XXX}\\
 	\email{two@student.ethz.ch}
 % 3rd. author
-\alignauthor Student Three\\
+\alignauthor Vincent Demotz\\
 	\affaddr{ETH ID XX-XXX-XXX}\\
 	\email{three@student.ethz.ch}
 \and  % use '\and' if you need 'another row' of author names
 % 4th. author
-\alignauthor Student Four\\
- 	\affaddr{ETH ID XX-XXX-XXX}\\
+\alignauthor Young Ban\\
+ 	\affaddr{ETH ID 10-935-062}\\
  	\email{four@student.ethz.ch}
 % 5th. author
-\alignauthor Student Five\\
+\alignauthor Alessio Bähler\\
  	\affaddr{ETH ID XX-XXX-XXX}\\
  	\email{five@student.ethz.ch}
 % 6th. author
@@ -232,6 +232,8 @@ The layout of the public header is as follows:
     \vspace{-5mm} % use negative white space to fix too large gaps
 \end{figure}
 
+
+$\:$\newline
 1: length of the message (4 bytes) \newline
 2: length of Text section (2 bytes)\newline
 3: status byte (1 byte)\newline
@@ -267,9 +269,9 @@ Assuming that no friends are compromised, this gives us authenticity and secrecy
 
 \subsection{Database}
 %Structure
-In order to store persistently the user's data on his or her device it tourned out that the most suitable approach between the ones offered by the Android operating system [1], was to use a SQLite database [2]. This decision was mainly based on the two following application requirements:
-1) the user data needs to be structured;
-2) it shouldn't be possible to access the data from outside the application.
+In order to store persistently the user's data on his or her device it tourned out that the most suitable approach between the ones offered by the Android operating system [5], was to use a SQLite database [6]. This decision was mainly based on the two following application requirements:\newline
+1) the user data needs to be structured;\newline
+2) it shouldn't be possible to access the data from outside the application;\newline
 The structure of the database is simple and consists of only two tables: one storing the users' data and the other storing the posts.
 
 The user table stores id, username and other information needed by different layers, e.g. the number of messages on the user's wall for the protocol layer and the keys for the secutity layer. The primary key is the id, since it's unique with high probability among all users.
@@ -296,24 +298,28 @@ A post contains an id, the id of who posted it, the id of the user on whose wall
 %Implementation
 
 An interface provides access to the functionalities of the database for the other layers, which don't have another way to access the data. This allows a better control over the state of the database, in particular for assuring consistency to the whole system, and made easier throughout the implementation process, because the structure and the methods evolved over time.
-Extending the SQLiteOpenHelper class [3] helped to make database creation and version control easier to manage.
-All core methods are implemented using the functions already provided by the SQLiteDatabase class [4], in particular insert(), update(), delete() and query(). This methods are divided into three categories:
+Extending the SQLiteOpenHelper class [7] helped to make database creation and version control easier to manage.
+All core methods are implemented using the functions already provided by the SQLiteDatabase class [8], in particular insert(), update(), delete() and query(). This methods are divided into three categories:
 - user, to manage data about the owner of the device;
 - friend, to manage data about all his or her friends;
 - post, to manage data about all posts saved in the device.
 
 \subsection{Server/Networking}
+
+$\:$\newline
 \textbf{Hardware and Setup}\newline
 \indent The server in our project is only responsible for forwarding, buffering and caching the messages. It doesn't store the user data in a permanent way and also cannot read the user messages, since the data is encrypted. 
-Because of these circumstances we decided on having a small, lightweight server. Therefore we used a Raspberry Pi Modell B [1]. The R-Pi runs an ARM 700 MHz processor and 512 MB of RAM. It is connected with an Ethernet cable to the network.
+Because of these circumstances we decided on having a small, lightweight server. Therefore we used a Raspberry Pi Modell B [9]. The R-Pi runs an ARM 700 MHz processor and 512 MB of RAM. It is connected with an Ethernet cable to the network.
 The R-Pi is running Raspbian, a linux distribution, adapted for Raspberry Pi devices. The whole installation is headless and accessed through SSH. This setup is very energy efficient. 
-Since we do not have access to a static Public IP, we have a client in the network, that updates a DNS entry [2] every minute and guarantees, that our server is always reachable over the same address. 
+Since we do not have access to a static Public IP, we have a client in the network, that updates a DNS entry [10] every minute and guarantees, that our server is always reachable over the same address. 
 
+$\:$\newline
 \textbf{Software}\newline
-\indent Because of the limited resources the hardware is offering the server application needs to be very lightweight. To avoid too much thread-switching overhead, to efficiently use the resources and offer good scalability, we decided on a Non-blocking I/O (NIO) [3][4] approach to design the server application. The core-application consists of two threads running in parallel. The server thread, which implements the NIO server and a worker thread which processes the incoming data and decides what to do with the messages. Based on the public header the worker thread handles the message accordingly.
+\indent Because of the limited resources the hardware is offering the server application needs to be very lightweight. To avoid too much thread-switching overhead, to efficiently use the resources and offer good scalability, we decided on a Non-blocking I/O (NIO) [11][12] approach to design the server application. The core-application consists of two threads running in parallel. The server thread, which implements the NIO server and a worker thread which processes the incoming data and decides what to do with the messages. Based on the public header the worker thread handles the message accordingly.
 %Two data structures are responsible to process the messages in a meaningful way. The first is a HashMap which stores the connected users and the corresponding sockets. If a user is not connected, then the posts get buffered in a user specific PriorityQueue. The time a user connects again he or she can request all posts on his or her wall missed whilst offline.
 Alongside the core-application, a monitor thread is running. The task of the monitor thread is to periodically check the connectivity and memory usage of the application. In case of failure and/or too less memory available, the monitor thread can command the server to drop the oldest messages in the cache or to restart the server thread. 
 
+$\:$\newline
 \textbf{Transport Protocol}\newline
 \indent Communication is performed over TCP. This allows us to rely on the correct ordering and reliable transmission of messages.
 
@@ -336,6 +342,17 @@ One issue is that current monetization models seem hard to apply to our approach
 Mobile devices are powerful enough to implement a mostly peer-to-peer social network. Our architecture might provide reduced infrastructure costs compared to centralized systems, as little or no permanent storage is required. Availability is acceptable: Users can always access content they have seen before, and eventually they will receive all updates. 
 The system should scale well, as the server component could be very easily replicated without the need for complex synchronisation mechanisms.
 
+\section{References}
+\vspace{-3mm}
+$\:$\newline
+[5]: http://developer.android.com/guide/topics/data/data-storage.html\newline
+[6]: http://developer.android.com/training/basics/data-storage/\newline databases.html\newline
+[7]: http://developer.android.com/reference/android/database/\newline sqlite/SQLiteOpenHelper.html\newline
+[8]: http://developer.android.com/reference/android/database/\newline sqlite/SQLiteDatabase.html\newline
+[9]:http://www.raspberrypi.org/\newline
+[10]: freedns.afraid.org\newline
+[11]: http://en.wikipedia.org/wiki/Non-blocking$\_$I/O$\_$$\%$28Java$\%$29\newline
+[12]: http://docs.oracle.com/javase/7/docs/api/java/nio/channels/\newline package-summary.html\newline
 
 
 
