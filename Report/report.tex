@@ -152,18 +152,14 @@ updates to their own walls by a "push" mechanism.
 \section{Implementation}
 For the implementation of our project we divided it into 5 main layer corresponding the problems: User Interface, Database, Server/Networking, Security, Protocol
 
-\begin{figure}[H]
-
-	\centering
-    \includegraphics[width=\columnwidth]{Architecture.png}
-
-    
-    \caption{Overview over the general Communication and Layers}
-\end{figure}
-
 \subsection{User Interface}
 
 The main activity holds a navigation bar to switch between the friends list and the user's own wall (Figure 1).
+
+A second activity is for viewing a friend's wall. This activity is started when clicking one of the friends (Figure 2) or immediately after establishing a new friendship. The wall is implmented using the same fragment the user sees when looking at his or her own wall.\newline
+
+The last activity is for displaying incoming friendship requests. It pops up when two phones are held close together and one of the users taps the screen, initiating a friendship request (Figure 3).
+
 
 \begin{figure}[H]
 	\centering
@@ -184,13 +180,11 @@ The main activity holds a navigation bar to switch between the friends list and 
 	
 \end{figure}
 
-A second activity is for viewing a friend's wall. This activity is started when clicking one of the friends (Figure 2) or immediately after establishing a new friendship. The wall is implmented using the same fragment the user sees when looking at his or her own wall.\newline
-
-The last activity is for displaying incoming friendship requests. It pops up when two phones are held close together and one of the users taps the screen, initiating a friendship request (Figure 3).
-
 Upon first opening the application, the user is prompted to choose a username for registration which then gets saved in the local database (Figure 6).
 
-In the wall fragment the user can see an interface for adding new posts. There we have a button for adding pictures to a post. Pictures can be taken from the gallery or a new picture can be taken (Figures 4 and 5). A send button allows posting the content the user entered in the textView. \begin{figure}[H]
+In the wall fragment the user can see an interface for adding new posts. There we have a button for adding pictures to a post. Pictures can be taken from the gallery or a new picture can be taken (Figures 4 and 5). A send button allows posting the content the user entered in the textView.
+
+\begin{figure}[H]
 	\centering
 	\subfigure[Figure 4]{
 	    \includegraphics[height=4cm]{Figure_4}
@@ -214,9 +208,9 @@ In the wall fragment the user can see an interface for adding new posts. There w
 The main responsibility of the protocol lies in maintaining the eventual consistency of the system.
 
 Each peer has a random 128-bit user id. This guarantees uniqueness of the ids with high probability without any coordination.
-Each peer stores a post count and a virtual clock for each friend. The virtual clock is a lamport time stamp. We increment it when posting, and update it on receival of posts. Posts on some wall are ordered lexicographically with respect to the virtual clock and the user id of the author.
+Each peer stores a post count and a virtual clock for each friend. The virtual clock is a lamport time stamp. We increment it when posting, and update it on receival of posts. Posts are ordered lexicographically with respect to the virtual clock and the user id of the author. This order is total for each wall.
 
-Messages have a public header, which is sent in plain and used by the server for appropiate handling of the messages. The private part of a message consists of a JSON text portion and potentially image binary payload.
+Messages have a public header, which is sent in plain and used by the server for appropiate handling of the messages. The private part of a message consists of a JSON text portion and an optional image payload.
 
 \begin{figure}[H]
 
@@ -239,24 +233,24 @@ The layout of the public header is as follows:
 \end{figure}
 
 1: length of the message (4 bytes) \newline
-2: length of Text (2 bytes)\newline
+2: length of Text section (2 bytes)\newline
 3: status byte (1 byte)\newline
 4: virtual clock value (4 bytes)\newline
 
 Crucial for the consistency are following kind of events:\newline
-\textbf{Request of data:} This happens when a peer comes back online and wants to access a certain wall.  
+\textbf{Request of data:} This happens when a peer wants to fetch updates of a certain wall.  
 In case the target is the own wall it requests all buffered posts the server stored in its absence.
-If it wants to access an other wall, there are following two cases:\newline
-Case 1 : Wall owner is online
-Responding to the data request, the target peer will send a message containing its wall's post count and maximum virtual clock value. If the local post count is $\leq$ the reported post count, a request for all posts with value $\geq$ the reported virtual clock value is sent.\newline
-Case 2: Wall owner is offline
+If it wants to access an other wall, there are two cases:\newline
+Case 1 : Wall owner is online.
+Responding to the data request, the target peer will send a message containing its wall's post count and virtual clock value. If the local post count is less than the reported post count, a request for all posts with value at least the reported virtual clock value is sent. The peer answeres this request by sending all such posts in increasing virtual clock value order. \newline
+Case 2: Wall owner is offline.
 In this case the server will send the peer all cached posts of the target peer's wall.\newline
 \textbf{Making a post:}
-To keep the virtual clock values up to date the outgoing post's value is the wall's most recent clock value incremented by 1.\newline
-To maintain consistency on what posts are really in the system, in case the target is the own wall, the instant of commit to the local database is decisive.
-Else if the target is an other wall, the instant the server receives the post message is crucial. Our assumption here is that the server does not crash before properly delivering the posts it received. TCP guarantees that each post send is also received.\newline
+As already mentioned, we increment the virtual clock of a wall when posting to it.\newline
+In case the target is the own wall, the commit to the local database determines if the post is successful or not.
+If the target is a friends wall, the instant the server receives the post message is decisive. The server has the responsibility of ensuring that such a post is delivered to the wall owner eventually. \newline
 \textbf{Receiving a post:}
-Whenever a post message is received the maximum clock value gets set to the maximum of the received value and itself.  The wall's post count increases by one after each receiving.
+As previously outlined, whenever a post message is received the virtual clock value of the corresponding wall gets set to the maximum of the received value and the local value.  The wall's post count is incremented.
 
 \subsection{Security}
 The cryptography is peer-to-peer. The server acts as a relay for the client messages and is untrusted.
@@ -321,7 +315,7 @@ Since we do not have access to a static Public IP, we have a client in the netwo
 Alongside the core-application, a monitor thread is running. The task of the monitor thread is to periodically check the connectivity and memory usage of the application. In case of failure and/or too less memory available, the monitor thread can command the server to drop the oldest messages in the cache or to restart the server thread. 
 
 \textbf{Transport Protocol}\newline
-\indent Communication is performed over TCP. This allows us to rely on the correct ordering and reliable transmission messages.
+\indent Communication is performed over TCP. This allows us to rely on the correct ordering and reliable transmission of messages.
 
 \section{Testing}
 
