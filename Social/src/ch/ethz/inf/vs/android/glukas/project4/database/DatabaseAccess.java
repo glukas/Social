@@ -7,7 +7,6 @@ import ch.ethz.inf.vs.android.glukas.project4.Post;
 import ch.ethz.inf.vs.android.glukas.project4.User;
 import ch.ethz.inf.vs.android.glukas.project4.UserCredentials;
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
-import ch.ethz.inf.vs.android.glukas.project4.Wall;
 
 /**
  * Abstract list of all functionalities offered by the database.
@@ -176,22 +175,9 @@ public interface DatabaseAccess {
 	////
 	
 	/**
-	 * Get the user's wall
-	 * @return wall of user
-	 */
-	public Wall getUserWall();
-	
-	/**
 	 * Delete the user's wall
 	 */
 	public void deleteUserWall();
-	
-	/**
-	 * Get the wall of a friend.
-	 * @param id the friend's id
-	 * @return the friend's wall object
-	 */
-	public Wall getFriendWall(UserId id);
 	
 	/**
 	 * Delete the wall of a friend.

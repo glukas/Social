@@ -16,7 +16,6 @@ import ch.ethz.inf.vs.android.glukas.project4.BasicUser;
 import ch.ethz.inf.vs.android.glukas.project4.User;
 import ch.ethz.inf.vs.android.glukas.project4.UserDelegate;
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
-import ch.ethz.inf.vs.android.glukas.project4.Wall;
 import ch.ethz.inf.vs.android.glukas.project4.database.DatabaseAccess;
 import ch.ethz.inf.vs.android.glukas.project4.database.Utility;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.DatabaseException;
@@ -105,10 +104,6 @@ public class Protocol implements ProtocolInterface, SecureChannelDelegate {
 	
 	public int getNewPostId(UserId userId) {
 		return database.getFriendMaxPostsId(userId)+1;
-	}
-	
-	public Wall getUserWall() {
-		return database.getUserWall();
 	}
 	
 	@Override

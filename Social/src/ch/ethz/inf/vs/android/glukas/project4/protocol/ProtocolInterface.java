@@ -10,7 +10,6 @@ import ch.ethz.inf.vs.android.glukas.project4.Post;
 import ch.ethz.inf.vs.android.glukas.project4.User;
 import ch.ethz.inf.vs.android.glukas.project4.UserDelegate;
 import ch.ethz.inf.vs.android.glukas.project4.UserId;
-import ch.ethz.inf.vs.android.glukas.project4.Wall;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.DatabaseException;
 import ch.ethz.inf.vs.android.glukas.project4.exceptions.NetworkException;
 
