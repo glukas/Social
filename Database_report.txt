@@ -5,9 +5,9 @@ In order to store persistently the user's data on his/hers device it tourned out
 1) the user data need to be structured in some not necessarly trivial way;
 2) it shouldn't be possible to access the data from outside the application.
 The structure of the database is simple and consists of only two tables: one storing the users' data and the other storing the posts.
-In the users table are stored informations about the user, like id and username. Other informations needed by different layers are also stored here, e.g. informations about the user's number of messages for the protocol layer and the keys for the cryptographic layer. The primary key is the id, since it's unique between all users.
+In the users table are stored informations about the user, like id and username. Other informations needed by different layers are also stored here, e.g. informations about the user's number of messages for the protocol layer and the keys for the secutity layer. The primary key is the id, since it's unique between all users.
 
-figure ??: users table with example data.
+figure ??: users table with example data ("..." means that the data is too long to fit).
 
 The posts table stores the single posts that are part of the user's wall or one of his/hers friend's wall. A post contains an id, the id of who posted it, the id of the user on whose wall it was posted, date and time when it was recieved, text and/or image content. Id, poster_id and wall_id form the primary key, while both poster_id and wall_id are foreign key references to the users table.
 
