@@ -132,18 +132,29 @@ The distinctive feature of Social is that instead of using a client-server archi
 The motivation to provide a social networking service that focuses on privacy and security comes from the invasive privacy policies that such communication services nowadays have.
 \end{abstract}
 
-\section{Introduction}
+\section{Tasks and Problems}
+
+Going into this project we considered following problems we would have to solve: \newline
+- Suitable UserInterface and Display \newline
+- Reliable storage/retrieval of posts and information \newline
+- Setting up the Server and Network \newline
+- Encryption of the posts and information \newline
+- Logical consistency of the posts \newline
 
 
 
 \section{Architecture}
 
-For the implementation of our project we divided it into 5 main layers : \newline
-- User Interface \newline
-- DataBase \newline
-- Server/Networking \newline 
-- Security \newline
-- Protocol \newline
+For the implementation of our project we divided it into 5 main layer corresponding the problems: User Interface, Database, Server/Networking, Security, Protocol
+
+\begin{figure}[H]
+\vspace{-2mm} % use negative white space to fix too large gaps
+	\centering
+    \includegraphics[width=\columnwidth]{Architecture.png}
+
+    
+    \caption{Overview over the general Communication and Layers}
+\end{figure}
 
 
 
@@ -170,7 +181,7 @@ Regarding the user interface we implemented three different activities. One as t
 	
 \end{figure}
 
- A second one for viewing a friend's wall when clicking one of the friends from the friend list (Figure 2), which opens up the same fragment implementation the user sees when looking at his own wall.\newline
+ A second one for viewing a friend's wall when clicking one of the friends (Figure 2), which opens up the same fragment implementation the user sees when looking at his own wall.\newline
  
 
 Then a final activity for accepting incoming friend requests which pops up when the NFCAdapter is used, meaning two phones are held close together to exchange friend requests (Figure 3).
