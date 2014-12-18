@@ -216,9 +216,11 @@ To communicate between different peers we use messages which contain information
     \lfig{Layout}
     \vspace{-5mm} % use negative white space to fix too large gaps
 \end{figure}
-The information stored by the PublicHeader is used by the server for appropiate handling of the message.  
+The information stored by the PublicHeader is used by the server for appropiate handling of the message.  \newline
 
-The main responsibility of the protocol part lies in maintaining the consistency of the system. To achieve that, the post count of the wall and the respective virtual clock values of each post are of importance. The clock values will then guarantee the right order of posts. Regarding the implementation it was only of significance that if one user makes multiple posts on a certain wall that this user's posts will be in the right order, since every wall has its own virtual clock and uniqueness of values between walls is not assured.
+%img of public header
+
+The main responsibility of the protocol part lies in maintaining the consistency of the system. To achieve that, the post count of the wall and the respective virtual clock values of each post are of importance. The clock values will then guarantee the right order of posts. Regarding the implementation it was only of significance that if one peer makes multiple posts on a certain wall that this peer's posts will be in the right order. Every wall has its own virtual clock and uniqueness of values between walls is not assured.
 
 Crucial for the consistency are following kind of events:\newline
 \textbf{Request of data:} This happens when a peer comes back online and wants to access a certain wall.  
@@ -296,16 +298,6 @@ Since we do not have access to a static Public IP, we have a client in the netwo
 \indent Because of the limited resources the hardware is offering the server application needs to be very lightweight. To avoid too much thread-switching overhead, to efficiently use the resources and offer good scalability, we decided on a Non-blocking I/O (NIO) [3][4] approach to design the server application. The core-application consists of two threads running in parallel. The server thread, which implements the NIO server and a worker thread which processes the incoming data and decides what to do with the messages. Based on the public header the worker thread handles the message accordingly.
 %Two data structures are responsible to process the messages in a meaningful way. The first is a HashMap which stores the connected users and the corresponding sockets. If a user is not connected, then the posts get buffered in a user specific PriorityQueue. The time a user connects again he or she can request all posts on his or her wall missed whilst offline.
 Alongside the core-application, a monitor thread is running. The task of the monitor thread is to periodically check the connectivity and memory usage of the application. In case of failure and/or too less memory available, the monitor thread can command the server to drop the oldest messages in the cache or to restart the server thread. 
-
-
-
-
-
-
-
-
-
-
 
 \section{Testing}
 
