@@ -3,7 +3,8 @@
 %
 \documentclass{report}
 
-\usepackage[english]{babel}
+\usepackage[english,german]{babel}
+\usepackage[utf8x]{inputenc}
 \usepackage{graphicx}
 \usepackage{tabularx}
 \usepackage{subfigure}
@@ -101,20 +102,20 @@
 % 2nd. author
 \alignauthor Mathias Birrer\\
 	\affaddr{ETH ID 11-921-129}\\
-	\email{two@student.ethz.ch}
+	\email{matbirre@student.ethz.ch}
 % 3rd. author
 \alignauthor Vincent Demotz\\
 	\affaddr{ETH ID XX-XXX-XXX}\\
-	\email{three@student.ethz.ch}
+	\email{vdemotz@student.ethz.ch}
 \and  % use '\and' if you need 'another row' of author names
 % 4th. author
 \alignauthor Young Ban\\
  	\affaddr{ETH ID 10-935-062}\\
- 	\email{four@student.ethz.ch}
+ 	\email{bany@student.ethz.ch}
 % 5th. author
 \alignauthor Alessio Bähler\\
  	\affaddr{ETH ID XX-XXX-XXX}\\
- 	\email{five@student.ethz.ch}
+ 	\email{abaehler@student.ethz.ch}
 % 6th. author
 \alignauthor Samuel Schmid\\
  	\affaddr{ETH ID 10-919-991}\\
@@ -155,50 +156,51 @@ The implementation consist of the following components: On the client side, ther
 
 \subsection{User Interface}
 
-The main activity holds a navigation bar to switch between the friends list and the user's own wall (Figure 1).
+The main activity holds a navigation bar to switch between the friends list and the user's own wall (a).
 
-A second activity is for viewing a friend's wall. This activity is started when clicking one of the friends (Figure 2) or immediately after establishing a new friendship. The wall is implmented using the same fragment the user sees when looking at his or her own wall.\newline
+A second activity is for viewing a friend's wall. This activity is started when clicking one of the friends (b) or immediately after establishing a new friendship. The wall is implmented using the same fragment the user sees when looking at his or her own wall.\newline
 
-The last activity is for displaying incoming friendship requests. It pops up when two phones are held close together and one of the users taps the screen, initiating a friendship request (Figure 3).
+The last activity is for displaying incoming friendship requests. It pops up when two phones are held close together and one of the users taps the screen, initiating a friendship request (c).
 
 
 \begin{figure}[H]
 	\centering
-	\subfigure[Figure 1]{
-	    \includegraphics[height=4cm]{Figure_1}
+	\subfigure[]{
+		
+	    \includegraphics[height=4.5cm]{Figure_1}
+	}
+	\hfill
+	\subfigure[]{
+	    \includegraphics[height=4.5cm]{Figure_2}
 
 	}
 	\hfill
-	\subfigure[Figure 2]{
-	    \includegraphics[height=4cm]{Figure_2}
-
-	}
-	\hfill
-	\subfigure[Figure 3]{
-	    \includegraphics[height=4cm]{Figure_3}
+	\subfigure[]{
+	    \includegraphics[height=4.5cm]{Figure_3}
 
 	}
 	
 \end{figure}
 
-Upon first opening the application, the user is prompted to choose a username for registration which then gets saved in the local database (Figure 6).
+Upon first opening the application, the user is prompted to choose a username for registration which then gets saved in the local database (d).
 
-In the wall fragment the user can see an interface for adding new posts. There we have a button for adding pictures to a post. Pictures can be taken from the gallery or a new picture can be taken (Figures 4 and 5). A send button allows posting the content the user entered in the textView.
+In the wall fragment the user can see an interface for adding new posts. There we have a button for adding pictures to a post. Pictures can be taken from the gallery or a new picture can be taken (e and f). A send button allows posting the content the user entered in the textView.
 
 \begin{figure}[H]
 	\centering
-	\subfigure[Figure 4]{
-	    \includegraphics[height=4cm]{Figure_4}
+	\subfigure[]{
+		\label{Figure a}
+	    \includegraphics[height=4.5cm]{Figure_6}
 
 	}
 	\hfill
-	\subfigure[Figure 5]{
-	    \includegraphics[height=4cm]{Figure_5}
+	\subfigure[]{
+	    \includegraphics[height=4.5cm]{Figure_4}
 
 	}
 	\hfill
-	\subfigure[Figure 6]{
-	    \includegraphics[height=4cm]{Figure_6}
+	\subfigure[]{
+	    \includegraphics[height=4.5cm]{Figure_5}
 
 	}
 	
@@ -211,35 +213,38 @@ The main responsibility of the protocol lies in maintaining the eventual consist
 Each peer has a random 128-bit user id. This guarantees uniqueness of the ids with high probability without any coordination.
 Each peer stores a post count and a virtual clock for each friend. The virtual clock is a lamport time stamp. We increment it when posting, and update it on receival of posts. Posts are ordered lexicographically with respect to the virtual clock and the user id of the author. This order is total for each wall.
 
-Messages have a public header, which is sent in plain and used by the server for appropiate handling of the messages. The private part of a message consists of a JSON text portion and an optional image payload.
+Messages have a public header, which is sent in plain and used by the server for appropiate handling of the messages. The private part of a message consists of a JSON text portion and an optional image payload. (Figure 1)
 
 \begin{figure}[H]
 
+	\setcounter{figure}{0}
 	\centering
     \includegraphics[width=\columnwidth]{Layout.png}
     \lfig{Layout}
-    \vspace{-5mm} % use negative white space to fix too large gaps
+    \vspace{-7mm} % use negative white space to fix too large gaps
+    \label{Figure 1}
+    \caption{layout of the whole message}
 \end{figure}
-
-
+\vspace{-3mm}
+$\:$\newline
 The layout of the public header is as follows:
 
 
 \begin{figure}[H]
 
 	\centering
-    \includegraphics[height = 1cm]{PublicHeader.png}
+    \includegraphics[width =\columnwidth]{PublicHeader.png}
     \lfig{PublicHeader}
     \vspace{-5mm} % use negative white space to fix too large gaps
 \end{figure}
 
-
+\vspace{-3mm}
 $\:$\newline
 1: length of the message (4 bytes) \newline
 2: length of Text section (2 bytes)\newline
 3: status byte (1 byte)\newline
 4: virtual clock value (4 bytes)\newline
-
+$\:$\newline
 The protocol specifies the following events:\newline
 \textbf{Request of data:} This happens when a peer wants to fetch updates of a certain wall.  
 In case the target is the own wall it requests all buffered posts the server stored in its absence.
@@ -282,9 +287,11 @@ In order to store persistently the user's data on his or her device it tourned o
 2) it shouldn't be possible to access the data from outside the application;\newline
 The structure of the database is simple and consists of only two tables: one storing the users' data and the other storing the posts.
 
-The user table stores id, username and other information needed by different layers, e.g. the number of messages on the user's wall for the protocol layer and the keys for the secutity layer. The primary key is the id, since it's unique with high probability among all users.
+The user table (Figure 1) stores id, username and other information needed by different layers, e.g. the number of messages on the user's wall for the protocol layer and the keys for the secutity layer. The primary key is the id, since it's unique with high probability among all users.
 
 \begin{figure}[H]
+	
+	
 	\centering
     \includegraphics[width=\columnwidth]{users_table_example.png}
     \lfig{users_table_example}
@@ -292,7 +299,7 @@ The user table stores id, username and other information needed by different lay
 	\caption{user table with example data ("..." means that the data is too long to fit).}
 \end{figure}
 
-The post table stores the single posts that are part of the user's wall or one of his/hers friend's wall. 
+The post table (Figure 2) stores the single posts that are part of the user's wall or one of his/hers friend's wall. 
 A post contains an id, the id of who posted it, the id of the user on whose wall it was posted, date and time when it was received, text and/or image content.Id, poster$\_$id and wall$\_$id form the primary key, while both poster$\_$id and wall$\_$id are foreign key references to the users table.
 
 \begin{figure}[H]
@@ -316,6 +323,7 @@ All core methods are implemented using the functions already provided by the SQL
 
 \subsection{Server and Networking}
 
+\vspace{-1mm}
 $\:$\newline
 \textbf{Hardware and Setup}\newline
 \indent The server in our project is only responsible for forwarding, buffering and caching the messages. It doesn't store the user data in a permanent way and also cannot read the user messages, since the data is encrypted. 
@@ -323,12 +331,14 @@ Because of these circumstances we decided on having a small, lightweight server.
 The R-Pi is running Raspbian, a linux distribution, adapted for Raspberry Pi devices. The whole installation is headless and accessed through SSH. This setup is very energy efficient. 
 Since we do not have access to a static Public IP, we have a client in the network, that updates a DNS entry [10] every minute and guarantees, that our server is always reachable over the same address. 
 
+\vspace{-2mm}
 $\:$\newline
 \textbf{Software}\newline
 \indent Because of the limited resources the hardware is offering the server application needs to be very lightweight. To avoid too much thread-switching overhead, to efficiently use the resources and offer good scalability, we decided on a Non-blocking I/O (NIO) [11][12] approach to design the server application. The core-application consists of two threads running in parallel. The server thread, which implements the NIO server and a worker thread which processes the incoming data and decides what to do with the messages. Based on the public header the worker thread handles the message accordingly.
 %Two data structures are responsible to process the messages in a meaningful way. The first is a HashMap which stores the connected users and the corresponding sockets. If a user is not connected, then the posts get buffered in a user specific PriorityQueue. The time a user connects again he or she can request all posts on his or her wall missed whilst offline.
 Alongside the core-application, a monitor thread is running. The task of the monitor thread is to periodically check the connectivity and memory usage of the application. In case of failure and/or too less memory available, the monitor thread can command the server to drop the oldest messages in the cache or to restart the server thread. 
 
+\vspace{-2mm}
 $\:$\newline
 \textbf{Transport Protocol}\newline
 \indent Communication is performed over TCP. This allows us to rely on the correct ordering and reliable transmission of messages.
@@ -355,6 +365,11 @@ The system should scale well, as the server component could be very easily repli
 \section{References}
 \vspace{-3mm}
 $\:$\newline
+[1] AES: http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf\newline
+[2] CBC William F. Ehrsam, Carl H. W. Meyer, John L. Smith, Walter L. Tuchman,
+"Message verification and transmission error detection by block chaining", US Patent 4074066, 1976\newline
+[3] HMAC http://tools.ietf.org/html/rfc2104\newline
+[4] SHA https://www.federalregister.gov/\newline articles/2012/03/06/2012-5400/ announcing-approval-of-federal-information-processing-standard-fips-publication-180-4-secure-hash\newline
 [5]: http://developer.android.com/guide/topics/data/data-storage.html\newline
 [6]: http://developer.android.com/training/basics/data-storage/\newline databases.html\newline
 [7]: http://developer.android.com/reference/android/database/\newline sqlite/SQLiteOpenHelper.html\newline
